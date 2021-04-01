@@ -4,7 +4,7 @@ import {
   Route,
 } from "react-router-dom";
 import SignUpForm from "../src/views/pages/SignUpForm";
-
+import LoginForm from "../src/views/pages/LoginForm";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
                 <h1>Forgot password</h1>
               </Route>
               <Route exact path="/">
-                <h1>Login</h1>
+                <LoginForm/>
               </Route>
             </>
           )}
