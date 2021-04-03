@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function LogIn() {
     return (
@@ -18,14 +18,14 @@ export default function LogIn() {
             <Container component="main" maxWidth="xs">
                 <div class="paper">
                     <Typography component="h1" variant="h5" style={{ color: "white" }}>Login Form</Typography>
-                    <form class="form">
+                    <div className="form">
                         <Grid container spacing={2}>
                             <Grid container spacing={0}>
                                 <Grid>
                                     <img src={User_photo} className="photo" alt="User_photo" />
                                 </Grid>
                                 <Grid>
-                                    <label class="brtop">enter your username :</label>
+                                    <label className="brtop">enter your username :</label>
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
@@ -44,7 +44,7 @@ export default function LogIn() {
                                     <img src={Password_photo} className="photo" alt="Password_photo" />
                                 </Grid>
                                 <Grid>
-                                    <label class="brtop">enter your password :</label>
+                                    <label className="brtop">enter your password :</label>
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
@@ -68,7 +68,7 @@ export default function LogIn() {
                         <Grid>
                             <Link to="/sign-up">Don't have an account? Sign Up</Link>
                         </Grid>
-                    </form>
+                    </div>
                 </div>
             </Container>
         </Box>

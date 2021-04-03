@@ -9,22 +9,22 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function SignUp() {
   return (
     <Box>
       <Container component="main" maxWidth="xs">
-        <div class="paper">
+        <div className="paper">
           <Typography component="h1" variant="h5" style={{ color: "white" }}>SignUp Form</Typography>
-          <form class="form">
+          <div class="form">
             <Grid container spacing={2}>
               <Grid container spacing={0}>
                 <Grid>
                   <img src={email_photo} className="photo" alt="email_photo" />
                 </Grid>
                 <Grid>
-                  <label class="brtop">enter your email address :</label>
+                  <label className="brtop">enter your email address :</label>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -42,7 +42,7 @@ export default function SignUp() {
                   <img src={User_photo} className="photo" alt="User_photo" />
                 </Grid>
                 <Grid>
-                  <label class="brtop">enter your username :</label>
+                  <label className="brtop">enter your username :</label>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -60,7 +60,7 @@ export default function SignUp() {
                   <img src={Password_photo} className="photo" alt="Password_photo" />
                 </Grid>
                 <Grid>
-                  <label class="brtop">enter your password twice :</label>
+                  <label className="brtop">enter your password twice :</label>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -88,15 +88,13 @@ export default function SignUp() {
                 />
               </Grid>
             </Grid>
-            <Button type="submit" variant="contained" class="button">
-              Sign Up
-          </Button>
+            <Button type="submit" variant="contained" class="button">Sign Up</Button>
             <Grid>
               <Grid item>
                 <Link to="/">Already have an account? log in</Link>
               </Grid>
             </Grid>
-          </form>
+          </div>
         </div>
       </Container>
     </Box>

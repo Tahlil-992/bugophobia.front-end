@@ -15,14 +15,13 @@ export default function ForgetPass() {
             <Container component="main" maxWidth="xs">
                 <div class="paper">
                     <Typography component="h1" variant="h5" style={{ color: "white" }}>Forget Password Form</Typography>
-                    <form class="form">
-
+                    <div className="form">
                         <Grid container spacing={2}>
                             <Grid>
                                 <Link to="/"><Button variant="contained" class="backButton">back to login form</Button></Link>
                             </Grid>
                             <Grid>
-                                <label class="brtop">
+                                <label className="brtop">
                                     Hey,<br />
                                     We have sent a password to your email.<br />
                                     please check your mailbox,<br />
@@ -34,7 +33,7 @@ export default function ForgetPass() {
                                     <img src={Password_photo} className="photo" alt="Password_photo" />
                                 </Grid>
                                 <Grid>
-                                    <label class="brtop">enter the password we've sent to you :</label>
+                                    <label className="brtop">enter the password we've sent to you :</label>
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
@@ -51,7 +50,7 @@ export default function ForgetPass() {
                             </Grid>
                         </Grid>
                         <Button type="submit" fullWidth variant="contained" class="button" >Submit</Button>
-                    </form>
+                    </div>
                 </div>
             </Container>
         </Box>
