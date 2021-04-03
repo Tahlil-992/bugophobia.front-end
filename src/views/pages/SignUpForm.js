@@ -5,11 +5,11 @@ import Password_photo from "../../assets/images/Password_photo.png";
 import email_photo from "../../assets/images/email_photo.png";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import {Link} from "react-router-dom";
 
 export default function SignUp() {
   return (
@@ -93,7 +93,7 @@ export default function SignUp() {
           </Button>
             <Grid>
               <Grid item>
-                <Link href="#" variant="body2">Already have an account? log in</Link>
+                <Link to="/">Already have an account? log in</Link>
               </Grid>
             </Grid>
           </form>

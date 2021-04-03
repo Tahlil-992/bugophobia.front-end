@@ -4,13 +4,13 @@ import User_photo from "../../assets/images/User_photo.png";
 import Password_photo from "../../assets/images/Password_photo.png";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import {Link} from "react-router-dom";
 
 export default function LogIn() {
     return (
@@ -61,14 +61,12 @@ export default function LogIn() {
                             </Grid>
                             <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
                         </Grid>
-                        <Button type="submit" fullWidth variant="contained" class="button" >
-                            Sign In
-                        </Button>
+                        <Button type="submit" fullWidth variant="contained" class="button" >Log in</Button>
                         <Grid>
-                            <Link href="#" variant="body2">Forgot password?</Link>
+                            <Link to="/forget-password">Forget password?</Link>
                         </Grid>
                         <Grid>
-                            <Link href="#" variant="body2">Don't have an account? Sign Up</Link>
+                            <Link to="/sign-up">Don't have an account? Sign Up</Link>
                         </Grid>
                     </form>
                 </div>

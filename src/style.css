@@ -36,3 +36,14 @@
     margin-top: 25px;
     margin-bottom: 25px;
 }
+.backButton {
+    background-color: #16c2d5;
+    border: 5px solid #10217d;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    padding: 5px 5px;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
