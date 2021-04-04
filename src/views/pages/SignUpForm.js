@@ -10,7 +10,7 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import CloseIcon from '@material-ui/icons/Close';
 import axios from "axios";
 // import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
@@ -56,6 +56,8 @@ const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 
 export default function SignUp() {
+
+  const history = useHistory();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -129,6 +131,7 @@ export default function SignUp() {
     }
     else {
       console.log("info correct");
+      callAPI();
     }
   }
 
@@ -136,6 +139,20 @@ export default function SignUp() {
     setOpenSnackBar(false);
   }
   console.log(message);
+
+  const callAPI = async () => {
+    try {
+      const response = await callSignUPAPI({username, password, email});
+      if (response.status === 201)
+      { 
+        setOpenSnackBar(false);
+        history.replace("/");
+      }
+    }
+    catch {
+      setOpenSnackBar(true);
+    }
+  }
 
   return (
     <Box>
