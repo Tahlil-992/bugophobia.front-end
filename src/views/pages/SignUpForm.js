@@ -10,6 +10,43 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const callSignUPAPI = async ({ username, password, email }) => {
+  try {
+    const response = await axios({
+      url: "/auth/register/",
+      method: "POST",
+      baseURL: "http://localhost:8000",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        username,
+        password,
+        email
+      }
+    })
+    return {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+      payload: response.data,
+    };
+  }
+  catch (e){
+    const error = e
+    const {status = '', statusText = '', headers = {}, data = null} = error;
+    const result = {
+      status,
+      statusText,
+      headers,
+      errorCode: status,
+      payload: data,
+    };      
+    throw result;
+  }
+}
 
 export default function SignUp() {
   return (
