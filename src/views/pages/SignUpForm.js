@@ -242,10 +242,6 @@ export default function SignUp() {
                   autoComplete="current-password"
                   value={password}
                   onChange={event => setPassword(event.target.value)}
-                  helperText={<><Typography variant="caption" display="block">
-                    {`*Password must include lower and uppercase letters and numbers.\n`}</Typography>
-                    <Typography variant="caption">
-                      {`*Symbols are optional.`}</Typography></>}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -261,6 +257,11 @@ export default function SignUp() {
                   autoComplete="current-password"
                   value={configPass}
                   onChange={event => setConfigPass(event.target.value)}
+                  helperText={<>
+                    <Typography variant="caption" display="block">
+                      {`*Password must include lower and uppercase letters and numbers.\n`}</Typography>
+                    <Typography variant="caption">
+                      {`*Symbols are optional.`}</Typography></>}
                 />
               </Grid>
             </Grid>

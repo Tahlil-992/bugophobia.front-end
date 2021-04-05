@@ -59,7 +59,7 @@ export default function LogIn() {
                                     autoComplete="current-password"
                                 />
                             </Grid>
-                            <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
+                            <FormControlLabel control={<Checkbox value="remember"/>} label="Remember me" />
                         </Grid>
                         <Button type="submit" fullWidth variant="contained" class="button" >Log in</Button>
                         <Grid>
