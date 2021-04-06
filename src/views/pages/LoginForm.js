@@ -158,7 +158,7 @@ export default function LogIn() {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-									error={!isUsernameValid}
+				    error={!isUsernameValid}
                                     variant="outlined"
                                     required
                                     fullWidth
@@ -166,8 +166,8 @@ export default function LogIn() {
                                     label="UserName"
                                     name="username"
                                     autoFocus
-									value={username}
-									onChange={event => setUsername(event.target.value)}
+				    value={username}
+				    onChange={event => setUsername(event.target.value)}
                                 />
                             </Grid>
                             <Grid container spacing={0}>
@@ -180,7 +180,7 @@ export default function LogIn() {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-									error={!(ispasswordValid)}
+				    error={!(ispasswordValid)}
                                     variant="outlined"
                                     required
                                     fullWidth
@@ -189,16 +189,16 @@ export default function LogIn() {
                                     type="password"
                                     id="password"
                                     autoComplete="current-password"
-									value={password}
-									onChange={event => setPassword(event.target.value)}
+				    value={password}
+				    onChange={event => setPassword(event.target.value)}
                                 />
                             </Grid>
                             <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
                         </Grid>
-							<Box display="flex" justifyContent="space-between">
-								<Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Login</Button>
-								{isLoading && <LoadingSpinner />}
-							</Box>
+				<Box display="flex" justifyContent="space-between">
+					<Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Login</Button>
+					{isLoading && <LoadingSpinner />}
+				</Box>
                         <Grid>
                             <Link to="/forget-password">Forget password?</Link>
                         </Grid>
