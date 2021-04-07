@@ -20,16 +20,19 @@ import { LoadingSpinner } from "../../assets/loading.spinner"
 const callSignUPAPI = async ({ username, password, email }) => {
   try {
     const response = await axios({
-      url: "/auth/register/",
+      url: "/auth/register/patient/",
       method: "POST",
       baseURL: "http://localhost:8000",
       headers: {
         "Content-Type": "application/json",
       },
       data: {
-        username,
-        password,
-        email
+        user: {
+          username,
+          password,
+          email,
+          "is_doctor": false,
+        },
       }
     })
     return {
@@ -172,6 +175,41 @@ export default function SignUp() {
 
   }, [onSubmit]);
 
+  if (message === "" && openSnackBar) {
+    console.log(username);
+    console.log(email);
+    console.log(password);
+    console.log(configPass);
+
+    console.log(isUsernameValid);
+    console.log(isEmailValid);
+    console.log(ispasswordValid);
+    console.log(isConfigPassValid);
+
+    console.log(onSubmit);
+    console.log(isLoading);
+
+    console.log("**************");
+  }
+
+  if (isLoading) {
+    console.log(username);
+    console.log(email);
+    console.log(password);
+    console.log(configPass);
+
+    console.log(isUsernameValid);
+    console.log(isEmailValid);
+    console.log(ispasswordValid);
+    console.log(isConfigPassValid);
+
+    console.log(onSubmit);
+    console.log(isLoading);
+
+    console.log("%%%%%%%%%%%%%%%%%");
+  }
+
+
   return (
     <Box>
       <Container component="main" maxWidth="xs">
@@ -282,8 +320,8 @@ export default function SignUp() {
             <Box display="flex" alignItems="center">
               <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
               <Typography style={{ color: "#611a15" }}>{message}</Typography>
-              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
+              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
+                <CloseIcon style={{ color: "#611a15" }} />
               </IconButton>
             </Box>}
           ContentProps={{ style: { backgroundColor: "#f9a099" } }}
