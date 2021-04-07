@@ -31,7 +31,6 @@ const callSignUPAPI = async ({ username, password, email }) => {
           username,
           password,
           email,
-          "is_doctor": false,
         },
       }
     })
