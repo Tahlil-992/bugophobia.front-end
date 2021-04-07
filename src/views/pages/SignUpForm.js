@@ -42,13 +42,12 @@ const callSignUPAPI = async ({ username, password, email }) => {
     };
   }
   catch (e) {
-    const error = e
+    const error = e.response
     const { status = '', statusText = '', headers = {}, data = null } = error;
     const result = {
       status,
       statusText,
       headers,
-      errorCode: status,
       payload: data,
     };
     throw result;
@@ -155,14 +154,14 @@ export default function SignUp() {
         history.replace("/");
       }
     }
-    catch {
+    catch (error) {
       setIsLoading(false);
       setPassword("");
       setConfigPass("");
       setIsPasswordValid(false);
       setIsConfigPassValid(false);
       setOpenSnackBar(true);
-      setMessage("Something went wrong while trying to create your account. Your email or username might already exist!");
+      setMessage(`${error.payload.user.email[0]}\n${error.payload.user.username[0]}`);
     }
   }
 
