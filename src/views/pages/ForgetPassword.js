@@ -18,9 +18,6 @@ export default function ForgetPass() {
                     <div className="form">
                         <Grid container spacing={2}>
                             <Grid>
-                                <Link to="/"><Button variant="contained" class="backButton">back to login form</Button></Link>
-                            </Grid>
-                            <Grid>
                                 <label className="brtop">
                                     Hey,<br />
                                     We have sent a password to your email.<br />
@@ -50,6 +47,9 @@ export default function ForgetPass() {
                             </Grid>
                         </Grid>
                         <Button type="submit" fullWidth variant="contained" class="button" >Submit</Button>
+                        <Grid>
+                            <Link to="/">back to login form</Link>
+                        </Grid>
                     </div>
                 </div>
             </Container>
