@@ -14,22 +14,27 @@ import { Link, useHistory } from "react-router-dom";
 import CloseIcon from '@material-ui/icons/Close';
 import axios from "axios";
 import IconButton from '@material-ui/core/IconButton';
+import Modal from '@material-ui/core/Modal';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { LoadingSpinner } from "../../assets/loading.spinner"
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import { makeStyles } from '@material-ui/core/styles';
+import { LoadingSpinner } from "../../assets/loading.spinner";
 
 const callSignUPAPI = async ({ username, password, email }) => {
   try {
     const response = await axios({
-      url: "/auth/register/",
+      url: "/auth/register/patient/",
       method: "POST",
       baseURL: "http://localhost:8000",
       headers: {
         "Content-Type": "application/json",
       },
       data: {
-        username,
-        password,
-        email
+        user: {
+          username,
+          password,
+          email,
+        },
       }
     })
     return {
@@ -40,13 +45,12 @@ const callSignUPAPI = async ({ username, password, email }) => {
     };
   }
   catch (e) {
-    const error = e
+    const error = e.response
     const { status = '', statusText = '', headers = {}, data = null } = error;
     const result = {
       status,
       statusText,
       headers,
-      errorCode: status,
       payload: data,
     };
     throw result;
@@ -57,7 +61,23 @@ const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
 const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: '#c2fcc2',
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+  },
+}));
+
 export default function SignUp() {
+
+  const classes = useStyles();
 
   const history = useHistory();
 
@@ -76,49 +96,54 @@ export default function SignUp() {
 
   const [message, setMessage] = useState();
   const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const checkEmail = () => {
     const res = emailRegex.test(email)
-    setIsEmailValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Invalid pattern for email!");
     }
+    return res;
   }
 
   const checkUsername = () => {
     const res = userNameRegex.test(username);
-    setIsUsernameValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Invalid pattern for username!");
     }
+    return res;
   }
 
   const checkPassword = () => {
     const res = passwordRegex.test(password);
-    setIsPasswordValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Invalid pattern for password!");
     }
+    return res;
   }
 
   const checkConfigPass = () => {
     const res = (configPass === password);
-    setIsConfigPassValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Enter the password again!");
     }
+    return res;
   }
 
   const validateInputs = () => {
-    checkEmail();
-    checkUsername();
-    checkPassword();
-    checkConfigPass();
-    if (isEmailValid && isUsernameValid && ispasswordValid && isConfigPassValid)
+    const email_res = checkEmail();
+    const user_res = checkUsername();
+    const pass_res = checkPassword();
+    const conf_res = checkConfigPass();
+    setIsEmailValid(email_res);
+    setIsUsernameValid(user_res);
+    setIsPasswordValid(pass_res);
+    setIsConfigPassValid(conf_res);
+    if (email_res && user_res && pass_res && conf_res)
       return true;
     return false;
   }
@@ -127,9 +152,6 @@ export default function SignUp() {
     const res = validateInputs();
     if (!res) {
       setPassword("");
-      setConfigPass("");
-      setIsPasswordValid(false);
-      setIsConfigPassValid(false);
       setOpenSnackBar(true);
     }
     else {
@@ -150,17 +172,31 @@ export default function SignUp() {
       setIsLoading(false);
       if (response.status === 201) {
         setOpenSnackBar(false);
-        history.replace("/");
+        setOpenModal(true);
       }
     }
-    catch {
+    catch (error) {
       setIsLoading(false);
       setPassword("");
       setConfigPass("");
-      setIsPasswordValid(false);
-      setIsConfigPassValid(false);
       setOpenSnackBar(true);
-      setMessage("Something went wrong while trying to create your account. Your email or username might already exist!");
+      if (error.payload.user !== null && error.payload.user !== undefined) {
+        console.log("i'm in");
+        const err_payload = error.payload.user;
+        let err_message = "";
+        const keys = Object.keys(err_payload);
+        keys.forEach((item) => 
+        {
+          const i = item.charAt(0).toUpperCase() + item.slice(1);
+          const m = err_payload[item][0].charAt(0).toUpperCase() + err_payload[item][0].slice(1);
+          err_message += `${i}: ${m}\n`;
+          setMessage(err_message);
+        })
+      }
+      else {
+        setMessage("Something went wrong while trying to create your account.");
+      }
+
     }
   }
 
@@ -168,9 +204,14 @@ export default function SignUp() {
     if (onSubmit) {
       callAPI();
       setOnSubmit(false);
+      setOpenModal(false);
     }
 
   }, [onSubmit]);
+
+  const goToLogin = () => {
+    history.replace("/");
+  }
 
   return (
     <Box>
@@ -283,8 +324,8 @@ export default function SignUp() {
             <Box display="flex" alignItems="center">
               <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
               <Typography style={{ color: "#611a15" }}>{message}</Typography>
-              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
+              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
+                <CloseIcon style={{ color: "#611a15" }} />
               </IconButton>
             </Box>}
           ContentProps={{ style: { backgroundColor: "#f9a099" } }}
@@ -293,6 +334,16 @@ export default function SignUp() {
           resumeHideDuration={0}
         >
         </Snackbar>
+        <Modal
+          open={openModal}
+          onClose={() => goToLogin()}
+        >
+          <div className={classes.paper} display="flex" color='#1e4620'>
+            <CheckCircleIcon />
+            <h2>SignUp was Successful!</h2>
+            <Button onClick={() => goToLogin()}>Dismiss</Button>
+          </div>
+        </Modal>
       </Container>
     </Box>
   );
