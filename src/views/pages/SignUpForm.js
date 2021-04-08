@@ -80,46 +80,50 @@ export default function SignUp() {
 
   const checkEmail = () => {
     const res = emailRegex.test(email)
-    setIsEmailValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Invalid pattern for email!");
     }
+    return res;
   }
 
   const checkUsername = () => {
     const res = userNameRegex.test(username);
-    setIsUsernameValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Invalid pattern for username!");
     }
+    return res;
   }
 
   const checkPassword = () => {
     const res = passwordRegex.test(password);
-    setIsPasswordValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Invalid pattern for password!");
     }
+    return res;
   }
 
   const checkConfigPass = () => {
     const res = (configPass === password);
-    setIsConfigPassValid(res);
     if (message === "" || message === null || message === undefined) {
       if (!res)
         setMessage("Enter the password again!");
     }
+    return res;
   }
 
   const validateInputs = () => {
-    checkEmail();
-    checkUsername();
-    checkPassword();
-    checkConfigPass();
-    if (isEmailValid && isUsernameValid && ispasswordValid && isConfigPassValid)
+    const email_res = checkEmail();
+    const user_res = checkUsername();
+    const pass_res = checkPassword();
+    const conf_res = checkConfigPass();
+    setIsEmailValid(email_res);
+    setIsUsernameValid(user_res);
+    setIsPasswordValid(pass_res);
+    setIsConfigPassValid(conf_res);
+    if (email_res && user_res && pass_res && conf_res)
       return true;
     return false;
   }
@@ -128,9 +132,6 @@ export default function SignUp() {
     const res = validateInputs();
     if (!res) {
       setPassword("");
-      setConfigPass("");
-      setIsPasswordValid(false);
-      setIsConfigPassValid(false);
       setOpenSnackBar(true);
     }
     else {
@@ -158,10 +159,18 @@ export default function SignUp() {
       setIsLoading(false);
       setPassword("");
       setConfigPass("");
-      setIsPasswordValid(false);
-      setIsConfigPassValid(false);
       setOpenSnackBar(true);
-      setMessage(`${error.payload.user.email[0]}\n${error.payload.user.username[0]}`);
+      const err_payload = error.payload.user;
+      let err_message = "";
+      const keys = Object.keys(err_payload);
+      keys.forEach((item) => 
+      {
+        const i = item.charAt(0).toUpperCase() + item.slice(1);
+        const m = err_payload[item][0].charAt(0).toUpperCase() + err_payload[item][0].slice(1);
+        err_message += `${i}: ${m}\n`;
+        setMessage(err_message);
+      })
+
     }
   }
 
@@ -172,41 +181,6 @@ export default function SignUp() {
     }
 
   }, [onSubmit]);
-
-  if (message === "" && openSnackBar) {
-    console.log(username);
-    console.log(email);
-    console.log(password);
-    console.log(configPass);
-
-    console.log(isUsernameValid);
-    console.log(isEmailValid);
-    console.log(ispasswordValid);
-    console.log(isConfigPassValid);
-
-    console.log(onSubmit);
-    console.log(isLoading);
-
-    console.log("**************");
-  }
-
-  if (isLoading) {
-    console.log(username);
-    console.log(email);
-    console.log(password);
-    console.log(configPass);
-
-    console.log(isUsernameValid);
-    console.log(isEmailValid);
-    console.log(ispasswordValid);
-    console.log(isConfigPassValid);
-
-    console.log(onSubmit);
-    console.log(isLoading);
-
-    console.log("%%%%%%%%%%%%%%%%%");
-  }
-
 
   return (
     <Box>
