@@ -39,17 +39,8 @@ const callLoginAPI = async ({ email, password }) => {
       payload: response.data,
     };
   }
-  catch (e) {
-    const error = e
-    const { status = '', statusText = '', headers = {}, data = null } = error;
-    const result = {
-      status,
-      statusText,
-      headers,
-      errorCode: status,
-      payload: data,
-    };
-    return result;
+  catch (error) {
+	throw error;
   }
 }
 
@@ -58,6 +49,9 @@ export default function LogIn() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	
+	const [isEmailEmpty, setIsEmailEmpty] = useState(false);
+	const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
+	
 	const [onSubmit, setOnSubmit] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -65,9 +59,21 @@ export default function LogIn() {
 	const [openSnackBar, setOpenSnackBar] = useState(false);
 	  
 	const handleSubmit = () => {
-		setOpenSnackBar(false);
-		setIsLoading(true);
-		setOnSubmit(true);
+		if (email !== "" && password !== "") {
+			setOpenSnackBar(false);
+			setIsLoading(true);
+			setOnSubmit(true);
+		}
+		else {
+			setOpenSnackBar(true);
+			setMessage("Please fill all the fields!");
+			if (password === "") {
+				setIsPasswordEmpty(true);
+			}
+			if (email === "") {
+				setIsEmailEmpty(true);
+			}
+		}
 	}
 
 	const handleClose = () => {
@@ -82,18 +88,18 @@ export default function LogIn() {
 		  if (response.status === 200) {
 			setOpenSnackBar(false);
 			const payload = response.payload;
-			alert("Login Successfully!\n"+payload.access);
+			alert("Login Successfully!\n" + payload.access + "\n" + payload.refresh);
 		  }
 		  
 		}
 		catch(e) {
-			if (e.status === 401)
-				alert("Wrong Password!")
-			else {
-			setIsLoading(false);
-			setPassword("");
-			setOpenSnackBar(true);
-			setMessage("Something went wrong while trying to login");
+			if (e.message === "Request failed with status code 401") {
+				setIsLoading(false);
+				setOpenSnackBar(true);
+				setMessage("The email address or the password is wrong, Please check again.");
+			}
+			else if (e.message === "Request failed with status code 400") {
+				alert("Bad Request");
 			}
 		}
 	}
@@ -123,7 +129,7 @@ export default function LogIn() {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-									//error={!isEmailValid}
+									error={isEmailEmpty}
 									variant="outlined"
 									required
 									fullWidth
@@ -131,7 +137,7 @@ export default function LogIn() {
 									label="Email Address"
 									name="email"
 									value={email}
-									onChange={event => setEmail(event.target.value)}
+									onChange={event => {setEmail(event.target.value); setIsEmailEmpty(false);}}
                                 />
                             </Grid>
                             <Grid container spacing={0}>
@@ -144,7 +150,7 @@ export default function LogIn() {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-									//error={!(ispasswordValid)}
+									error={isPasswordEmpty}
                                     variant="outlined"
                                     required
                                     fullWidth
@@ -154,7 +160,7 @@ export default function LogIn() {
                                     id="password"
                                     autoComplete="current-password"
 									value={password}
-									onChange={event => setPassword(event.target.value)}
+									onChange={event => {setPassword(event.target.value); setIsPasswordEmpty(false);}}
                                 />
                             </Grid>
                             <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
@@ -192,4 +198,5 @@ export default function LogIn() {
         </Box>
     );
 }
+
 
