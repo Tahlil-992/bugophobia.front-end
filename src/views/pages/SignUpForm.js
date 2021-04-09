@@ -19,6 +19,7 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import { makeStyles } from '@material-ui/core/styles';
 import { LoadingSpinner } from "../../assets/loading.spinner";
+import Paper from '@material-ui/core/Paper';
 
 const callSignUPAPI = async ({ username, password, email }) => {
   try {
@@ -102,7 +103,7 @@ export default function SignUp() {
     const res = emailRegex.test(email)
     if (message === "" || message === null || message === undefined) {
       if (!res)
-        setMessage("Invalid pattern for email!");
+        setMessage("Invalid email!");
     }
     return res;
   }
@@ -111,7 +112,7 @@ export default function SignUp() {
     const res = userNameRegex.test(username);
     if (message === "" || message === null || message === undefined) {
       if (!res)
-        setMessage("Invalid pattern for username!");
+        setMessage("Invalid username!");
     }
     return res;
   }
@@ -120,7 +121,7 @@ export default function SignUp() {
     const res = passwordRegex.test(password);
     if (message === "" || message === null || message === undefined) {
       if (!res)
-        setMessage("Invalid pattern for password!");
+        setMessage("Invalid password!");
     }
     return res;
   }
@@ -129,7 +130,7 @@ export default function SignUp() {
     const res = (configPass === password);
     if (message === "" || message === null || message === undefined) {
       if (!res)
-        setMessage("Enter the password again!");
+        setMessage("Enter your password again!");
     }
     return res;
   }
@@ -152,6 +153,7 @@ export default function SignUp() {
     const res = validateInputs();
     if (!res) {
       setPassword("");
+      setConfigPass("");
       setOpenSnackBar(true);
     }
     else {
@@ -181,15 +183,12 @@ export default function SignUp() {
       setConfigPass("");
       setOpenSnackBar(true);
       if (error.payload.user !== null && error.payload.user !== undefined) {
-        console.log("i'm in");
         const err_payload = error.payload.user;
         let err_message = "";
         const keys = Object.keys(err_payload);
-        keys.forEach((item) => 
-        {
-          const i = item.charAt(0).toUpperCase() + item.slice(1);
+        keys.forEach((item) => {
           const m = err_payload[item][0].charAt(0).toUpperCase() + err_payload[item][0].slice(1);
-          err_message += `${i}: ${m}\n`;
+          err_message += `${m}\n`;
           setMessage(err_message);
         })
       }
@@ -225,7 +224,7 @@ export default function SignUp() {
                   <img src={email_photo} className="photo" alt="email_photo" />
                 </Grid>
                 <Grid>
-                  <label className="brtop">enter your email address :</label>
+                  <label className="brtop">Enter your email address :</label>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -246,7 +245,7 @@ export default function SignUp() {
                   <img src={User_photo} className="photo" alt="User_photo" />
                 </Grid>
                 <Grid>
-                  <label className="brtop">enter your username :</label>
+                  <label className="brtop">Enter your username :</label>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -267,7 +266,7 @@ export default function SignUp() {
                   <img src={Password_photo} className="photo" alt="Password_photo" />
                 </Grid>
                 <Grid>
-                  <label className="brtop">enter your password twice :</label>
+                  <label className="brtop">Enter your password twice :</label>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -298,11 +297,11 @@ export default function SignUp() {
                   autoComplete="current-password"
                   value={configPass}
                   onChange={event => setConfigPass(event.target.value)}
-                  helperText={<>
-                    <Typography variant="caption" display="block">
-                      {`*Password must include lower and uppercase letters and numbers.\n`}</Typography>
+                  helperText={
                     <Typography variant="caption">
-                      {`*Symbols are optional.`}</Typography></>}
+                      {`* Password should be at least 8 characters including lowercase and uppercase letters and numbers. Symbols are optional`}
+                    </Typography>
+                  }
                 />
               </Grid>
             </Grid>
@@ -320,19 +319,27 @@ export default function SignUp() {
         <Snackbar
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           open={openSnackBar}
-          message={
-            <Box display="flex" alignItems="center">
-              <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
-              <Typography style={{ color: "#611a15" }}>{message}</Typography>
-              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
-                <CloseIcon style={{ color: "#611a15" }} />
-              </IconButton>
-            </Box>}
-          ContentProps={{ style: { backgroundColor: "#f9a099" } }}
           autoHideDuration={6000}
           onClose={handleClose}
           resumeHideDuration={0}
         >
+          <Paper style={{backgroundColor: "#f9a099", borderRadius: "7px"}} elevation={3}>
+            <Box 
+              display="flex" 
+              alignItems="center" 
+              justifyContent="space-between" 
+              px={"1em"} py={"1em"}>
+              <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+              <Box>
+              {message && message.split("\n").map((item) => 
+                  <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
+              )}
+              </Box>
+              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
+                <CloseIcon style={{ color: "#611a15" }} />
+              </IconButton>
+            </Box>
+          </Paper>
         </Snackbar>
         <Modal
           open={openModal}
