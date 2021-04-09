@@ -39,8 +39,16 @@ const callLoginAPI = async ({ email, password }) => {
       payload: response.data,
     };
   }
-  catch (error) {
-	throw error;
+  catch (e) {
+    const error = e.response
+    const { status = '', statusText = '', headers = {}, data = null } = error;
+    const result = {
+      status,
+      statusText,
+      headers,
+      payload: data,
+    };
+    throw result;
   }
 }
 
@@ -87,20 +95,21 @@ export default function LogIn() {
 		  setIsLoading(false);
 		  if (response.status === 200) {
 			setOpenSnackBar(false);
-			const payload = response.payload;
-			alert("Login Successfully!\n" + payload.access + "\n" + payload.refresh);
+			//const payload = response.payload;
+			alert("Login Successfully!");
 		  }
 		  
 		}
-		catch(e) {
-			if (e.message === "Request failed with status code 401") {
-				setIsLoading(false);
-				setOpenSnackBar(true);
-				setMessage("The email address or the password is wrong, Please check again.");
+		catch (error) {
+			setIsLoading(false);
+			setOpenSnackBar(true);
+			if (error.payload !== null && error.payload !== undefined) {
+			  setMessage("Wrong email address or password, Please check again.");
 			}
-			else if (e.message === "Request failed with status code 400") {
-				alert("Bad Request");
+			else {
+			  setMessage("Something went wrong while trying to login");
 			}
+	  
 		}
 	}
 
@@ -198,5 +207,7 @@ export default function LogIn() {
         </Box>
     );
 }
+
+
 
 
