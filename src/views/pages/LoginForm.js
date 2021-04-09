@@ -133,7 +133,7 @@ export default function LogIn() {
                                     <img src={email_photo} className="photo" alt="email_photo" />
                                 </Grid>
                                 <Grid>
-                                    <label className="brtop">enter your email address :</label>
+                                    <label className="brtop">Enter your email address :</label>
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
@@ -154,7 +154,7 @@ export default function LogIn() {
                                     <img src={Password_photo} className="photo" alt="Password_photo" />
                                 </Grid>
                                 <Grid>
-                                    <label className="brtop">enter your password :</label>
+                                    <label className="brtop">Enter your password :</label>
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
