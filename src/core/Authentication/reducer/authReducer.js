@@ -2,27 +2,26 @@ import { LOGIN, SIGNOUT, STORE_ACCESS_TOKEN, REMEMBER_ME } from "../action/actio
 
 const initialstate = {
   token: {
-      access: null,
-      refresh: null,
+    access: null,
+    refresh: null,
   },
-  username: null,
   email: null,
   remember_me: false,
 }
 
-export const authReducer = (currentState = initialState, action) => {
+export const authReducer = (currentState = { authData: initialstate }, action) => {
   switch (action.type) {
-    case LOGIN: 
+    case LOGIN:
       return {
         ...currentState,
         authData: action.payload,
       };
-    case SIGNOUT: 
+    case SIGNOUT:
       return {
         ...currentState,
         authData: initialstate,
       };
-    case STORE_ACCESS_TOKEN: 
+    case STORE_ACCESS_TOKEN:
       return {
         ...currentState,
         authData: {
@@ -33,7 +32,7 @@ export const authReducer = (currentState = initialState, action) => {
           }
         }
       };
-    case REMEMBER_ME: 
+    case REMEMBER_ME:
       return {
         ...currentState,
         authData: {
@@ -41,6 +40,6 @@ export const authReducer = (currentState = initialState, action) => {
           remember_me: true,
         }
       }
-    default: return State;
+    default: return currentState;
   }
 }

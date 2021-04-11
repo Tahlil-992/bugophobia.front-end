@@ -69,6 +69,8 @@ export default function LogIn() {
     const [message, setMessage] = useState();
     const [openSnackBar, setOpenSnackBar] = useState(false);
 
+	const [checked, setChecked] = useState(false);
+
     const handleSubmit = () => {
         if (email !== "" && password !== "") {
             setOpenSnackBar(false);
@@ -92,29 +94,34 @@ export default function LogIn() {
         setMessage("");
     }
 
-    const callAPI = async () => {
-        try {
-            const response = await callLoginAPI({ email, password });
-            setIsLoading(false);
-            if (response.status === 200) {
-                setOpenSnackBar(false);
-                //const payload = response.payload;
-                alert("Login Successfully!");
-            }
+	const callAPI = async () => {
+		try {
+			const response = await callLoginAPI({ email, password });
+			setIsLoading(false);
+			if (response.status === 200) {
+				setOpenSnackBar(false);
+				const payload = response.payload;
+				login({ accessToken: payload.access, refreshToken: payload.refresh, email: email })
+				if (checked) {
+					rememberMe();
+					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh})
+				}
+				alert("Login Successfully!\n" + payload);
+			}
 
-        }
-        catch (error) {
-            setIsLoading(false);
-            setOpenSnackBar(true);
-            if (error.payload !== null && error.payload !== undefined) {
-                setMessage("Wrong email address or password, Please check again.");
-            }
-            else {
-                setMessage("Something went wrong while trying to login");
-            }
+		}
+		catch (error) {
+			setIsLoading(false);
+			setOpenSnackBar(true);
+			if (error.payload !== null && error.payload !== undefined) {
+				setMessage("Wrong email address or password, Please check again.");
+			}
+			else {
+				setMessage("Something went wrong while trying to login");
+			}
 
-        }
-    }
+		}
+	}
 
     useEffect(() => {
         if (onSubmit) {
@@ -216,7 +223,6 @@ export default function LogIn() {
         </Box>
     );
 }
-
-
+export default connect(null, { login, rememberMe })(LogIn)
 
 
