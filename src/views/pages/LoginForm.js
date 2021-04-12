@@ -1,7 +1,5 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "../../style.css";
-import email_photo from "../../assets/images/email_photo.png";
-import Password_photo from "../../assets/images/Password_photo.png";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
@@ -16,111 +14,120 @@ import CloseIcon from '@material-ui/icons/Close';
 import axios from "axios";
 import IconButton from '@material-ui/core/IconButton';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { LoadingSpinner } from "../../assets/loading.spinner"
+import InputAdornment from "@material-ui/core/InputAdornment";
+import EmailIcon from '@material-ui/icons/Email';
+import LockIcon from '@material-ui/icons/Lock';
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import { LoadingSpinner } from "../../assets/loading.spinner";
 
 const callLoginAPI = async ({ email, password }) => {
-  try {
-    const response = await axios({
-      url: "/auth/token/email/",
-      method: "POST",
-      baseURL: "http://localhost:8000",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        email,
-        password
-      }
-    })
-    return {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      payload: response.data,
-    };
-  }
-  catch (e) {
-    const error = e.response
-    const { status = '', statusText = '', headers = {}, data = null } = error;
-    const result = {
-      status,
-      statusText,
-      headers,
-      payload: data,
-    };
-    throw result;
-  }
+    try {
+        const response = await axios({
+            url: "/auth/token/email/",
+            method: "POST",
+            baseURL: "http://localhost:8000",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            data: {
+                email,
+                password
+            }
+        })
+        return {
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+            payload: response.data,
+        };
+    }
+    catch (e) {
+        const error = e.response
+        const { status = '', statusText = '', headers = {}, data = null } = error;
+        const result = {
+            status,
+            statusText,
+            headers,
+            payload: data,
+        };
+        throw result;
+    }
 }
 
 export default function LogIn() {
-	
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	
-	const [isEmailEmpty, setIsEmailEmpty] = useState(false);
-	const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
-	
-	const [onSubmit, setOnSubmit] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
 
-	const [message, setMessage] = useState();
-	const [openSnackBar, setOpenSnackBar] = useState(false);
-	  
-	const handleSubmit = () => {
-		if (email !== "" && password !== "") {
-			setOpenSnackBar(false);
-			setIsLoading(true);
-			setOnSubmit(true);
-		}
-		else {
-			setOpenSnackBar(true);
-			setMessage("Please fill all the fields!");
-			if (password === "") {
-				setIsPasswordEmpty(true);
-			}
-			if (email === "") {
-				setIsEmailEmpty(true);
-			}
-		}
-	}
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-	const handleClose = () => {
-		setOpenSnackBar(false);
-		setMessage("");
-	}
-	  
-	const callAPI = async () => {
-		try {
-		  const response = await callLoginAPI({ email, password });
-		  setIsLoading(false);
-		  if (response.status === 200) {
-			setOpenSnackBar(false);
-			//const payload = response.payload;
-			alert("Login Successfully!");
-		  }
-		  
-		}
-		catch (error) {
-			setIsLoading(false);
-			setOpenSnackBar(true);
-			if (error.payload !== null && error.payload !== undefined) {
-			  setMessage("Wrong email address or password, Please check again.");
-			}
-			else {
-			  setMessage("Something went wrong while trying to login");
-			}
-	  
-		}
-	}
+    const [isEmailEmpty, setIsEmailEmpty] = useState(false);
+    const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
 
-	useEffect(() => {
-		if (onSubmit) {
-		  callAPI();
-		  setOnSubmit(false);
-		}
+    const [onSubmit, setOnSubmit] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-	  }, [onSubmit]);	
-	
+    const [message, setMessage] = useState();
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+
+    const handleSubmit = () => {
+        if (email !== "" && password !== "") {
+            setOpenSnackBar(false);
+            setIsLoading(true);
+            setOnSubmit(true);
+        }
+        else {
+            setOpenSnackBar(true);
+            setMessage("Please fill all the fields!");
+            if (password === "") {
+                setIsPasswordEmpty(true);
+            }
+            if (email === "") {
+                setIsEmailEmpty(true);
+            }
+        }
+    }
+
+    const handleClose = () => {
+        setOpenSnackBar(false);
+        setMessage("");
+    }
+
+    const callAPI = async () => {
+        try {
+            const response = await callLoginAPI({ email, password });
+            setIsLoading(false);
+            if (response.status === 200) {
+                setOpenSnackBar(false);
+                //const payload = response.payload;
+                alert("Login Successfully!");
+            }
+
+        }
+        catch (error) {
+            setIsLoading(false);
+            setOpenSnackBar(true);
+            if (error.payload !== null && error.payload !== undefined) {
+                setMessage("Wrong email address or password, Please check again.");
+            }
+            else {
+                setMessage("Something went wrong while trying to login");
+            }
+
+        }
+    }
+
+    useEffect(() => {
+        if (onSubmit) {
+            callAPI();
+            setOnSubmit(false);
+        }
+
+    }, [onSubmit]);
+
+    const [showPassword, setShowPassword] = useState(false);
+    const handleClickShowPassword = () => setShowPassword(!showPassword);
+    const handleMouseDownPassword = () => setShowPassword(!showPassword);
+
     return (
         <Box>
             <Container component="main" maxWidth="xs">
@@ -128,38 +135,25 @@ export default function LogIn() {
                     <Typography component="h1" variant="h5" style={{ color: "white" }}>Login Form</Typography>
                     <div className="form">
                         <Grid container spacing={2}>
-                            <Grid container spacing={0}>
-                                <Grid>
-                                    <img src={email_photo} className="photo" alt="email_photo" />
-                                </Grid>
-                                <Grid>
-                                    <label className="brtop">Enter your email address :</label>
-                                </Grid>
-                            </Grid>
                             <Grid item xs={12}>
                                 <TextField
-									error={isEmailEmpty}
-									variant="outlined"
-									required
-									fullWidth
-									id="email"
-									label="Email Address"
-									name="email"
-									value={email}
-									onChange={event => {setEmail(event.target.value); setIsEmailEmpty(false);}}
+                                    error={isEmailEmpty}
+                                    variant="outlined"
+                                    required
+                                    fullWidth
+                                    id="email"
+                                    label="Email Address"
+                                    name="email"
+                                    value={email}
+                                    onChange={event => { setEmail(event.target.value); setIsEmailEmpty(false); }}
+                                    InputProps={{
+                                        startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>)
+                                    }}
                                 />
                             </Grid>
-                            <Grid container spacing={0}>
-                                <Grid>
-                                    <img src={Password_photo} className="photo" alt="Password_photo" />
-                                </Grid>
-                                <Grid>
-                                    <label className="brtop">Enter your password :</label>
-                                </Grid>
-                            </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={12}><br/>
                                 <TextField
-									error={isPasswordEmpty}
+                                    error={isPasswordEmpty}
                                     variant="outlined"
                                     required
                                     fullWidth
@@ -168,41 +162,57 @@ export default function LogIn() {
                                     type="password"
                                     id="password"
                                     autoComplete="current-password"
-									value={password}
-									onChange={event => {setPassword(event.target.value); setIsPasswordEmpty(false);}}
+                                    value={password}
+                                    onChange={event => { setPassword(event.target.value); setIsPasswordEmpty(false); }}
+                                    type={showPassword ? "text" : "password"}
+                                    InputProps={{
+                                        startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}>
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
                                 />
                             </Grid>
-                            <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
+                            <Grid item xs={12}>
+                                <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
+                            </Grid>
                         </Grid>
-				<Box display="flex" justifyContent="space-between">
-					<Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Log in</Button>
-					{isLoading && <LoadingSpinner />}
-				</Box>
+                        <Box display="flex" justifyContent="space-between">
+                            <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Log in</Button>
+                            {isLoading && <LoadingSpinner />}
+                        </Box>
                         <Grid>
-                            <Link to="/forget-password">Forget password?</Link>
+                            <Link class="link" to="/forget-password">Forget password?</Link>
                         </Grid>
                         <Grid>
-                            <Link to="/sign-up">Don't have an account? Sign Up</Link>
+                            <Link class="link" to="/sign-up">Don't have an account? Sign Up</Link>
                         </Grid>
                     </div>
                 </div>
-				<Snackbar
-				  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-				  open={openSnackBar}
-				  message={
-					<Box display="flex" alignItems="center">
-					  <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
-					  <Typography style={{ color: "#611a15" }}>{message}</Typography>
-					  <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-						<CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
-					  </IconButton>
-					</Box>}
-				  ContentProps={{ style: { backgroundColor: "#f9a099" } }}
-				  autoHideDuration={6000}
-				  onClose={handleClose}
-				  resumeHideDuration={0}
-				>
-				</Snackbar>
+                <Snackbar
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    open={openSnackBar}
+                    message={
+                        <Box display="flex" alignItems="center">
+                            <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+                            <Typography style={{ color: "#611a15" }}>{message}</Typography>
+                            <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                                <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
+                            </IconButton>
+                        </Box>}
+                    ContentProps={{ style: { backgroundColor: "#f9a099" } }}
+                    autoHideDuration={6000}
+                    onClose={handleClose}
+                    resumeHideDuration={0}
+                >
+                </Snackbar>
             </Container>
         </Box>
     );
