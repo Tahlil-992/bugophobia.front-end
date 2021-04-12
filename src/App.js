@@ -1,13 +1,19 @@
-import { BrowserRouter as Router, Switch, Route, } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
-import LandingPage from "../src/views/pages/LandingPage";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { login, rememberMe, signOut } from "./core/Authentication/action/authActions";
 import { useEffect } from "react";
 
 function App({ login, rememberMe }) {
+
+  const token = useSelector(store => store.authReducer.authData.token);
 
   useEffect(() => {
     setTimeout(async () => {
@@ -44,7 +50,7 @@ function App({ login, rememberMe }) {
   return (
     <Router>
       <Switch>
-        {true &&
+        {!token.access && !token.refresh ?
           (
             <>
               <Route exact path="/sign-up">
@@ -58,6 +64,16 @@ function App({ login, rememberMe }) {
               </Route>
               <Route exact path="/">
                 <LandingPage />
+              </Route>
+            </>
+          ) :
+          (
+            <>
+              <Route exact path="/">
+                <Redirect to="/patient/home"/>
+              </Route>
+              <Route exact path="/patient/home">
+                <h1>HELLO!</h1>
               </Route>
             </>
           )}
