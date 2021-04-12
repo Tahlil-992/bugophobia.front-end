@@ -1,4 +1,4 @@
-import { LOGIN, SIGNOUT, STORE_ACCESS_TOKEN, REMEMBER_ME } from "../action/actionTypes";
+import { LOGIN, SIGNOUT, REMEMBER_ME } from "../action/actionTypes";
 
 const initialstate = {
   token: {
@@ -20,17 +20,6 @@ export const authReducer = (currentState = { authData: initialstate }, action) =
       return {
         ...currentState,
         authData: initialstate,
-      };
-    case STORE_ACCESS_TOKEN:
-      return {
-        ...currentState,
-        authData: {
-          ...currentState.authData,
-          token: {
-            ...currentState.authData.token,
-            refresh: action.payload.token.access,
-          }
-        }
       };
     case REMEMBER_ME:
       return {

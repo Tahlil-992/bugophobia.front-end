@@ -1,6 +1,7 @@
-// to be updated => token header format
+import { resetLocalStorage, resetSessionStorage } from "./storageManager";
+
 const callAPI = async (request, sendToken = true) => {
-    const accessToken = await localStorage.getItem("accessToken");
+    const accessToken = await (localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken"));
     const authorization = sendToken && { "Authorization": `Bearer ${accessToken}` };
     try {
         const response = await axios({
@@ -36,22 +37,39 @@ const callAPI = async (request, sendToken = true) => {
     }
 }
 
-export const callAPIHandler = (request) => {
+export const callAPIHandler = (request, sendToken, isRemembered) => {
     try {
-        const response = callAPI(request);
+        const response = callAPI(request, sendToken);
         return response;
     }
     catch (e) {
-        if (e.status === 401)
+        if (e.status === 401) {
             try {
                 const refreshRequest = { url: "/auth/token/refresh/", method: "POST" };
                 const refreshResponse = callAPI(refreshRequest, true);
+                if (refreshResponse.status === 200) {
+                    if (isRemembered) {
+                        await localStorage.setItem("accessToken");
+                    }
+                    else {
+                        await sessionStorage.setItem("accessToken");
+                    }
+                }
                 const retryResponse = callAPI(request);
                 return retryResponse;
             }
             catch (e) {
-                if (e.status === 401)
-                    throw e; 
+                if (e.status === 401) {
+                    if (isRemembered) {
+                        await resetLocalStorage();
+                    }
+                    else {
+                        await resetSessionStorage();
+                    }
+                    location.replace("http://localhost:3000/");
+                }
             }
+        }
+
     }
 }

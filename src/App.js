@@ -7,7 +7,7 @@ import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
 import { connect } from "react-redux";
-import { login, rememberMe } from "./core/Authentication/action/authActions";
+import { login, rememberMe, signOut } from "./core/Authentication/action/authActions";
 import { useEffect } from "react";
 
 function App({ login, rememberMe }) {
@@ -30,13 +30,16 @@ function App({ login, rememberMe }) {
           refreshToken = await sessionStorage.getItem("refreshToken");
           email = await sessionStorage.getItem("email");
         }
-
-        login({ accessToken: accessToken, refreshToken: refreshToken, email: email });
-        if (remembered)
-          rememberMe();
-
+        if (accessToken) {
+          login({ accessToken: accessToken, refreshToken: refreshToken, email: email });
+          if (remembered)
+            rememberMe();
+        }
+        else {
+          signOut();
+        }
         } catch (e) {
-        console.error('error in save token in async storage');
+        console.error('Error while token management!');
       }
     }, 1000);
   }, [])
