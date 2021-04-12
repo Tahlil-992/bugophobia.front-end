@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import "../../style.css";
-import User_photo from "../../assets/images/User_photo.png";
-import Password_photo from "../../assets/images/Password_photo.png";
-import email_photo from "../../assets/images/email_photo.png";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
@@ -19,6 +16,12 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import { makeStyles } from '@material-ui/core/styles';
 import { LoadingSpinner } from "../../assets/loading.spinner";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import EmailIcon from '@material-ui/icons/Email';
+import LockIcon from '@material-ui/icons/Lock';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Paper from '@material-ui/core/Paper';
 
 const callSignUPAPI = async ({ username, password, email }) => {
@@ -99,68 +102,35 @@ export default function SignUp() {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
-  const checkEmail = () => {
+  const [emailhelper, setemailhelper] = useState("");
+  const [userhelper, setuserhelper] = useState("");
+  const [passhelper, setpasshelper] = useState("");
+  const [configpasshelper, setConfigpasshelper] = useState("");
+
+  const checkEmail = (email) => {
     const res = emailRegex.test(email)
-    if (message === "" || message === null || message === undefined) {
-      if (!res)
-        setMessage("Invalid email!");
-    }
-    return res;
+    setIsEmailValid(res);
   }
 
-  const checkUsername = () => {
+  const checkUsername = (userame) => {
     const res = userNameRegex.test(username);
-    if (message === "" || message === null || message === undefined) {
-      if (!res)
-        setMessage("Invalid username!");
-    }
-    return res;
+    setIsUsernameValid(res);
   }
 
-  const checkPassword = () => {
+  const checkPassword = (password) => {
     const res = passwordRegex.test(password);
-    if (message === "" || message === null || message === undefined) {
-      if (!res)
-        setMessage("Invalid password!");
-    }
-    return res;
+    setIsPasswordValid(res);
   }
 
-  const checkConfigPass = () => {
+  const checkConfigPass = (configPass) => {
     const res = (configPass === password);
-    if (message === "" || message === null || message === undefined) {
-      if (!res)
-        setMessage("Enter your password again!");
-    }
-    return res;
-  }
-
-  const validateInputs = () => {
-    const email_res = checkEmail();
-    const user_res = checkUsername();
-    const pass_res = checkPassword();
-    const conf_res = checkConfigPass();
-    setIsEmailValid(email_res);
-    setIsUsernameValid(user_res);
-    setIsPasswordValid(pass_res);
-    setIsConfigPassValid(conf_res);
-    if (email_res && user_res && pass_res && conf_res)
-      return true;
-    return false;
+    setIsConfigPassValid(res);
   }
 
   const handleSubmit = () => {
-    const res = validateInputs();
-    if (!res) {
-      setPassword("");
-      setConfigPass("");
-      setOpenSnackBar(true);
-    }
-    else {
-      setOpenSnackBar(false);
-    }
-    setIsLoading(res);
-    setOnSubmit(res);
+    setOpenSnackBar(false);
+    setIsLoading(true);
+    setOnSubmit(true);
   }
 
   const handleClose = () => {
@@ -195,7 +165,6 @@ export default function SignUp() {
       else {
         setMessage("Something went wrong while trying to create your account.");
       }
-
     }
   }
 
@@ -208,9 +177,41 @@ export default function SignUp() {
 
   }, [onSubmit]);
 
+  useEffect(() => {
+    if (isEmailValid)
+      setemailhelper("");
+    else
+      setemailhelper("Email is invalid");
+  }, [isEmailValid]);
+
+  useEffect(() => {
+    if (isUsernameValid)
+      setuserhelper("");
+    else
+      setuserhelper("Username is invalid");
+  }, [isUsernameValid]);
+
+  useEffect(() => {
+    if (ispasswordValid)
+      setpasshelper("");
+    else
+      setpasshelper("Password should be at least 8 characters including lowercase and uppercase letters and numbers. Symbols are optional.");
+  }, [ispasswordValid]);
+
+  useEffect(() => {
+    if (isConfigPassValid)
+      setConfigpasshelper("");
+    else
+      setConfigpasshelper("Passwords don't match");
+  }, [isConfigPassValid]);
+
   const goToLogin = () => {
     history.replace("/");
   }
+
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
   return (
     <Box>
@@ -219,14 +220,6 @@ export default function SignUp() {
           <Typography component="h1" variant="h5" style={{ color: "white" }}>SignUp Form</Typography>
           <div class="form">
             <Grid container spacing={2}>
-              <Grid container spacing={0}>
-                <Grid>
-                  <img src={email_photo} className="photo" alt="email_photo" />
-                </Grid>
-                <Grid>
-                  <label className="brtop">Enter your email address :</label>
-                </Grid>
-              </Grid>
               <Grid item xs={12}>
                 <TextField
                   error={!isEmailValid}
@@ -237,39 +230,35 @@ export default function SignUp() {
                   label="Email Address"
                   name="email"
                   value={email}
-                  onChange={event => setEmail(event.target.value)}
+                  onChange={event => { setEmail(event.target.value); checkEmail(event.target.value); }}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>),
+                    endAdornment: (<InputAdornment position="end"></InputAdornment>)
+                  }}
+                  helperText={emailhelper}
                 />
               </Grid>
-              <Grid container spacing={0}>
-                <Grid>
-                  <img src={User_photo} className="photo" alt="User_photo" />
-                </Grid>
-                <Grid>
-                  <label className="brtop">Enter your username :</label>
-                </Grid>
-              </Grid>
               <Grid item xs={12}>
+                <br />
                 <TextField
                   error={!isUsernameValid}
                   variant="outlined"
                   required
                   fullWidth
                   id="username"
-                  label="UserName"
+                  label="Username"
                   name="username"
                   value={username}
-                  onChange={event => setUsername(event.target.value)}
+                  onChange={event => { setUsername(event.target.value); checkUsername(event.target.value); }}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><AccountCircleIcon /></InputAdornment>),
+                    endAdornment: (<InputAdornment position="end"></InputAdornment>)
+                  }}
+                  helperText={userhelper}
                 />
               </Grid>
-              <Grid container spacing={0}>
-                <Grid>
-                  <img src={Password_photo} className="photo" alt="Password_photo" />
-                </Grid>
-                <Grid>
-                  <label className="brtop">Enter your password twice :</label>
-                </Grid>
-              </Grid>
               <Grid item xs={12}>
+                <br />
                 <TextField
                   error={!(ispasswordValid && isConfigPassValid)}
                   variant="outlined"
@@ -281,7 +270,22 @@ export default function SignUp() {
                   id="password"
                   autoComplete="current-password"
                   value={password}
-                  onChange={event => setPassword(event.target.value)}
+                  onChange={event => { setPassword(event.target.value); checkPassword(event.target.value); }}
+                  type={showPassword ? "text" : "password"}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}>
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                  helperText={passhelper}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -291,17 +295,17 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="Rpassword"
-                  label="Repeat Password"
+                  label="Confirm Password"
                   type="password"
                   id="Rpassword"
                   autoComplete="current-password"
                   value={configPass}
-                  onChange={event => setConfigPass(event.target.value)}
-                  helperText={
-                    <Typography variant="caption">
-                      {`* Password should be at least 8 characters including lowercase and uppercase letters and numbers. Symbols are optional`}
-                    </Typography>
-                  }
+                  onChange={event => { setConfigPass(event.target.value); checkConfigPass(event.target.value) }}
+                  type={showPassword ? "text" : "password"}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>)
+                  }}
+                  helperText={configpasshelper}
                 />
               </Grid>
             </Grid>
@@ -311,7 +315,7 @@ export default function SignUp() {
             </Box>
             <Grid>
               <Grid item>
-                <Link to="/">Already have an account? log in</Link>
+                <Link class="link" to="/">Already have an account? Log in</Link>
               </Grid>
             </Grid>
           </div>
@@ -323,17 +327,17 @@ export default function SignUp() {
           onClose={handleClose}
           resumeHideDuration={0}
         >
-          <Paper style={{backgroundColor: "#f9a099", borderRadius: "7px"}} elevation={3}>
-            <Box 
-              display="flex" 
-              alignItems="center" 
-              justifyContent="space-between" 
+          <Paper style={{ backgroundColor: "#f9a099", borderRadius: "7px" }} elevation={3}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
               px={"1em"} py={"1em"}>
               <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
               <Box>
-              {message && message.split("\n").map((item) => 
+                {message && message.split("\n").map((item) =>
                   <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
-              )}
+                )}
               </Box>
               <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
                 <CloseIcon style={{ color: "#611a15" }} />
