@@ -111,7 +111,6 @@ function LogIn({ login, rememberMe }) {
 					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email})
 					await resetLocalStorage();
 				}
-				alert("Login Successfully!");
 			}
 
 		}
