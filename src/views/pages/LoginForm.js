@@ -17,7 +17,7 @@ import axios from "axios";
 import IconButton from '@material-ui/core/IconButton';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { LoadingSpinner } from "../../assets/loading.spinner";
-import { setLocalStorage } from "../../core/modules/localStorageManager";
+import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { connect } from "react-redux";
 import { login, rememberMe } from "../../core/Authentication/action/authActions";
 
@@ -55,7 +55,7 @@ const callLoginAPI = async ({ email, password }) => {
 	}
 }
 
-function LogIn() {
+function LogIn({ login, rememberMe }) {
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -104,9 +104,14 @@ function LogIn() {
 				login({ accessToken: payload.access, refreshToken: payload.refresh, email: email })
 				if (checked) {
 					rememberMe();
-					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh})
+					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email});
+					await resetSessionStorage();
 				}
-				alert("Login Successfully!\n" + payload);
+				else {
+					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email})
+					await resetLocalStorage();
+				}
+				alert("Login Successfully!");
 			}
 
 		}
@@ -222,6 +227,11 @@ function LogIn() {
 	);
 }
 
-export default connect(null, { login, rememberMe })(LogIn)
+export default connect(
+	null,
+	dispatch => ({
+		login: userData => dispatch(login(userData)),
+		rememberMe: () => dispatch(rememberMe),
+	}))(LogIn);
 
 
