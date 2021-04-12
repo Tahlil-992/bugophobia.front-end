@@ -112,7 +112,7 @@ export default function SignUp() {
     setIsEmailValid(res);
   }
 
-  const checkUsername = (userame) => {
+  const checkUsername = (username) => {
     const res = userNameRegex.test(username);
     setIsUsernameValid(res);
   }
