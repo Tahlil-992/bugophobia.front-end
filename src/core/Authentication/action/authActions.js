@@ -1,4 +1,4 @@
-import { LOGIN, REMEMBER_ME, STORE_ACCESS_TOKEN, SIGNOUT } from "./actionTypes";
+import { LOGIN, REMEMBER_ME, SIGNOUT } from "./actionTypes";
 
 export const login = userData => ({
     type: LOGIN,
@@ -8,15 +8,6 @@ export const login = userData => ({
             refresh: userData.refreshToken,
         },
         email: userData.email,
-    }
-});
-
-export const storeAccessToken = accessToken => ({
-    type: STORE_ACCESS_TOKEN,
-    payload: {
-        token: {
-            access: accessToken,
-        }
     }
 });
 
