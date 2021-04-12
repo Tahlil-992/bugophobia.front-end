@@ -20,6 +20,9 @@ import LockIcon from '@material-ui/icons/Lock';
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import { LoadingSpinner } from "../../assets/loading.spinner";
+import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
+import { connect } from "react-redux";
+import { login, rememberMe } from "../../core/Authentication/action/authActions";
 
 const callLoginAPI = async ({ email, password }) => {
     try {
@@ -55,7 +58,7 @@ const callLoginAPI = async ({ email, password }) => {
     }
 }
 
-export default function LogIn() {
+function LogIn({ login, rememberMe }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -104,9 +107,14 @@ export default function LogIn() {
 				login({ accessToken: payload.access, refreshToken: payload.refresh, email: email })
 				if (checked) {
 					rememberMe();
-					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh})
+					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email});
+					await resetSessionStorage();
 				}
-				alert("Login Successfully!\n" + payload);
+				else {
+					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email})
+					await resetLocalStorage();
+				}
+				alert("Login Successfully!");
 			}
 
 		}
@@ -224,6 +232,12 @@ export default function LogIn() {
         </Box>
     );
 }
-export default connect(null, { login, rememberMe })(LogIn)
+
+export default connect(
+	null,
+	dispatch => ({
+		login: userData => dispatch(login(userData)),
+		rememberMe: () => dispatch(rememberMe),
+	}))(LogIn);
 
 
