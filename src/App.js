@@ -76,6 +76,16 @@ function App({ login, rememberMe }) {
                 <h1>HELLO!</h1>
               </Route>
             </>
+          ) :
+          (
+            <>
+              <Route exact path="/">
+                <Redirect to="/patient/home"/>
+              </Route>
+              <Route exact path="/patient/home">
+                <h1>HELLO!</h1>
+              </Route>
+            </>
           )}
       </Switch>
     </Router>
