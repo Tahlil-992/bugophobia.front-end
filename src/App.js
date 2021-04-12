@@ -35,7 +35,7 @@ function App({ login, rememberMe }) {
         else {
           signOut();
         }
-        } catch (e) {
+      } catch (e) {
         console.error('Error while token management!');
       }
     }, 1000);
@@ -66,4 +66,9 @@ function App({ login, rememberMe }) {
   );
 }
 
-export default connect(null, { login, rememberMe })(App)
+export default connect(
+	null,
+	dispatch => ({
+		login: userData => dispatch(login(userData)),
+		rememberMe: () => dispatch(rememberMe()),
+	}))(App);

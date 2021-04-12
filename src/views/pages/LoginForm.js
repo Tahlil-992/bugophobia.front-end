@@ -236,7 +236,7 @@ export default connect(
 	null,
 	dispatch => ({
 		login: userData => dispatch(login(userData)),
-		rememberMe: () => dispatch(rememberMe),
+		rememberMe: () => dispatch(rememberMe()),
 	}))(LogIn);
 
 

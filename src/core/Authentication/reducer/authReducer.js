@@ -14,7 +14,10 @@ export const authReducer = (currentState = { authData: initialstate }, action) =
     case LOGIN:
       return {
         ...currentState,
-        authData: action.payload,
+        authData: {
+          ...action.payload,
+          remember_me: false,
+        },
       };
     case SIGNOUT:
       return {
