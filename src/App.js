@@ -1,8 +1,8 @@
 import {
-  BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
+  useHistory
 } from "react-router-dom";
 import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
@@ -14,6 +14,7 @@ import { useEffect } from "react";
 function App({ login, rememberMe }) {
 
   const token = useSelector(store => store.authReducer.authData.token);
+  const history = useHistory();
 
   useEffect(() => {
     setTimeout(async () => {
@@ -39,16 +40,18 @@ function App({ login, rememberMe }) {
             rememberMe();
         }
         else {
+          console.log("nothing")
           signOut();
+          console.log("signed out")
+          history.replace("/")
         }
       } catch (e) {
-        console.error('Error while token management!');
+        console.error('Error while token management!\n' + e);
       }
     }, 1000);
   }, [])
 
   return (
-    <Router>
       <Switch>
         {!token.access && !token.refresh ?
           (
@@ -75,7 +78,6 @@ function App({ login, rememberMe }) {
             </>
           )}
       </Switch>
-    </Router>
   );
 }
 

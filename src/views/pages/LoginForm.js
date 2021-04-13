@@ -195,7 +195,10 @@ function LogIn({ login, rememberMe }) {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
+                                <FormControlLabel 
+									control={<Checkbox value="remember" />} 
+									label="Remember me" 
+									onChange={(event) => setChecked(event.target.checked)}/>
                             </Grid>
                         </Grid>
                         <Box display="flex" justifyContent="space-between">
@@ -238,5 +241,3 @@ export default connect(
 		login: userData => dispatch(login(userData)),
 		rememberMe: () => dispatch(rememberMe()),
 	}))(LogIn);
-
-
