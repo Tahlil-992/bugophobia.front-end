@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "../../style.css";
-import * as loginsignup_actions from "../../core/LoginSignUp/action/LoginSignUpAction";
+import {setIsDoctor} from "../../core/Authentication/action/authActions";
 import { connect } from "react-redux";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -388,12 +388,12 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
 }
 const mapStateToProps = (state) => {
   return {
-    isdoctor: state.LoginSignUp.isdoctor,
+    isdoctor: state.authReducer.isdoctor,
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    setIsDoctor: (av) => dispatch(loginsignup_actions.setIsDoctor(av)),
+    setIsDoctor: (av) => dispatch(setIsDoctor(av)),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

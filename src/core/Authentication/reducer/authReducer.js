@@ -1,15 +1,18 @@
-import { LOGIN, SIGNOUT, REMEMBER_ME } from "../action/actionTypes";
+import { LOGIN, SIGNOUT, REMEMBER_ME, SET_ISDOCTOR } from "../action/actionTypes";
 
 const initialstate = {
-  token: {
-    access: null,
-    refresh: null,
+  authData: {
+    token: {
+      access: null,
+      refresh: null,
+    },
+    email: null,
+    remember_me: false,
   },
-  email: null,
-  remember_me: false,
+  isdoctor: false,
 }
 
-export const authReducer = (currentState = { authData: initialstate }, action) => {
+export const authReducer = (currentState = initialstate, action) => {
   switch (action.type) {
     case LOGIN:
       return {
@@ -31,6 +34,11 @@ export const authReducer = (currentState = { authData: initialstate }, action) =
           ...currentState.authData,
           remember_me: true,
         }
+      };
+    case SET_ISDOCTOR:
+      return {
+        ...currentState,
+        isdoctor: true,
       }
     default: return currentState;
   }

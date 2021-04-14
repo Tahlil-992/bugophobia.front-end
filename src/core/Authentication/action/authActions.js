@@ -1,4 +1,4 @@
-import { LOGIN, REMEMBER_ME, SIGNOUT } from "./actionTypes";
+import { LOGIN, REMEMBER_ME, SIGNOUT, SET_ISDOCTOR } from "./actionTypes";
 
 export const login = userData => ({
     type: LOGIN,
@@ -20,3 +20,10 @@ export const rememberMe = () => ({
     type: REMEMBER_ME,
     payload: null,
 });
+
+export function setIsDoctor (state) {
+    return {
+        type : SET_ISDOCTOR,
+        payload: { isdoctor: state },
+    };
+}
