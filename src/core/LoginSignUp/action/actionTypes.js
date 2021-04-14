@@ -1,3 +1,3 @@
 export const ActionTypes = {
-    test : "test" 
-  };
+  SET_ISDOCTOR: "SET_ISDOCTOR",
+};

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../../style.css";
+import * as loginsignup_actions from "../../core/LoginSignUp/action/LoginSignUpAction";
+import { connect } from "react-redux";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
@@ -23,6 +25,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Paper from '@material-ui/core/Paper';
+import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 
 const callSignUPAPI = async ({ username, password, email }) => {
   try {
@@ -61,7 +64,7 @@ const callSignUPAPI = async ({ username, password, email }) => {
   }
 }
 
-const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
+const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
 const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 
@@ -79,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+const SignUp = ({ isdoctor, setIsDoctor }) => {
 
   const classes = useStyles();
 
@@ -206,20 +209,42 @@ export default function SignUp() {
   }, [isConfigPassValid]);
 
   const goToLogin = () => {
-    history.replace("/");
+    history.replace("/login");
   }
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
+  const changeToPatient = () => {
+    setIsDoctor(false);
+  }
+  const changeToDoctor = () => {
+    setIsDoctor(true);
+  }
   return (
     <Box>
       <Container component="main" maxWidth="xs">
         <div className="paper">
-          <Typography component="h1" variant="h5" style={{ color: "white" }}>SignUp Form</Typography>
+          {isdoctor && <Typography component="h1" variant="h5" style={{ color: "white" }}>Doctor SignUp Form</Typography> }
+          {!isdoctor && <Typography component="h1" variant="h5" style={{ color: "white" }}>Patient SignUp Form</Typography> }
           <div class="form">
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                {isdoctor &&
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="MedicalLicenseNumber"
+                    label="Medical License Number"
+                    name="MedicalLicenseNumber"
+                    InputProps={{
+                      startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
+                    }}
+                  />
+                }
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   error={!isEmailValid}
@@ -266,7 +291,6 @@ export default function SignUp() {
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
                   id="password"
                   autoComplete="current-password"
                   value={password}
@@ -296,7 +320,6 @@ export default function SignUp() {
                   fullWidth
                   name="Rpassword"
                   label="Confirm Password"
-                  type="password"
                   id="Rpassword"
                   autoComplete="current-password"
                   value={configPass}
@@ -315,7 +338,11 @@ export default function SignUp() {
             </Box>
             <Grid>
               <Grid item>
-                <Link class="link" to="/">Already have an account? Log in</Link>
+                {!isdoctor && <Link class="link" onClick={changeToDoctor}>Are you a doctor? Sign up as a doctor</Link> }
+                {isdoctor && <Link class="link" onClick={changeToPatient}>Are you a patient? Sign up as a patient</Link> }
+              </Grid>
+              <Grid item>
+                <Link class="link" to="/login">Already have an account? Log in</Link>
               </Grid>
             </Grid>
           </div>
@@ -359,3 +386,14 @@ export default function SignUp() {
     </Box>
   );
 }
+const mapStateToProps = (state) => {
+  return {
+    isdoctor: state.LoginSignUp.isdoctor,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setIsDoctor: (av) => dispatch(loginsignup_actions.setIsDoctor(av)),
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

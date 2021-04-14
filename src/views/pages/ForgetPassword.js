@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import "../../style.css";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -12,8 +12,6 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import LockIcon from '@material-ui/icons/Lock';
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import ArrowBackSharpIcon from '@material-ui/icons/ArrowBackSharp';
-import KeyboardBackspaceSharpIcon from '@material-ui/icons/KeyboardBackspaceSharp';
 
 export default function ForgetPass() {
     const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +39,6 @@ export default function ForgetPass() {
                                     fullWidth
                                     name="password"
                                     label="Password"
-                                    type="password"
                                     id="password"
                                     autoComplete="current-password"
                                     type={showPassword ? "text" : "password"}
@@ -63,7 +60,7 @@ export default function ForgetPass() {
                         </Grid>
                         <Button type="submit" fullWidth variant="contained" class="button" >Submit</Button>
                         <Grid>
-                            <Link class="link" to="/">Back to login form</Link>
+                            <Link class="link" to="/login">Back to login form</Link>
                         </Grid>
                     </div>
                 </div>
