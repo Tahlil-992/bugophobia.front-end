@@ -1,11 +1,8 @@
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, } from "react-router-dom";
 import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
+import LandingPage from "../src/views/pages/LandingPage";
 
 function App() {
   return (
@@ -15,13 +12,16 @@ function App() {
           (
             <>
               <Route exact path="/sign-up">
-                <SignUpForm/>
+                <SignUpForm />
               </Route>
               <Route exact path="/forget-password">
-                <ForgetPassword/>
+                <ForgetPassword />
+              </Route>
+              <Route exact path="/login">
+                <LoginForm />
               </Route>
               <Route exact path="/">
-                <LoginForm/>
+                <LandingPage />
               </Route>
             </>
           )}
@@ -29,5 +29,4 @@ function App() {
     </Router>
   );
 }
-
 export default App;

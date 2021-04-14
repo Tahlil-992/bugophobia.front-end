@@ -1,7 +1,8 @@
 import {ActionTypes} from "./actionTypes"
 
-export function test(){
+export function setIsDoctor(state){
     return {
-        type : ActionTypes.test
+        type : ActionTypes.SET_ISDOCTOR,
+        payload: { isdoctor: state },
     };
 }

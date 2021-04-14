@@ -63,7 +63,7 @@ export default function ForgetPass() {
                         </Grid>
                         <Button type="submit" fullWidth variant="contained" class="button" >Submit</Button>
                         <Grid>
-                            <Link class="link" to="/">Back to login form</Link>
+                            <Link class="link" to="/login">Back to login form</Link>
                         </Grid>
                     </div>
                 </div>
