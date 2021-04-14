@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import "../../style.css";
 import * as loginsignup_actions from "../../core/LoginSignUp/action/LoginSignUpAction";
 import Button from '@material-ui/core/Button';
@@ -17,8 +17,8 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
         setIsDoctor(true);
     }
     return (
-        <Container component="main" class="paper">
-            <div style={{ width: '100%' }} style={{ backgroundColor: "#89dee2", border: "5px solid #527c88", padding: "50px", borderRadius: "10px" }}>
+        <Container component="main" class="paper" style={{width: '100%'}}>
+            <div style={{ backgroundColor: "#89dee2", border: "5px solid #527c88", padding: "50px", borderRadius: "10px" }}>
                 <Grid>
                     <Typography component="h1" variant="h5" >
                         Welcome<br />Please choose which type of user you are<br />

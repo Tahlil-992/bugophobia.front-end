@@ -291,7 +291,6 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
                   id="password"
                   autoComplete="current-password"
                   value={password}
@@ -321,7 +320,6 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                   fullWidth
                   name="Rpassword"
                   label="Confirm Password"
-                  type="password"
                   id="Rpassword"
                   autoComplete="current-password"
                   value={configPass}
