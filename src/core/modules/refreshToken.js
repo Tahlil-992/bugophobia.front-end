@@ -1,4 +1,5 @@
 import { resetLocalStorage, resetSessionStorage } from "./storageManager";
+import axios from "axios";
 
 const callAPI = async (request, sendToken = true) => {
     const accessToken = await (localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken"));
@@ -37,7 +38,7 @@ const callAPI = async (request, sendToken = true) => {
     }
 }
 
-export const callAPIHandler = (request, sendToken, isRemembered) => {
+export const callAPIHandler = async (request, sendToken, isRemembered) => {
     try {
         const response = callAPI(request, sendToken);
         return response;
@@ -66,7 +67,10 @@ export const callAPIHandler = (request, sendToken, isRemembered) => {
                     else {
                         await resetSessionStorage();
                     }
-                    location.replace("http://localhost:3000/");
+                    // location.replace("http://localhost:3000/");
+                }
+                else {
+                    throw e;
                 }
             }
         }

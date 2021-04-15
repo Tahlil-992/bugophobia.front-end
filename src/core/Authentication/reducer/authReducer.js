@@ -38,7 +38,7 @@ export const authReducer = (currentState = initialstate, action) => {
     case SET_ISDOCTOR:
       return {
         ...currentState,
-        isdoctor: true,
+        isdoctor: action.payload.isdoctor,
       }
     default: return currentState;
   }
