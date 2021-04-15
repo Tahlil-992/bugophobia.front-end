@@ -6,6 +6,7 @@ import {
 import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
+import ProfileDoctor from "../src/views/pages/ProfileDoctor";
 
 function App() {
   return (
@@ -22,6 +23,9 @@ function App() {
               </Route>
               <Route exact path="/">
                 <LoginForm/>
+              </Route>
+              <Route exact path="/profile-doctor">
+                <ProfileDoctor/>
               </Route>
             </>
           )}
