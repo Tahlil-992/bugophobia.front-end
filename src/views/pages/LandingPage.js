@@ -1,6 +1,6 @@
 import React from 'react';
 import "../../style.css";
-import * as loginsignup_actions from "../../core/LoginSignUp/action/LoginSignUpAction";
+import {setIsDoctor} from "../../core/Authentication/action/authActions";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -42,12 +42,12 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
 }
 const mapStateToProps = (state) => {
     return {
-        isdoctor: state.LoginSignUp.isdoctor,
+        isdoctor: state.authReducer.isdoctor,
     };
 };
 const mapDispatchToProps = (dispatch) => {
     return {
-        setIsDoctor: (av) => dispatch(loginsignup_actions.setIsDoctor(av)),
+        setIsDoctor: (av) => dispatch(setIsDoctor(av)),
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(LandingPage);

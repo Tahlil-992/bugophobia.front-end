@@ -9,9 +9,8 @@ import Container from '@material-ui/core/Container';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Snackbar from '@material-ui/core/Snackbar';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import CloseIcon from '@material-ui/icons/Close';
-import axios from "axios";
 import IconButton from '@material-ui/core/IconButton';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -20,42 +19,24 @@ import LockIcon from '@material-ui/icons/Lock';
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import { LoadingSpinner } from "../../assets/loading.spinner";
+import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
+import { connect } from "react-redux";
+import { login, rememberMe, setIsDoctor } from "../../core/Authentication/action/authActions";
+import { callAPIHandler } from "../../core/modules/refreshToken";
 
-const callLoginAPI = async ({ email, password }) => {
+const callLoginAPI = async ({ email, password }, isRemembered) => {
     try {
-        const response = await axios({
-            url: "/auth/token/email/",
-            method: "POST",
-            baseURL: "http://localhost:8000",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            data: {
-                email,
-                password
-            }
-        })
-        return {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers,
-            payload: response.data,
-        };
+        const response = callAPIHandler({method:"POST", data: {email, password}, url: "/auth/token/email/"}, true, isRemembered);
+        return response;
     }
     catch (e) {
-        const error = e.response
-        const { status = '', statusText = '', headers = {}, data = null } = error;
-        const result = {
-            status,
-            statusText,
-            headers,
-            payload: data,
-        };
-        throw result;
+        throw e;
     }
 }
 
-export default function LogIn() {
+function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
+
+    const history = useHistory();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -68,6 +49,8 @@ export default function LogIn() {
 
     const [message, setMessage] = useState();
     const [openSnackBar, setOpenSnackBar] = useState(false);
+
+	const [checked, setChecked] = useState(false);
 
     const handleSubmit = () => {
         if (email !== "" && password !== "") {
@@ -92,29 +75,41 @@ export default function LogIn() {
         setMessage("");
     }
 
-    const callAPI = async () => {
-        try {
-            const response = await callLoginAPI({ email, password });
-            setIsLoading(false);
-            if (response.status === 200) {
-                setOpenSnackBar(false);
-                //const payload = response.payload;
-                alert("Login Successfully!");
-            }
+	const callAPI = async () => {
+		try {
+			const response = await callLoginAPI({ email, password }, checked);
+			setIsLoading(false);
+			if (response.status === 200) {
+				setOpenSnackBar(false);
+				const payload = response.payload;
+				login({ accessToken: payload.access, refreshToken: payload.refresh, email: email });
+                setIsDoctor(payload.is_doctor);
+				if (checked) {
+					rememberMe();
+					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor});
+					await resetSessionStorage();
+				}
+				else {
+					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor});
+					await resetLocalStorage();
+				}
+                history.go(-(history.length - 1));
+                history.push("/");
+			}
 
-        }
-        catch (error) {
-            setIsLoading(false);
-            setOpenSnackBar(true);
-            if (error.payload !== null && error.payload !== undefined) {
-                setMessage("Wrong email address or password, Please check again.");
-            }
-            else {
-                setMessage("Something went wrong while trying to login");
-            }
+		}
+		catch (error) {
+			setIsLoading(false);
+			setOpenSnackBar(true);
+			if (error.payload !== null && error.payload !== undefined) {
+				setMessage("Wrong email address or password, Please check again.");
+			}
+			else {
+				setMessage("Something went wrong while trying to login");
+			}
 
-        }
-    }
+		}
+	}
 
     useEffect(() => {
         if (onSubmit) {
@@ -180,7 +175,10 @@ export default function LogIn() {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <FormControlLabel control={<Checkbox value="remember" />} label="Remember me" />
+                                <FormControlLabel 
+									control={<Checkbox value="remember" />} 
+									label="Remember me" 
+									onChange={(event) => setChecked(event.target.checked)}/>
                             </Grid>
                         </Grid>
                         <Box display="flex" justifyContent="space-between">
@@ -217,6 +215,10 @@ export default function LogIn() {
     );
 }
 
-
-
-
+export default connect(
+	state => ({ isdoctor: state.authReducer.isdoctor }),
+	dispatch => ({
+		login: userData => dispatch(login(userData)),
+		rememberMe: () => dispatch(rememberMe()),
+        setIsDoctor: (av) => dispatch(setIsDoctor(av)),
+	}))(LogIn);

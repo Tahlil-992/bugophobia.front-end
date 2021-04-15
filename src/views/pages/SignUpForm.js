@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "../../style.css";
-import * as loginsignup_actions from "../../core/LoginSignUp/action/LoginSignUpAction";
+import {setIsDoctor} from "../../core/Authentication/action/authActions";
 import { connect } from "react-redux";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -11,7 +11,6 @@ import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import { Link, useHistory } from "react-router-dom";
 import CloseIcon from '@material-ui/icons/Close';
-import axios from "axios";
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
@@ -26,47 +25,22 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Paper from '@material-ui/core/Paper';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
+import { callAPIHandler } from "../../core/modules/refreshToken";
 
-const callSignUPAPI = async ({ username, password, email }) => {
+const callSignUPAPI = async (data) => {
   try {
-    const response = await axios({
-      url: "/auth/register/patient/",
-      method: "POST",
-      baseURL: "http://localhost:8000",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        user: {
-          username,
-          password,
-          email,
-        },
-      }
-    })
-    return {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      payload: response.data,
-    };
+    const response = callAPIHandler({method:"POST", data: data, url: "/auth/register/doctor/"}, false, false);
+    return response;
   }
   catch (e) {
-    const error = e.response
-    const { status = '', statusText = '', headers = {}, data = null } = error;
-    const result = {
-      status,
-      statusText,
-      headers,
-      payload: data,
-    };
-    throw result;
+    throw e;
   }
 }
 
 const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
 const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
+const numRegex = RegExp(/^-?[0-9,\.]+$/);
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -92,11 +66,13 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [configPass, setConfigPass] = useState("");
+  const [gmcNum, setgmcNum] = useState("");
 
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isUsernameValid, setIsUsernameValid] = useState(true);
   const [ispasswordValid, setIsPasswordValid] = useState(true);
   const [isConfigPassValid, setIsConfigPassValid] = useState(true);
+  const [isgmcValid, setIsgmcValid] = useState(true);
 
   const [onSubmit, setOnSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -130,6 +106,11 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     setIsConfigPassValid(res);
   }
 
+  const checkGMC = (gmc) => {
+    const res = numRegex.test(gmc);
+    setIsgmcValid(res);
+  }
+
   const handleSubmit = () => {
     setOpenSnackBar(false);
     setIsLoading(true);
@@ -143,7 +124,11 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
 
   const callAPI = async () => {
     try {
-      const response = await callSignUPAPI({ username, password, email });
+      const data = isdoctor 
+        ? {user: {email: email, password: password, username: username, is_doctor: true}, gmc_number: Number(gmcNum)} 
+        : {user: {email: email, password: password, username: username, is_doctor: false}}
+      const response = await callSignUPAPI(data);
+
       setIsLoading(false);
       if (response.status === 201) {
         setOpenSnackBar(false);
@@ -233,12 +218,15 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
               <Grid item xs={12}>
                 {isdoctor &&
                   <TextField
+                    error={!isgmcValid}
                     variant="outlined"
                     required
                     fullWidth
                     id="MedicalLicenseNumber"
                     label="Medical License Number"
                     name="MedicalLicenseNumber"
+                    value={gmcNum}
+                    onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
                     InputProps={{
                       startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
                     }}
@@ -388,12 +376,12 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
 }
 const mapStateToProps = (state) => {
   return {
-    isdoctor: state.LoginSignUp.isdoctor,
+    isdoctor: state.authReducer.isdoctor,
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    setIsDoctor: (av) => dispatch(loginsignup_actions.setIsDoctor(av)),
+    setIsDoctor: (av) => dispatch(setIsDoctor(av)),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(SignUp);
