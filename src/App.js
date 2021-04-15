@@ -49,7 +49,8 @@ function App({ setIsDoctor, login, rememberMe }) {
           console.log("nothing")
           signOut();
           console.log("signed out")
-          history.replace("/")
+          history.go(-(history.length - 1));
+          history.push("/");
         }
       } catch (e) {
         console.error('Error while token management!\n' + e);
