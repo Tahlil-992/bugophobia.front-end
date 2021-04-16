@@ -13,6 +13,23 @@
     padding: 50px;
     margin-top: 10px;
 }
+.profilepaper {
+    margin-left: 10%;
+    margin-top: 5%;
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.profileform{
+    background-color: #89dee2;
+    border: 3px solid #527c88;
+    border-radius: 10px;
+    padding: 50px;
+    width: 60vmax;
+    margin-top: 10px;
+}
 .box {
     display: flex;   
 }
