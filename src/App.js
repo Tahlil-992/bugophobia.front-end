@@ -84,9 +84,7 @@ function App({ setIsDoctor, login, rememberMe }) {
             <Route exact path="/">
               {is_doctor ? <Redirect to="/doctor/home" /> : <Redirect to="/patient/home" />}
             </Route>
-            <Route path="*">
-              {is_doctor ? <Redirect to="/doctor/home" /> : <Redirect to="/patient/home" />}
-            </Route>
+            
             <Route exact path="/patient/home">
               <h1>Hello PATIENT!</h1>
             </Route>
