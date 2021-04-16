@@ -1,13 +1,9 @@
-import {
-  Switch,
-  Route,
-  Redirect,
-  useHistory
-} from "react-router-dom";
+import { Switch, Route, Redirect, useHistory } from "react-router-dom";
 import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
 import LandingPage from "../src/views/pages/LandingPage";
+import Explore from "../src/views/pages/Explore";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import { useEffect } from "react";
@@ -77,16 +73,16 @@ function App({ setIsDoctor, login, rememberMe }) {
         (
           <>
             <Route exact path="/">
-              {is_doctor ? <Redirect to="/doctor/home" /> : <Redirect to="/patient/home" />}
+              {is_doctor ? <Redirect to="/doctor/explore" /> : <Redirect to="/patient/explore" />}
             </Route>
             <Route path="*">
-              {is_doctor ? <Redirect to="/doctor/home" /> : <Redirect to="/patient/home" />}
+              {is_doctor ? <Redirect to="/doctor/explore" /> : <Redirect to="/patient/explore" />}
             </Route>
-            <Route exact path="/patient/home">
-              <h1>Hello PATIENT!</h1>
+            <Route exact path="/patient/explore">
+              <Explore />
             </Route>
-            <Route exact path="/doctor/home">
-              <h1>Hello DOCTOR!</h1>
+            <Route exact path="/doctor/explore">
+              <Explore />
             </Route>
           </>
         )}
