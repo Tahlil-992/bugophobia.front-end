@@ -86,15 +86,14 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                 setIsDoctor(payload.is_doctor);
 				if (checked) {
 					rememberMe();
-					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor});
+					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false"});
 					await resetSessionStorage();
 				}
 				else {
-					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor});
+					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false"});
 					await resetLocalStorage();
 				}
-                history.go(-(history.length - 1));
-                history.push("/");
+                history.replace("/")
 			}
 
 		}

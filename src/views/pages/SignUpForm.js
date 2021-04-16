@@ -27,9 +27,9 @@ import Paper from '@material-ui/core/Paper';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 
-const callSignUPAPI = async (data) => {
+const callSignUPAPI = async (data, isdoctor) => {
   try {
-    const response = callAPIHandler({method:"POST", data: data, url: "/auth/register/doctor/"}, false, false);
+    const response = callAPIHandler({method:"POST", data: data, url: `/auth/register/${isdoctor ? "doctor": "patient"}/`}, false, false);
     return response;
   }
   catch (e) {
@@ -127,7 +127,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
       const data = isdoctor 
         ? {user: {email: email, password: password, username: username, is_doctor: true}, gmc_number: Number(gmcNum)} 
         : {user: {email: email, password: password, username: username, is_doctor: false}}
-      const response = await callSignUPAPI(data);
+      const response = await callSignUPAPI(data, isdoctor);
 
       setIsLoading(false);
       if (response.status === 201) {
