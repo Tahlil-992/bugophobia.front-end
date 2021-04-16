@@ -8,7 +8,8 @@ export const CommentFragment = ({ comments }) => {
         <>
         {comments.map(comment => {
             return (
-                <Card>
+                <Card style={{marginTop:"1em"}}>
+                    
                     <CardContent>
                         <Comment commentInfo={comment.info}/>
                     </CardContent>
