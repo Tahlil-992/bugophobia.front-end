@@ -8,6 +8,8 @@ import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
 import LandingPage from "../src/views/pages/LandingPage";
+import Profile from "../src/views/pages/Profile";
+import ViewProfile from "../src/views/pages/ViewProfile";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import { useEffect } from "react";
@@ -90,6 +92,12 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/doctor/home">
               <h1>Hello DOCTOR!</h1>
+            </Route>
+            <Route exact path="/profile">
+              <Profile />
+            </Route>
+            <Route exact path="/view-profile">
+              <ViewProfile />
             </Route>
           </>
         )}
