@@ -50,19 +50,19 @@ export default function Profile () {
 
     const [profileImage, setProfileImage] = useState();
 
-    const [firstName, setFirstName] = useState("mohammadreza");
-    const [lastName, setlastName] = useState('kia');
-    const [email, setEmail] = useState('mokia@gmail.com');
-    const [username, setUsername] = useState('mokia');
-    const [gender, setGender] = useState('Male');
-    const [age, setAge] = useState('21');
-    const [phoneNumber, setPhoneNumber] = useState('0911*****89');
-    const [city, setCity] = useState('Gorgan');
-    const [password, setPassword] = useState('********');
-    const [gmcNumber, setGmcNumber] = useState('168545547321659485');
-    const [specialization, setSpecialization] = useState('Neurologist');
-    const [experience, setExperience] = useState('10');
-    const [insurance, setInsurance] = useState('takmili');
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [gender, setGender] = useState('');
+    const [age, setAge] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [city, setCity] = useState('');
+    const [password, setPassword] = useState('');
+    const [gmcNumber, setGmcNumber] = useState('');
+    const [specialization, setSpecialization] = useState('');
+    const [experience, setExperience] = useState('');
+    const [insurance, setInsurance] = useState('');
 
     const [firstNameDis, setFirstNameDis] = useState(false);
     const [lastNameDis, setLastNameDis] = useState(false);
@@ -79,35 +79,41 @@ export default function Profile () {
     const [insuranceDis, setInsuranceDis] = useState(false);
 
     const [editProfile, setEditProfile] = useState(false);
+    const [buttonLable1, setButtonLable1] = useState("Edit Profile");
 
     const fields = isDoctor ?
-                    [['First Name', firstName, firstNameDis, setFirstNameDis, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, lastNameDis, setLastNameDis, <DoubleArrowIcon/>],
-                    ['Email Address', email, emailDis, setEmailDis, <EmailIcon/>],
-                    ['Username', username, usernameDis, setUsernameDis, <AccountCircleIcon/>],
-                    ['Gender', gender, genderDis, setGenderDis, <WcIcon/>],
-                    ['Age', age, ageDis, setAgeDis, <AlarmIcon/>],
-                    ['Phone Number', phoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
-                    ['City', city, cityDis, setCityDis, <ApartmentIcon/>],
-                    //['Password', password, passwordDis, setPasswordDis, <LockIcon/>],
-                    ['GMC Number', gmcNumber, gmcNumberDis, setGmcNumberDis, <LocalHospitalIcon/>],
-                    ['Filed of Specialization', specialization, specializationDis, setSpecializationDis, <WorkIcon/>],
-                    ['Work Experiece', experience, experienceDis, setExperienceDis, <BuildIcon/>]
+                   [['First Name', firstName, setFirstName, firstNameDis, setFirstNameDis, <DoubleArrowIcon/>],
+                    ['Last Name', lastName, setLastName, lastNameDis, setLastNameDis, <DoubleArrowIcon/>],
+                    ['Email Address', email, setEmail, emailDis, setEmailDis, <EmailIcon/>],
+                    ['Username', username, setUsername, usernameDis, setUsernameDis, <AccountCircleIcon/>],
+                    ['Gender', gender, setGender, genderDis, setGenderDis, <WcIcon/>],
+                    ['Age', age, setAge, ageDis, setAgeDis, <AlarmIcon/>],
+                    ['Phone Number', phoneNumber, setPhoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
+                    ['City', city, setCity, cityDis, setCityDis, <ApartmentIcon/>],
+                    //['Password', password, setPassword, passwordDis, setPasswordDis, <LockIcon/>],
+                    ['GMC Number', gmcNumber, setGmcNumber, gmcNumberDis, setGmcNumberDis, <LocalHospitalIcon/>],
+                    ['Filed of Specialization', specialization, setSpecialization, specializationDis, setSpecializationDis, <WorkIcon/>],
+                    ['Work Experiece', experience, setExperience, experienceDis, setExperienceDis, <BuildIcon/>]
                     ]
 
                    :
 
-                   [['First Name', firstName, firstNameDis, setFirstNameDis, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, lastNameDis, setLastNameDis, <DoubleArrowIcon/>],
-                    ['Email Address', email, emailDis, setEmailDis, <EmailIcon/>],
-                    ['Username', username, usernameDis, setUsernameDis, <AccountCircleIcon/>],
-                    ['Gender', gender, genderDis, setGenderDis, <WcIcon/>],
-                    ['Age', age, ageDis, setAgeDis, <AlarmIcon/>],
-                    ['Phone Number', phoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
-                    ['City', city, cityDis, setCityDis, <ApartmentIcon/>],
-                    //['Password', password, passwordDis, setPasswordDis, <LockIcon/>],
+                   [['First Name', firstName, setFirstName, firstNameDis, setFirstNameDis, <DoubleArrowIcon/>],
+                    ['Last Name', lastName, setLastName, lastNameDis, setLastNameDis, <DoubleArrowIcon/>],
+                    ['Email Address', email, setEmail, emailDis, setEmailDis, <EmailIcon/>],
+                    ['Username', username, setUsername, usernameDis, setUsernameDis, <AccountCircleIcon/>],
+                    ['Gender', gender, setGender, genderDis, setGenderDis, <WcIcon/>],
+                    ['Age', age, setAge, ageDis, setAgeDis, <AlarmIcon/>],
+                    ['Phone Number', phoneNumber, setPhoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
+                    ['City', city, setCity, cityDis, setCityDis, <ApartmentIcon/>],
+                    //['Password', password, setPassword, passwordDis, setPasswordDis, <LockIcon/>],
                     ['Insurance Type', insurance, insuranceDis, setInsuranceDis, <LocalHospitalIcon/>]
                     ];
+
+    const buttonHandler1 = () => {
+        setButtonLable1(editProfile ? "Edit Profile" : "Save Changes");
+        setEditProfile(!editProfile);
+    }
 
     return (
         <div class="profilepaper">
@@ -155,15 +161,16 @@ export default function Profile () {
                                                     return(
                                                         <Grid item xs={12}>
                                                             <TextField 
-                                                                onMouseEnter={() => item[3](true)}
-                                                                onMouseLeave={() => item[3](false)}
-                                                                disabled={item[2]}
+                                                                onMouseEnter={() => item[4](true)}
+                                                                onMouseLeave={() => item[4](false)}
+                                                                disabled={item[3] && !editProfile}
                                                                 variant="outlined"
                                                                 fullWidth 
                                                                 label={item[0]}
                                                                 value={item[1]}
+                                                                onChange={event => item[2](event.target.value)}
                                                                 InputProps={{
-                                                                    startAdornment: (<InputAdornment position="start">{item[4]}</InputAdornment>)
+                                                                    startAdornment: (<InputAdornment position="start">{item[5]}</InputAdornment>)
                                                                 }}
                                                                 />
                                                         </Grid>
@@ -172,7 +179,9 @@ export default function Profile () {
                                         </Grid>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
-                                        <Button variant="contained" class="button" >Edit Profile</Button>
+                                        <Button variant="contained" class="button" onClick={buttonHandler1}>
+                                            {buttonLable1}
+                                        </Button>
                                     </Box>
                                 </Container>
                             </div>
