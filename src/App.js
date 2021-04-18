@@ -83,10 +83,7 @@ function App({ setIsDoctor, login, rememberMe }) {
             <Route exact path="/doctor/explore">
               <Explore />
             </Route>
-            <Route exact path="/patient/profile">
-              <Profile />
-            </Route>
-            <Route exact path="/doctor/profile">
+            <Route exact path="/profile">
               <Profile />
             </Route>
           </>

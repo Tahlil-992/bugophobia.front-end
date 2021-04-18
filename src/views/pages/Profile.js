@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { Avatar, Button, Container, makeStyles } from '@material-ui/core';
+import { AppBar, Avatar, Button, Container, Link, makeStyles, Toolbar } from '@material-ui/core';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -21,7 +21,10 @@ import BuildIcon from '@material-ui/icons/Build';
 import WorkIcon from '@material-ui/icons/Work';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { callAPIHandler } from "../../core/modules/refreshToken";
+import { BorderColorOutlined } from '@material-ui/icons';
+import DoctorImage from "../../assets/images/doctor.png";
 
 const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
@@ -42,10 +45,22 @@ const useStyles = makeStyles((theme) => ({
       },
     },
     accordion:{
-        backgroundColor: '#89dee2',
+        backgroundColor: 'lightblue',
+        borderWidth: "3px",
+        borderColor: "#10217d",
+        
+    },
+    content: {
+        flexGrow: 1,
+        height: '100vh',
+        overflow: 'auto',
+        backgroundColor: 'lightblue',
+        paddingTop: "8px",
+        paddingBottom: "8px",
+        padding: "8px",
         '& > *': {
-            margin: theme.spacing(1),
-        }
+            margin: theme.spacing(2),
+          },
     },
     large: {
       width: theme.spacing(30),
@@ -59,6 +74,7 @@ export default function Profile () {
     const classes = useStyles();
 
     const isDoctor = !((sessionStorage.getItem("isdoctor") === "true") ? true : false);
+    const str = isDoctor ? "doctor" : "patient";
 
     const payload = {};
 
@@ -78,7 +94,7 @@ export default function Profile () {
 
     
 
-    const [profileImage, setProfileImage] = useState();
+    const [profileImage, setProfileImage] = useState(DoctorImage);
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -137,7 +153,7 @@ export default function Profile () {
                     ['Phone Number', phoneNumber, setPhoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
                     ['City', city, setCity, cityDis, setCityDis, <ApartmentIcon/>],
                     //['Password', password, setPassword, passwordDis, setPasswordDis, <LockIcon/>],
-                    ['Insurance Type', insurance, insuranceDis, setInsuranceDis, <LocalHospitalIcon/>]
+                    ['Insurance Type', insurance, setInsurance, insuranceDis, setInsuranceDis, <LocalHospitalIcon/>]
                     ];
 
     const buttonHandler1 = () => {
@@ -146,102 +162,115 @@ export default function Profile () {
     }
 
     return (
-        <div class="paper">
-            <Grid direction="column" container spacing={3}>
-                <Grid direction="row" container item spacing={3}>
-                    <Avatar className={classes.large} src={profileImage}></Avatar>
-                    <Grid direction="column" item justify="space-around" alignItems="flex-end">
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        {isDoctor ? (
-                            <div>
-                                <h2>{"Dr. " + firstName + " " + lastName}</h2>
-                                <h3>{"specialized of " + specialization}</h3>
-                                <h4>*****</h4>
-                            </div>
-                        )
-                        :
-                        (
-                            <div>
-                                <h2>{firstName + " " + lastName}</h2>
-                                <h3>{"User"}</h3>
-                            </div>
-                        )}
+        <React.Fragment>
+            <AppBar position="relative">
+                <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
+                    <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+                    <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
+                </Toolbar>
+            </AppBar>
+            <div className={classes.content}>
+                <Grid direction="column" container spacing={3}>
+                    <Grid direction="row" container item spacing={3}>
+                        <Avatar className={classes.large} src={profileImage}></Avatar>
+                        <Grid direction="column" item justify="space-around" alignItems="flex-end">
+                            <br></br>
+                            <br></br>
+                            <br></br>
+                            {isDoctor ? (
+                                <div>
+                                    <h2>{"Dr. " + firstName + " " + lastName}</h2>
+                                    <h3>{"specialized of " + specialization}</h3>
+                                    <h4>*****</h4>
+                                </div>
+                            )
+                            :
+                            (
+                                <div>
+                                    <h2>{firstName + " " + lastName}</h2>
+                                    <h3>{"User"}</h3>
+                                </div>
+                            )}
+                        </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
-            <br/>
-            <Grid container direction="row" spacing={0} className={classes.root}>  
-                <Grid item xs={isDoctor ? 4 : ''}>
-                    <Accordion className={classes.accordion}>
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1a-content"
-                            id="panel1a-header"
-                            >
-                            <Typography >Details</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div >
-                                <Container component="main" maxWidth="xs">                
-                                    <Box display="flex" justifyContent="space-between" >
-                                        <Grid container spacing={2} alignItems="flex-start">
-                                                {fields.map((item) => {
-                                                    return(
-                                                        <Grid item xs={12}>
-                                                            <TextField 
-                                                                onMouseEnter={() => item[4](true)}
-                                                                onMouseLeave={() => item[4](false)}
-                                                                disabled={item[3] && !editProfile}
-                                                                variant="outlined"
-                                                                fullWidth 
-                                                                label={item[0]}
-                                                                value={item[1]}
-                                                                onChange={event => item[2](event.target.value)}
-                                                                InputProps={{
-                                                                    startAdornment: (<InputAdornment position="start">{item[5]}</InputAdornment>)
-                                                                }}
-                                                                />
-                                                        </Grid>
-                                                        )
-                                                    })}
-                                        </Grid>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between">
-                                        <Button variant="contained" class="button" onClick={buttonHandler1}>
-                                            {buttonLable1}
-                                        </Button>
-                                    </Box>
-                                </Container>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
-                </Grid>
-                {isDoctor ?
-                    <Grid item xs={7}>
-                        <Accordion className={classes.accordion}>
+                <br/>
+                <Grid container direction="row" spacing={0} className={classes.root}>  
+                    <Grid item xs={isDoctor ? 4 : ''}>
+                        <Accordion className={classes.accordion} variant="outlined">
                             <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="panel1a-content"
                                 id="panel1a-header"
                                 >
-                                    <Typography >Comments</Typography>
+                                <Typography >Details</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <div >
-                                    <Container component="main" maxWidth="xs">
-                                        <h3><center>No Comments Here!</center></h3>
+                                <div>
+                                    <font color="white">
+                                    <Container component="main" maxWidth="xs">                
+                                        <Box display="flex" justifyContent="space-between" >
+                                            <Grid container spacing={2} alignItems="flex-start">
+                                                    {fields.map((item) => {
+                                                        return(
+                                                            <Grid item xs={12}>
+                                                                <TextField 
+                                                                    color="white"
+                                                                     backgroundColor="white"
+                                                                    onMouseEnter={() => item[4](true)}
+                                                                    onMouseLeave={() => item[4](false)}
+                                                                    disabled={item[3] && !editProfile}
+                                                                    variant="outlined"
+                                                                    
+                                                                    fullWidth 
+                                                                    label={item[0]}
+                                                                    value={item[1]}
+                                                                    onChange={event => item[2](event.target.value)}
+                                                                    InputProps={{
+                                                                        startAdornment: (<InputAdornment position="start">{item[5]}</InputAdornment>)
+                                                                    }}
+                                                                    />
+                                                            </Grid>
+                                                            )
+                                                        })}
+                                            </Grid>
+                                        </Box>
+                                        <Box display="flex" justifyContent="space-between">
+                                            <Button variant="contained" class="button" onClick={buttonHandler1}>
+                                                {buttonLable1}
+                                            </Button>
+                                        </Box>
                                     </Container>
+                                    </font>
                                 </div>
                             </AccordionDetails>
                         </Accordion>
-                    </Grid> 
-                    : 
-                    <></>
-                }
-            </Grid> 
-        </div>
+                    </Grid>
+                    {isDoctor ?
+                        <Grid item xs={7}>
+                            <Accordion className={classes.accordion} variant="outlined">
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                    >
+                                        <Typography >Comments</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <div >
+                                        <Container component="main" maxWidth="xs">
+                                            <h3><center>No Comments Here!</center></h3>
+                                        </Container>
+                                    </div>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> 
+                        : 
+                        <></>
+                    }
+                </Grid> 
+            </div>
+        </React.Fragment>
     );
 }
 
