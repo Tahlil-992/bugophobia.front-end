@@ -7,7 +7,7 @@ import Paper from "@material-ui/core/Paper"
 
 export const CommentFragment = ({ comments }) => {
     return (
-        <Paper style={{maxWidth:"70%", margin:"auto", padding:"1em 0", marginTop:"1em", backgroundColor:"#33ab9f"}} variant="outlined">
+        <Paper style={{maxWidth:"70%", margin:"auto", padding:"1em 0", marginTop:"1em", backgroundColor:"lightblue"}} variant="outlined">
         {comments.map(comment => {
             return (
                 <Card raised style={{maxWidth:"90%", margin:"auto", marginTop:"1em" }}>
