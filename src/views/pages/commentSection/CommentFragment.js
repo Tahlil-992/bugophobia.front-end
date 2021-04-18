@@ -2,7 +2,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import React from "react";
 import { Comment } from "./comment";
-import { AddComment } from "./AddComment";
+import AddComment from "./AddComment";
 import Paper from "@material-ui/core/Paper"
 
 export const CommentFragment = ({ comments }) => {
@@ -18,7 +18,7 @@ export const CommentFragment = ({ comments }) => {
                 </Card>    
             )
         })}
-        <AddComment/>
+        <AddComment setResult={(msg) => alert(msg)}/>
         </Paper>
     );
 }

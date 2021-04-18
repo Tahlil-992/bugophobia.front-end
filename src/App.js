@@ -13,7 +13,7 @@ import Explore from "../src/views/pages/Explore";
 import Profile from "../src/views/pages/Profile";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
-import { CommentSection } from "./views/pages/commentSection";
+import CommentSection from "./views/pages/commentSection";
 
 function App({ setIsDoctor, login, rememberMe }) {
 

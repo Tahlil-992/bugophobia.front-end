@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { callAPIHandler } from "../../../core/modules/refreshToken";
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
@@ -9,6 +9,8 @@ import SendIcon from '@material-ui/icons/Send';
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { IconButton } from "@material-ui/core";
+import { connect } from "react-redux";
+import { LoadingSpinner } from "../../../assets/loading.spinner";
 
 const callCreateCommentAPI = async ({ doctor_username, comment_content }, isRemembered) => {
     try {
@@ -20,7 +22,35 @@ const callCreateCommentAPI = async ({ doctor_username, comment_content }, isReme
     }
 }
 
-export const AddComment = ({ doctor_username = "" }) => {
+const AddComment = ({ doctor_username = "zodoc", remember_me, setResult }) => {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [content, setContent] = useState("");
+    const [onSubmit, setOnSubmit] = useState(false);
+
+    useEffect(() => {
+        let Message = "a"
+        const callAPI = async () => {
+            try {
+                const response = await callCreateCommentAPI({ doctor_username: doctor_username, comment_content: content }, remember_me);
+                if (response.status === 201) {
+                    Message = "Success";
+                    setContent("");
+                }
+            }
+            catch (e) {
+                Message = "Failure";
+            }
+            finally {
+                setResult(Message);
+            }
+        }
+        if (onSubmit) {
+            callAPI();
+            setIsLoading(false);
+        }
+        setOnSubmit(false);
+    }, [onSubmit])
 
     return (
         <Card raised style={{ maxWidth: "90%", margin: "auto", marginTop: "1em", marginBottom: "1em" }}>
@@ -28,7 +58,7 @@ export const AddComment = ({ doctor_username = "" }) => {
                 <Grid container>
                     <Grid item xs={2}>
                         <Box display="flex" alignItems="center" justifyContent="center">
-                            <AddCommentIcon color="primary" fontSize="large"/>
+                            <AddCommentIcon color="primary" fontSize="large" />
                         </Box>
                     </Grid>
                     <Grid item xs={10}>
@@ -39,12 +69,19 @@ export const AddComment = ({ doctor_username = "" }) => {
                             label="Write your comment here ..."
                             name="add-comment"
                             multiline
+                            value={content}
+                            onChange={event => setContent(event.target.value)}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton color="primary">
-                                            <SendIcon />
-                                        </IconButton>
+                                        {!isLoading &&
+                                            <IconButton 
+                                                disabled={content === ""} 
+                                                color="primary"
+                                                onClick={() => {setIsLoading(true); setOnSubmit(true);}}>
+                                                <SendIcon />
+                                            </IconButton>}
+                                        {isLoading && <LoadingSpinner />}
                                     </InputAdornment>)
                             }}
                         />
@@ -54,3 +91,9 @@ export const AddComment = ({ doctor_username = "" }) => {
         </Card>
     );
 }
+
+export default connect(state => {
+    return {
+        remember_me: state.authReducer.authData.remember_me,
+    }
+}, null)(AddComment);

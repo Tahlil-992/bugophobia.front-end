@@ -5,8 +5,11 @@ import React from 'react';
 // import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import { Box } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 // const useStyles = makeStyles({
 //     root: {
@@ -35,10 +38,18 @@ export const Comment = ({ commentInfo }) => {
                         {time}
                     </Typography>
                 </Box>
-                <Box>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="p" color={"textPrimary"}>
                         {content}
                     </Typography>
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                        <IconButton>
+                            <EditIcon color="primary"/>
+                        </IconButton>
+                        <IconButton>
+                            <DeleteIcon color="secondary"/>
+                        </IconButton>
+                    </Box>
                 </Box>
             </Grid>
         </Grid>
