@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "../../style.css";
-import {setIsDoctor} from "../../core/Authentication/action/authActions";
+import { setIsDoctor } from "../../core/Authentication/action/authActions";
 import { connect } from "react-redux";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -26,10 +26,13 @@ import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Paper from '@material-ui/core/Paper';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import { callAPIHandler } from "../../core/modules/refreshToken";
+import Toolbar from '@material-ui/core/Toolbar';
+import AppBar from '@material-ui/core/AppBar';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const callSignUPAPI = async (data, isdoctor) => {
   try {
-    const response = callAPIHandler({method:"POST", data: data, url: `/auth/register/${isdoctor ? "doctor": "patient"}/`}, false, false);
+    const response = callAPIHandler({ method: "POST", data: data, url: `/auth/register/${isdoctor ? "doctor" : "patient"}/` }, false, false);
     return response;
   }
   catch (e) {
@@ -124,9 +127,9 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
 
   const callAPI = async () => {
     try {
-      const data = isdoctor 
-        ? {user: {email: email, password: password, username: username, is_doctor: true}, gmc_number: Number(gmcNum)} 
-        : {user: {email: email, password: password, username: username, is_doctor: false}}
+      const data = isdoctor
+        ? { user: { email: email, password: password, username: username, is_doctor: true }, gmc_number: Number(gmcNum) }
+        : { user: { email: email, password: password, username: username, is_doctor: false } }
       const response = await callSignUPAPI(data, isdoctor);
 
       setIsLoading(false);
@@ -208,170 +211,177 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     setIsDoctor(true);
   }
   return (
-    <Box>
-      <Container component="main" maxWidth="xs">
-        <div className="paper">
-          {isdoctor && <Typography component="h1" variant="h5" style={{ color: "white" }}>Doctor SignUp Form</Typography> }
-          {!isdoctor && <Typography component="h1" variant="h5" style={{ color: "white" }}>Patient SignUp Form</Typography> }
-          <div class="form">
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {isdoctor &&
+    <React.Fragment >
+      <AppBar position="relative">
+        <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
+          <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+          {isdoctor && <Typography variant="h6" color="inherit" noWrap>Doctor SignUp Page</Typography>}
+          {!isdoctor && <Typography variant="h6" color="inherit" noWrap>Patient SignUp Page</Typography>}
+        </Toolbar>
+      </AppBar>
+      <Box style={{ display: 'flex', backgroundColor: 'lightblue', height: '690px', alignItems: 'center' }}>
+        <Container component="main" maxWidth="xs">
+          <div className="paper">
+            <div class="form">
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  {isdoctor &&
+                    <TextField
+                      error={!isgmcValid}
+                      variant="outlined"
+                      required
+                      fullWidth
+                      id="MedicalLicenseNumber"
+                      label="Medical License Number"
+                      name="MedicalLicenseNumber"
+                      value={gmcNum}
+                      onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
+                      InputProps={{
+                        startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
+                      }}
+                    />
+                  }
+                </Grid>
+                <Grid item xs={12}>
                   <TextField
-                    error={!isgmcValid}
+                    error={!isEmailValid}
                     variant="outlined"
                     required
                     fullWidth
-                    id="MedicalLicenseNumber"
-                    label="Medical License Number"
-                    name="MedicalLicenseNumber"
-                    value={gmcNum}
-                    onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    value={email}
+                    onChange={event => { setEmail(event.target.value); checkEmail(event.target.value); }}
                     InputProps={{
-                      startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
+                      startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>),
+                      endAdornment: (<InputAdornment position="end"></InputAdornment>)
                     }}
+                    helperText={emailhelper}
                   />
-                }
+                </Grid>
+                <Grid item xs={12}>
+                  <br />
+                  <TextField
+                    error={!isUsernameValid}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="username"
+                    label="Username"
+                    name="username"
+                    value={username}
+                    onChange={event => { setUsername(event.target.value); checkUsername(event.target.value); }}
+                    InputProps={{
+                      startAdornment: (<InputAdornment position="start"><AccountCircleIcon /></InputAdornment>),
+                      endAdornment: (<InputAdornment position="end"></InputAdornment>)
+                    }}
+                    helperText={userhelper}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <br />
+                  <TextField
+                    error={!(ispasswordValid && isConfigPassValid)}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    id="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={event => { setPassword(event.target.value); checkPassword(event.target.value); }}
+                    type={showPassword ? "text" : "password"}
+                    InputProps={{
+                      startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}>
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    helperText={passhelper}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    error={!(ispasswordValid && isConfigPassValid)}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="Rpassword"
+                    label="Confirm Password"
+                    id="Rpassword"
+                    autoComplete="current-password"
+                    value={configPass}
+                    onChange={event => { setConfigPass(event.target.value); checkConfigPass(event.target.value) }}
+                    type={showPassword ? "text" : "password"}
+                    InputProps={{
+                      startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>)
+                    }}
+                    helperText={configpasshelper}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  error={!isEmailValid}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  value={email}
-                  onChange={event => { setEmail(event.target.value); checkEmail(event.target.value); }}
-                  InputProps={{
-                    startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>),
-                    endAdornment: (<InputAdornment position="end"></InputAdornment>)
-                  }}
-                  helperText={emailhelper}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <br />
-                <TextField
-                  error={!isUsernameValid}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="username"
-                  label="Username"
-                  name="username"
-                  value={username}
-                  onChange={event => { setUsername(event.target.value); checkUsername(event.target.value); }}
-                  InputProps={{
-                    startAdornment: (<InputAdornment position="start"><AccountCircleIcon /></InputAdornment>),
-                    endAdornment: (<InputAdornment position="end"></InputAdornment>)
-                  }}
-                  helperText={userhelper}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <br />
-                <TextField
-                  error={!(ispasswordValid && isConfigPassValid)}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={event => { setPassword(event.target.value); checkPassword(event.target.value); }}
-                  type={showPassword ? "text" : "password"}
-                  InputProps={{
-                    startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}>
-                          {showPassword ? <Visibility /> : <VisibilityOff />}
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                  helperText={passhelper}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  error={!(ispasswordValid && isConfigPassValid)}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="Rpassword"
-                  label="Confirm Password"
-                  id="Rpassword"
-                  autoComplete="current-password"
-                  value={configPass}
-                  onChange={event => { setConfigPass(event.target.value); checkConfigPass(event.target.value) }}
-                  type={showPassword ? "text" : "password"}
-                  InputProps={{
-                    startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>)
-                  }}
-                  helperText={configpasshelper}
-                />
-              </Grid>
-            </Grid>
-            <Box display="flex" justifyContent="space-between">
-              <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Sign Up</Button>
-              {isLoading && <LoadingSpinner />}
-            </Box>
-            <Grid>
-              <Grid item>
-                {!isdoctor && <Link class="link" onClick={changeToDoctor}>Are you a doctor? Sign up as a doctor</Link> }
-                {isdoctor && <Link class="link" onClick={changeToPatient}>Are you a patient? Sign up as a patient</Link> }
-              </Grid>
-              <Grid item>
-                <Link class="link" to="/login">Already have an account? Log in</Link>
-              </Grid>
-            </Grid>
-          </div>
-        </div>
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={handleClose}
-          resumeHideDuration={0}
-        >
-          <Paper style={{ backgroundColor: "#f9a099", borderRadius: "7px" }} elevation={3}>
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              px={"1em"} py={"1em"}>
-              <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
-              <Box>
-                {message && message.split("\n").map((item) =>
-                  <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
-                )}
+              <Box display="flex" justifyContent="space-between">
+                <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Sign up</Button>
+                {isLoading && <LoadingSpinner />}
               </Box>
-              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
-                <CloseIcon style={{ color: "#611a15" }} />
-              </IconButton>
-            </Box>
-          </Paper>
-        </Snackbar>
-        <Modal
-          open={openModal}
-          onClose={() => goToLogin()}
-        >
-          <div className={classes.paper} display="flex" color='#1e4620'>
-            <CheckCircleIcon />
-            <h2>SignUp was Successful!</h2>
-            <Button onClick={() => goToLogin()}>Dismiss</Button>
+              <Grid>
+                <Grid item>
+                  {!isdoctor && <Link class="link" onClick={changeToDoctor}>Are you a doctor? Sign up as a doctor</Link>}
+                  {isdoctor && <Link class="link" onClick={changeToPatient}>Are you a patient? Sign up as a patient</Link>}
+                </Grid>
+                <Grid item>
+                  <Link class="link" to="/login">Already have an account? Log in</Link>
+                </Grid>
+              </Grid>
+            </div>
           </div>
-        </Modal>
-      </Container>
-    </Box>
+          <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            open={openSnackBar}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            resumeHideDuration={0}
+          >
+            <Paper style={{ backgroundColor: "#f9a099", borderRadius: "7px" }} elevation={3}>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                px={"1em"} py={"1em"}>
+                <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+                <Box>
+                  {message && message.split("\n").map((item) =>
+                    <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
+                  )}
+                </Box>
+                <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
+                  <CloseIcon style={{ color: "#611a15" }} />
+                </IconButton>
+              </Box>
+            </Paper>
+          </Snackbar>
+          <Modal
+            open={openModal}
+            onClose={() => goToLogin()}
+          >
+            <div className={classes.paper} display="flex" color='#1e4620'>
+              <CheckCircleIcon />
+              <h2>SignUp was Successful!</h2>
+              <Button onClick={() => goToLogin()}>Dismiss</Button>
+            </div>
+          </Modal>
+        </Container>
+      </Box>
+    </React.Fragment>
   );
 }
 const mapStateToProps = (state) => {

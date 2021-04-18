@@ -23,10 +23,13 @@ import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStor
 import { connect } from "react-redux";
 import { login, rememberMe, setIsDoctor } from "../../core/Authentication/action/authActions";
 import { callAPIHandler } from "../../core/modules/refreshToken";
+import Toolbar from '@material-ui/core/Toolbar';
+import AppBar from '@material-ui/core/AppBar';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const callLoginAPI = async ({ email, password }, isRemembered) => {
     try {
-        const response = callAPIHandler({method:"POST", data: {email, password}, url: "/auth/token/email/"}, true, isRemembered);
+        const response = callAPIHandler({ method: "POST", data: { email, password }, url: "/auth/token/email/" }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -50,7 +53,7 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
     const [message, setMessage] = useState();
     const [openSnackBar, setOpenSnackBar] = useState(false);
 
-	const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState(false);
 
     const handleSubmit = () => {
         if (email !== "" && password !== "") {
@@ -75,40 +78,40 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
         setMessage("");
     }
 
-	const callAPI = async () => {
-		try {
-			const response = await callLoginAPI({ email, password }, checked);
-			setIsLoading(false);
-			if (response.status === 200) {
-				setOpenSnackBar(false);
-				const payload = response.payload;
-				login({ accessToken: payload.access, refreshToken: payload.refresh, email: email });
+    const callAPI = async () => {
+        try {
+            const response = await callLoginAPI({ email, password }, checked);
+            setIsLoading(false);
+            if (response.status === 200) {
+                setOpenSnackBar(false);
+                const payload = response.payload;
+                login({ accessToken: payload.access, refreshToken: payload.refresh, email: email });
                 setIsDoctor(payload.is_doctor);
-				if (checked) {
-					rememberMe();
-					await setLocalStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false"});
-					await resetSessionStorage();
-				}
-				else {
-					await setSessionStorage({accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false"});
-					await resetLocalStorage();
-				}
+                if (checked) {
+                    rememberMe();
+                    await setLocalStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
+                    await resetSessionStorage();
+                }
+                else {
+                    await setSessionStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
+                    await resetLocalStorage();
+                }
                 history.replace("/")
-			}
+            }
 
-		}
-		catch (error) {
-			setIsLoading(false);
-			setOpenSnackBar(true);
-			if (error.payload !== null && error.payload !== undefined) {
-				setMessage("Wrong email address or password, Please check again.");
-			}
-			else {
-				setMessage("Something went wrong while trying to login");
-			}
+        }
+        catch (error) {
+            setIsLoading(false);
+            setOpenSnackBar(true);
+            if (error.payload !== null && error.payload !== undefined) {
+                setMessage("Wrong email address or password, Please check again.");
+            }
+            else {
+                setMessage("Something went wrong while trying to login");
+            }
 
-		}
-	}
+        }
+    }
 
     useEffect(() => {
         if (onSubmit) {
@@ -123,101 +126,108 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
     return (
-        <Box>
-            <Container component="main" maxWidth="xs">
-                <div class="paper">
-                    <Typography component="h1" variant="h5" style={{ color: "white" }}>Login Form</Typography>
-                    <div className="form">
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    error={isEmailEmpty}
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    id="email"
-                                    label="Email Address"
-                                    name="email"
-                                    value={email}
-                                    onChange={event => { setEmail(event.target.value); setIsEmailEmpty(false); }}
-                                    InputProps={{
-                                        startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>)
-                                    }}
-                                />
+        <React.Fragment >
+            <AppBar position="relative">
+                <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
+                    <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+                    <Typography variant="h6" color="inherit" noWrap>Login Page</Typography>
+                </Toolbar>
+            </AppBar>
+            <Box style={{ display: 'flex', backgroundColor: 'lightblue', height: '690px', alignItems: 'center' }}>
+                <Container component="main" maxWidth="xs">
+                    <div class="paper">
+                        <div className="form">
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        error={isEmailEmpty}
+                                        variant="outlined"
+                                        required
+                                        fullWidth
+                                        id="email"
+                                        label="Email Address"
+                                        name="email"
+                                        value={email}
+                                        onChange={event => { setEmail(event.target.value); setIsEmailEmpty(false); }}
+                                        InputProps={{
+                                            startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>)
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}><br />
+                                    <TextField
+                                        error={isPasswordEmpty}
+                                        variant="outlined"
+                                        required
+                                        fullWidth
+                                        name="password"
+                                        label="Password"
+                                        id="password"
+                                        autoComplete="current-password"
+                                        value={password}
+                                        onChange={event => { setPassword(event.target.value); setIsPasswordEmpty(false); }}
+                                        type={showPassword ? "text" : "password"}
+                                        InputProps={{
+                                            startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle password visibility"
+                                                        onClick={handleClickShowPassword}
+                                                        onMouseDown={handleMouseDownPassword}>
+                                                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <FormControlLabel
+                                        control={<Checkbox value="remember" />}
+                                        label="Remember me"
+                                        onChange={(event) => setChecked(event.target.checked)} />
+                                </Grid>
                             </Grid>
-                            <Grid item xs={12}><br/>
-                                <TextField
-                                    error={isPasswordEmpty}
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    id="password"
-                                    autoComplete="current-password"
-                                    value={password}
-                                    onChange={event => { setPassword(event.target.value); setIsPasswordEmpty(false); }}
-                                    type={showPassword ? "text" : "password"}
-                                    InputProps={{
-                                        startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={handleClickShowPassword}
-                                                    onMouseDown={handleMouseDownPassword}>
-                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
+                            <Box display="flex" justifyContent="space-between">
+                                <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Log in</Button>
+                                {isLoading && <LoadingSpinner />}
+                            </Box>
+                            <Grid>
+                                <Link class="link" to="/forget-password">Forget password?</Link>
                             </Grid>
-                            <Grid item xs={12}>
-                                <FormControlLabel 
-									control={<Checkbox value="remember" />} 
-									label="Remember me" 
-									onChange={(event) => setChecked(event.target.checked)}/>
+                            <Grid>
+                                <Link class="link" to="/sign-up">Don't have an account? Sign Up</Link>
                             </Grid>
-                        </Grid>
-                        <Box display="flex" justifyContent="space-between">
-                            <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Log in</Button>
-                            {isLoading && <LoadingSpinner />}
-                        </Box>
-                        <Grid>
-                            <Link class="link" to="/forget-password">Forget password?</Link>
-                        </Grid>
-                        <Grid>
-                            <Link class="link" to="/sign-up">Don't have an account? Sign Up</Link>
-                        </Grid>
+                        </div>
                     </div>
-                </div>
-                <Snackbar
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                    open={openSnackBar}
-                    message={
-                        <Box display="flex" alignItems="center">
-                            <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
-                            <Typography style={{ color: "#611a15" }}>{message}</Typography>
-                            <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                                <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
-                            </IconButton>
-                        </Box>}
-                    ContentProps={{ style: { backgroundColor: "#f9a099" } }}
-                    autoHideDuration={6000}
-                    onClose={handleClose}
-                    resumeHideDuration={0}
-                >
-                </Snackbar>
-            </Container>
-        </Box>
+                    <Snackbar
+                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                        open={openSnackBar}
+                        message={
+                            <Box display="flex" alignItems="center">
+                                <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+                                <Typography style={{ color: "#611a15" }}>{message}</Typography>
+                                <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                                    <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
+                                </IconButton>
+                            </Box>}
+                        ContentProps={{ style: { backgroundColor: "#f9a099" } }}
+                        autoHideDuration={6000}
+                        onClose={handleClose}
+                        resumeHideDuration={0}
+                    >
+                    </Snackbar>
+                </Container>
+            </Box>
+        </React.Fragment>
     );
 }
 
 export default connect(
-	state => ({ isdoctor: state.authReducer.isdoctor }),
-	dispatch => ({
-		login: userData => dispatch(login(userData)),
-		rememberMe: () => dispatch(rememberMe()),
+    state => ({ isdoctor: state.authReducer.isdoctor }),
+    dispatch => ({
+        login: userData => dispatch(login(userData)),
+        rememberMe: () => dispatch(rememberMe()),
         setIsDoctor: (av) => dispatch(setIsDoctor(av)),
-	}))(LogIn);
+    }))(LogIn);
