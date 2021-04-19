@@ -55,8 +55,6 @@ const useStyles = makeStyles((theme) => ({
         height: '100vh',
         overflow: 'auto',
         backgroundColor: 'lightblue',
-        paddingTop: "8px",
-        paddingBottom: "8px",
         padding: "8px",
         '& > *': {
             margin: theme.spacing(2),
@@ -73,28 +71,77 @@ export default function Profile () {
 
     const classes = useStyles();
 
-    const isDoctor = !((sessionStorage.getItem("isdoctor") === "true") ? true : false);
+    const isDoctor = ((sessionStorage.getItem("isdoctor") === "true") ? true : false) ||
+                     ((localStorage.getItem("isdoctor") === "true") ? true : false);
     const str = isDoctor ? "doctor" : "patient";
 
-    const payload = {};
-
-    const callAPI = async () => {
-        try {
-            const response = await callProfileAPI(isDoctor, true);
-            if (response.status === 200 || true) {
-                payload = response.payload;
-                alert(payload.user.email)
-            }
-        }
-        catch (error) {
-            console.log(error);
-
+    const specializationMap = (spec) => {
+        switch(spec) {
+            case 'C':
+                return 'Cardiologist';
+                break;
+            case 'D':
+                return 'Dermatologist';
+                break;
+            case 'G':
+                return 'General Practitioner';
+                break;
+            case 'GY':
+                return 'Gynecologist';
+                break;
+            case 'I':
+                return 'Internist';
+                break;
+            case 'N':
+                return 'Neurologist';
+                break;
+            case 'O':
+                return 'Obstetrician';
+                break;
+            case 'OP':
+                return 'Ophthalmologist';
+                break;
+            case 'OT':
+                return 'Otolaryngologist';
+                break;
+            case 'P':
+                return 'Pediatrician';
+                break;
+            case 'PS':
+                return 'Psychiatrist';
+                break;
+            case 'U':
+                return 'Urologist';
+                break;
         }
     }
 
-    
+    const insuranceMap = (insur) => {
+        switch(insur) {
+            case 'O':
+                return 'Omr';
+                break;
+            case 'H':
+                return 'Havades';
+                break;
+            case 'T':
+                return 'Takmili';
+                break;
+        }
+    }
 
-    const [profileImage, setProfileImage] = useState(DoctorImage);
+    const genderMap = (gen) => {
+        switch(gen) {
+            case 'M':
+                return 'Male';
+                break;
+            case 'F':
+                return 'Female';
+                break;
+        }
+    }
+
+    const [profileImage, setProfileImage] = useState(isDoctor ? DoctorImage : "");
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -109,6 +156,41 @@ export default function Profile () {
     const [specialization, setSpecialization] = useState("");
     const [experience, setExperience] = useState("");
     const [insurance, setInsurance] = useState("");
+
+    const callGetAPI = async () => {
+        try {
+            const response = await callProfileAPI(isDoctor, false);
+            if (response.status === 200) {
+                let payload = response.payload;
+                setFirstName(payload.user.first_name);
+                setLastName(payload.user.last_name);
+                setEmail(payload.user.email);
+                setUsername(payload.user.username);
+                setGender(genderMap(payload.user.gender));
+                setAge(payload.user.age);
+                setPhoneNumber(payload.user.phone_number);
+                setCity(payload.user.city);
+                if (isDoctor) {
+                    setGmcNumber(payload.user.gmc_number);
+                    setSpecialization(specializationMap(payload.user.field_of_specialization));
+                    setExperience(payload.user.work_experience);
+                }
+                else {
+                    setInsurance(insuranceMap(payload.insurance_type));
+                }
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const [sent, setSent] = useState(false);
+    if (!sent){
+        callGetAPI();
+        setSent(true);
+    }
 
     const [firstNameDis, setFirstNameDis] = useState(false);
     const [lastNameDis, setLastNameDis] = useState(false);
@@ -273,8 +355,3 @@ export default function Profile () {
         </React.Fragment>
     );
 }
-
-
-
-
-
