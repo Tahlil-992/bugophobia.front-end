@@ -5,11 +5,10 @@ import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import { callAPIHandler } from "../../../core/modules/refreshToken";
 import { connect } from "react-redux";
-import { LoadingSpinner } from "../../../assets/loading.spinner";
 
-const callGetCommentsAPI = async ({ doctor_username }, isRemembered) => {
+const callGetCommentsAPI = async ({ doctor_username, page=1 }, isRemembered) => {
     try {
-        const response = await callAPIHandler({ method: "GET", data: { doctor_username: doctor_username }, url: "/profile/comments/" }, true, isRemembered);
+        const response = await callAPIHandler({ method: "POST", data: { doctor_username: doctor_username }, params: {page: page}, url: "/profile/comments/" }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -18,33 +17,49 @@ const callGetCommentsAPI = async ({ doctor_username }, isRemembered) => {
 }
 
 const CommentSection = ({ remember_me }) => {
-    const comments = [
-        { info: { user: "ali", content: "bad doctor", time: "3 days ago" } },
-        { info: { user: "hasan", content: "good doctor", time: "10 months ago" } },
-    ]
 
     const [message, setMessage] = useState("");
-
-    useEffect(() => {
-        const callAPI = async () => {
-            try {
-                const response = await callGetCommentsAPI( {doctor_username: "zodoc"}, remember_me )
-                if (response.status === 200) {
-                    setMessage("Success");
-                    console.log(response);
-                }
-            }
-            catch {
-                setMessage("Failure");
+    const [comments, setComments] = useState([]);
+    const [onSendReq, setOnSendReq] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
+    const [count, setCount] = useState(0);
+    const [pageCounts, setPageCounts] = useState(1);
+    
+    const callAPI = async () => {
+        try {
+            const response = await callGetCommentsAPI( {doctor_username: "zodoc"}, remember_me )
+            console.log(response);
+            setCount(response.payload.count);
+            setPageCounts(Math.ceil(response.payload.count / response.payload.results.length))
+            setComments(response.payload.results.reverse());
+            if (response.status === 200) {
+                setMessage("Success");
+                console.log(response);
             }
         }
-        callAPI();
-    }, [])
+        catch {
+            setMessage("Failure");
+        }
+        finally {
+            setIsLoading(false);
+            setOnSendReq(false);
+        }
+    }
+
+    useEffect(() => {
+        if (onSendReq)
+            callAPI();
+    }, [onSendReq])
 
     return (
         <Container>
             <Box>
-                <CommentFragment comments={comments} />
+                <CommentFragment 
+                    comments={comments} 
+                    reload={() => {setOnSendReq(true); setIsLoading(true);}} 
+                    show={!isLoading}
+                    count={count}
+                    page={1}/>
             </Box>
         </Container>
 

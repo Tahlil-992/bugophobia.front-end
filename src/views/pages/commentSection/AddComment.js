@@ -22,27 +22,34 @@ const callCreateCommentAPI = async ({ doctor_username, comment_content }, isReme
     }
 }
 
-const AddComment = ({ doctor_username = "zodoc", remember_me, setResult }) => {
+const AddComment = ({ doctor_username = "zodoc", remember_me, reload }) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState("");
     const [onSubmit, setOnSubmit] = useState(false);
+    const [onReload, setOnReload] = useState(false);
 
     useEffect(() => {
-        let Message = "a"
+        if (onReload)
+            reload();
+        setOnReload(false);
+    }, [onReload])
+
+    useEffect(() => {
+        let flag = false;
         const callAPI = async () => {
             try {
                 const response = await callCreateCommentAPI({ doctor_username: doctor_username, comment_content: content }, remember_me);
                 if (response.status === 201) {
-                    Message = "Success";
+                    flag = true;
                     setContent("");
                 }
             }
             catch (e) {
-                Message = "Failure";
+                flag = false;
             }
             finally {
-                setResult(Message);
+                setOnReload(flag);
             }
         }
         if (onSubmit) {
@@ -81,7 +88,7 @@ const AddComment = ({ doctor_username = "zodoc", remember_me, setResult }) => {
                                                 onClick={() => {setIsLoading(true); setOnSubmit(true);}}>
                                                 <SendIcon />
                                             </IconButton>}
-                                        {isLoading && <LoadingSpinner />}
+                                        {isLoading && <LoadingSpinner withText={false}/>}
                                     </InputAdornment>)
                             }}
                         />
