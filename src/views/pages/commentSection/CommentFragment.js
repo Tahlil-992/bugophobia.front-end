@@ -1,7 +1,7 @@
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import React from "react";
-import { Comment } from "./comment";
+import Comment from "./comment";
 import AddComment from "./AddComment";
 import Paper from "@material-ui/core/Paper";
 import { LoadingSpinner } from "../../../assets/loading.spinner";
@@ -15,7 +15,7 @@ export const CommentFragment = ({ comments, reload, show, page, pageCount, count
                 return (
                     <Card key={comment.id} raised style={{ maxWidth: "90%", margin: "auto", marginTop: "1em" }}>
                         <CardContent>
-                            <Comment commentInfo={comment} />
+                            <Comment commentInfo={comment} reload={() => reload(page)}/>
                         </CardContent>
                     </Card>
                 )
@@ -26,7 +26,7 @@ export const CommentFragment = ({ comments, reload, show, page, pageCount, count
                     style={{ maxWidth: "90%", margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "lightblue" }}>
                     Be the first to comment
                 </Typography>}
-            <AddComment reload={(page) => reload(page)} />
+            <AddComment reload={() => reload(page)} />
             <Pagination
                 pageCount={pageCount}
                 page={page}
