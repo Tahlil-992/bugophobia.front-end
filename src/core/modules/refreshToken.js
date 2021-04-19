@@ -15,8 +15,8 @@ const callAPI = async (request, sendToken = true) => {
                 "Content-Type": "application/json",
 
             },
-            data: ["PUT", "POST"].includes(request.method) ? request.data : {},
-            params: ["DELETE", "GET"].includes(request.method) ? request.params : {},
+            data: request.data || {},
+            params: request.params || {},
         })
         return {
             status: response.status,
