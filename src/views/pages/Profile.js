@@ -172,9 +172,9 @@ export default function Profile () {
                 setPhoneNumber(payload.user.phone_number);
                 setCity(payload.user.city);
                 if (isDoctor) {
-                    setGmcNumber(payload.user.gmc_number);
-                    setSpecialization(specializationMap(payload.user.field_of_specialization));
-                    setExperience(payload.user.work_experience);
+                    setGmcNumber(payload.gmc_number);
+                    setSpecialization(specializationMap(payload.filed_of_specialization));
+                    setExperience(payload.work_experience);
                 }
                 else {
                     setInsurance(insuranceMap(payload.insurance_type));
