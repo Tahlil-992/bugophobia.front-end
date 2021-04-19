@@ -25,6 +25,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import { BorderColorOutlined } from '@material-ui/icons';
 import DoctorImage from "../../assets/images/doctor.png";
+import PatientImage from "../../assets/images/patient.png";
 
 const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
@@ -141,7 +142,7 @@ export default function Profile () {
         }
     }
 
-    const [profileImage, setProfileImage] = useState(isDoctor ? DoctorImage : "");
+    const [profileImage, setProfileImage] = useState(isDoctor ? DoctorImage : PatientImage);
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
