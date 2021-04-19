@@ -7,14 +7,14 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 export const Pagination = (
     {
-        count,
+        pageCount,
         page,
         onBackwardPage,
         onForwardPage,
         onForwardLastPage,
         onBackwardFirstPage
     }) => {
-
+        console.log("cur = " + page + " " + pageCount)
     return (
         <Box mb={2} display="flex" flexDirection="row" justifyContent="center" alignItems={"center"}>
             <Box display="flex" flexDirection="row" justifyContent="center" alignItems={"center"}>
@@ -24,10 +24,10 @@ export const Pagination = (
                 <IconButton disabled={page === 1} style={{padding: "0"}} onClick={onBackwardPage}>
                     <ChevronLeftIcon fontSize="large" />
                 </IconButton>
-                <IconButton disabled={page === count} style={{padding: "0"}} onClick={onForwardPage}>
+                <IconButton disabled={page === pageCount} style={{padding: "0"}} onClick={onForwardPage}>
                     <ChevronRightIcon fontSize="large" />
                 </IconButton>
-                <IconButton disabled={page === count} style={{padding: "0"}} onClick={onForwardLastPage}>
+                <IconButton disabled={page === pageCount} style={{padding: "0"}} onClick={onForwardLastPage}>
                     <LastPageIcon fontSize="large"/>
                 </IconButton>
             </Box>

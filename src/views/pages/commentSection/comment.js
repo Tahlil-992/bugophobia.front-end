@@ -65,7 +65,7 @@ export const Comment = ({ commentInfo }) => {
                     </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="p" color={"textPrimary"}>
+                    <Typography variant={"body2"} color={"textPrimary"}>
                         {comment_text}
                     </Typography>
                     <Box display="flex" justifyContent="center" alignItems="center">

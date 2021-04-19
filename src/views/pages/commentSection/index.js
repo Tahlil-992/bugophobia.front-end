@@ -6,7 +6,9 @@ import Container from "@material-ui/core/Container";
 import { callAPIHandler } from "../../../core/modules/refreshToken";
 import { connect } from "react-redux";
 
-const callGetCommentsAPI = async ({ doctor_username, page=1 }, isRemembered) => {
+const limit = 5;
+
+const callGetCommentsAPI = async ({ doctor_username, page }, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "POST", data: { doctor_username: doctor_username }, params: {page: page}, url: "/profile/comments/" }, true, isRemembered);
         return response;
@@ -24,13 +26,14 @@ const CommentSection = ({ remember_me }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [count, setCount] = useState(0);
     const [pageCounts, setPageCounts] = useState(1);
+    const [params, setParams] = useState({page: 1});
     
     const callAPI = async () => {
         try {
-            const response = await callGetCommentsAPI( {doctor_username: "zodoc"}, remember_me )
+            const response = await callGetCommentsAPI( {doctor_username: "zodoc", page: params.page}, remember_me )
             console.log(response);
             setCount(response.payload.count);
-            setPageCounts(Math.ceil(response.payload.count / response.payload.results.length))
+            setPageCounts(Math.ceil(response.payload.count / limit));
             setComments(response.payload.results.reverse());
             if (response.status === 200) {
                 setMessage("Success");
@@ -56,10 +59,11 @@ const CommentSection = ({ remember_me }) => {
             <Box>
                 <CommentFragment 
                     comments={comments} 
-                    reload={() => {setOnSendReq(true); setIsLoading(true);}} 
+                    reload={(page) => {setOnSendReq(true); setIsLoading(true); setParams({page: page});}} 
                     show={!isLoading}
-                    count={count}
-                    page={1}/>
+                    page={params.page}
+                    pageCount={pageCounts}
+                    count={count}/>
             </Box>
         </Container>
 
