@@ -11,6 +11,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import { IconButton } from "@material-ui/core";
 import { connect } from "react-redux";
 import { LoadingSpinner } from "../../../assets/loading.spinner";
+import { Severity } from "./index";
 
 const callCreateCommentAPI = async ({ doctor_username, comment_content }, isRemembered) => {
     try {
@@ -22,12 +23,32 @@ const callCreateCommentAPI = async ({ doctor_username, comment_content }, isReme
     }
 }
 
-const AddComment = ({ doctor_username = "zodoc", remember_me, reload }) => {
+const AddComment = ({ doctor_username = "zodoc", remember_me, reload, setMessage }) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState("");
     const [onSubmit, setOnSubmit] = useState(false);
     const [onReload, setOnReload] = useState(false);
+
+    const callAPI = async () => {
+        let flag = false;
+        try {
+            const response = await callCreateCommentAPI({ doctor_username: doctor_username, comment_content: content }, remember_me);
+            if (response.status === 201) {
+                flag = true;
+                setContent("");
+            }
+        }
+        catch (e) {
+            flag = false;
+        }
+        finally {
+            setOnReload(flag);
+            setMessage(!flag 
+                ? {type: Severity.ERROR, text: "Something went wrong while trying to submit your comment!"}
+                : {type: Severity.SUCCESS, text: "Comment submitted successfully!"});
+        }
+    }
 
     useEffect(() => {
         if (onReload)
@@ -36,26 +57,11 @@ const AddComment = ({ doctor_username = "zodoc", remember_me, reload }) => {
     }, [onReload])
 
     useEffect(() => {
-        let flag = false;
-        const callAPI = async () => {
-            try {
-                const response = await callCreateCommentAPI({ doctor_username: doctor_username, comment_content: content }, remember_me);
-                if (response.status === 201) {
-                    flag = true;
-                    setContent("");
-                }
-            }
-            catch (e) {
-                flag = false;
-            }
-            finally {
-                setOnReload(flag);
-            }
-        }
+
         if (onSubmit) {
             callAPI();
-            setIsLoading(false);
         }
+        setIsLoading(false);
         setOnSubmit(false);
     }, [onSubmit])
 

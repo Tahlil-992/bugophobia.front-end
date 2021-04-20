@@ -13,6 +13,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import SendIcon from "@material-ui/icons/Send";
 import { LoadingSpinner } from "../../../assets/loading.spinner";
 import ClearIcon from '@material-ui/icons/Clear';
+import { Severity } from '.';
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -46,7 +47,7 @@ const callDeleteCommentAPI = async ({ id }, isRemembered) => {
     }
 }
 
-const Comment = ({ commentInfo, reload, remember_me }) => {
+const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
 
     // const { comment_text, created, id, patient } = commentInfo;
 
@@ -74,15 +75,15 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
         setOnReload(false);
     }, [onReload])
     
-    useEffect(async() => {
+    useEffect(() => {
         if (isPendingEdit) {
-            await callEditAPI();
+            callEditAPI();
         }
     }, [isPendingEdit])
 
-    useEffect(async () => {
+    useEffect(() => {
         if (onGetEditedComment) {
-            await callGetSpecificAPI();
+            callGetSpecificAPI();
         }
     }, [onGetEditedComment])
 
@@ -112,9 +113,11 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
             const response = await callDeleteCommentAPI({ id: commentProps.id }, remember_me);
             if (response.status === 204) {
                 setOnReload(true);
+                setMessage({type: Severity.SUCCESS, text: "Comment deleted successfully!"});
             }
         }
         catch {
+            setMessage({type: Severity.ERROR, text: "Something went wrong while trying to delete your comment!"});
             console.log("Error while trying to delete comment");
         }
     }
@@ -155,6 +158,7 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
         catch {
             pend = false;
             onGet = false;
+            setMessage({type: Severity.ERROR, text: "Something went wrong while trying to edit your comment!"});
             // reload whole page or just do nothing
         }
         finally {
