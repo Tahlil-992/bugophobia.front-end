@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -12,7 +12,6 @@ import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import EmailIcon from '@material-ui/icons/Email';
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
-import LockIcon from '@material-ui/icons/Lock';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import WcIcon from '@material-ui/icons/Wc';
 import ApartmentIcon from '@material-ui/icons/Apartment';
@@ -23,7 +22,6 @@ import AlarmIcon from '@material-ui/icons/Alarm';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { callAPIHandler } from "../../core/modules/refreshToken";
-import { BorderColorOutlined } from '@material-ui/icons';
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
 
@@ -52,10 +50,6 @@ const useStyles = makeStyles((theme) => ({
         
     },
     content: {
-        flexGrow: 1,
-        height: '100vh',
-        overflow: 'auto',
-        backgroundColor: 'lightblue',
         padding: "8px",
         '& > *': {
             margin: theme.spacing(2),
@@ -72,48 +66,48 @@ export default function Profile () {
 
     const classes = useStyles();
 
-    const isDoctor = ((sessionStorage.getItem("isdoctor") === "true") ? true : false) ||
-                     ((localStorage.getItem("isdoctor") === "true") ? true : false);
+    var isDoctor = false;
+    var isRemembered = false;
+
+    if (localStorage.getItem("isdoctor") == null) {
+        isDoctor = ((sessionStorage.getItem("isdoctor") === "true") ? true : false);
+        isRemembered = false;
+    }
+    else {
+        isDoctor = ((localStorage.getItem("isdoctor") === "true") ? true : false);
+        isRemembered = true;
+    }
+
     const str = isDoctor ? "doctor" : "patient";
 
     const specializationMap = (spec) => {
         switch(spec) {
             case 'C':
                 return 'Cardiologist';
-                break;
             case 'D':
                 return 'Dermatologist';
-                break;
             case 'G':
                 return 'General Practitioner';
-                break;
             case 'GY':
                 return 'Gynecologist';
-                break;
             case 'I':
                 return 'Internist';
-                break;
             case 'N':
                 return 'Neurologist';
-                break;
             case 'O':
                 return 'Obstetrician';
-                break;
             case 'OP':
                 return 'Ophthalmologist';
-                break;
             case 'OT':
                 return 'Otolaryngologist';
-                break;
             case 'P':
                 return 'Pediatrician';
-                break;
             case 'PS':
                 return 'Psychiatrist';
-                break;
             case 'U':
                 return 'Urologist';
-                break;
+            default:
+                return '';
         }
     }
 
@@ -121,13 +115,12 @@ export default function Profile () {
         switch(insur) {
             case 'O':
                 return 'Omr';
-                break;
             case 'H':
                 return 'Havades';
-                break;
             case 'T':
                 return 'Takmili';
-                break;
+            default:
+                return '';
         }
     }
 
@@ -135,10 +128,19 @@ export default function Profile () {
         switch(gen) {
             case 'M':
                 return 'Male';
-                break;
             case 'F':
                 return 'Female';
-                break;
+            default:
+                return '';
+        }
+    }
+
+    const nullCheck = (exp) => {
+        if (exp == null) {
+            return "";
+        }
+        else {
+            return exp;
         }
     }
 
@@ -152,7 +154,6 @@ export default function Profile () {
     const [age, setAge] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [city, setCity] = useState("");
-    const [password, setPassword] = useState("");
     const [gmcNumber, setGmcNumber] = useState("");
     const [specialization, setSpecialization] = useState("");
     const [experience, setExperience] = useState("");
@@ -160,21 +161,21 @@ export default function Profile () {
 
     const callGetAPI = async () => {
         try {
-            const response = await callProfileAPI(isDoctor, false);
+            const response = await callProfileAPI(isDoctor, isRemembered);
             if (response.status === 200) {
                 let payload = response.payload;
-                setFirstName(payload.user.first_name);
-                setLastName(payload.user.last_name);
-                setEmail(payload.user.email);
-                setUsername(payload.user.username);
+                setFirstName(nullCheck(payload.user.first_name));
+                setLastName(nullCheck(payload.user.last_name));
+                setEmail(nullCheck(payload.user.email));
+                setUsername(nullCheck(payload.user.username));
                 setGender(genderMap(payload.user.gender));
-                setAge(payload.user.age);
-                setPhoneNumber(payload.user.phone_number);
-                setCity(payload.user.city);
+                setAge(nullCheck(payload.user.age));
+                setPhoneNumber(nullCheck(payload.user.phone_number));
+                setCity(nullCheck(payload.user.city));
                 if (isDoctor) {
-                    setGmcNumber(payload.gmc_number);
+                    setGmcNumber(nullCheck(payload.gmc_number));
                     setSpecialization(specializationMap(payload.filed_of_specialization));
-                    setExperience(payload.work_experience);
+                    setExperience(nullCheck(payload.work_experience));
                 }
                 else {
                     setInsurance(insuranceMap(payload.insurance_type));
@@ -193,50 +194,36 @@ export default function Profile () {
         setSent(true);
     }
 
-    const [firstNameDis, setFirstNameDis] = useState(false);
-    const [lastNameDis, setLastNameDis] = useState(false);
-    const [emailDis, setEmailDis] = useState(false);
-    const [usernameDis, setUsernameDis] = useState(false);
-    const [genderDis, setGenderDis] = useState(false);
-    const [ageDis, setAgeDis] = useState(false);
-    const [phoneNumberDis, setPhoneNumberDis] = useState(false);
-    const [cityDis, setCityDis] = useState(false);
-    const [passwordDis, setPasswordDis] = useState(false);
-    const [gmcNumberDis, setGmcNumberDis] = useState(false);
-    const [specializationDis, setSpecializationDis] = useState(false);
-    const [experienceDis, setExperienceDis] = useState(false);
-    const [insuranceDis, setInsuranceDis] = useState(false);
+    const [disabled, setDisabled] = useState(-1);
 
     const [editProfile, setEditProfile] = useState(false);
     const [buttonLable1, setButtonLable1] = useState("Edit Profile");
 
     const fields = isDoctor ?
-                   [['First Name', firstName, setFirstName, firstNameDis, setFirstNameDis, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, setLastName, lastNameDis, setLastNameDis, <DoubleArrowIcon/>],
-                    ['Email Address', email, setEmail, emailDis, setEmailDis, <EmailIcon/>],
-                    ['Username', username, setUsername, usernameDis, setUsernameDis, <AccountCircleIcon/>],
-                    ['Gender', gender, setGender, genderDis, setGenderDis, <WcIcon/>],
-                    ['Age', age, setAge, ageDis, setAgeDis, <AlarmIcon/>],
-                    ['Phone Number', phoneNumber, setPhoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
-                    ['City', city, setCity, cityDis, setCityDis, <ApartmentIcon/>],
-                    //['Password', password, setPassword, passwordDis, setPasswordDis, <LockIcon/>],
-                    ['GMC Number', gmcNumber, setGmcNumber, gmcNumberDis, setGmcNumberDis, <LocalHospitalIcon/>],
-                    ['Filed of Specialization', specialization, setSpecialization, specializationDis, setSpecializationDis, <WorkIcon/>],
-                    ['Work Experiece', experience, setExperience, experienceDis, setExperienceDis, <BuildIcon/>]
+                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>],
+                    ['Email Address', email, setEmail, <EmailIcon/>],
+                    ['Username', username, setUsername, <AccountCircleIcon/>],
+                    ['Gender', gender, setGender, <WcIcon/>],
+                    ['Age', age, setAge, <AlarmIcon/>],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>],
+                    ['City', city, setCity, <ApartmentIcon/>],
+                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>],
+                    ['Filed of Specialization', specialization, setSpecialization, <WorkIcon/>],
+                    ['Work Experiece', experience, setExperience, <BuildIcon/>]
                     ]
 
                    :
 
-                   [['First Name', firstName, setFirstName, firstNameDis, setFirstNameDis, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, setLastName, lastNameDis, setLastNameDis, <DoubleArrowIcon/>],
-                    ['Email Address', email, setEmail, emailDis, setEmailDis, <EmailIcon/>],
-                    ['Username', username, setUsername, usernameDis, setUsernameDis, <AccountCircleIcon/>],
-                    ['Gender', gender, setGender, genderDis, setGenderDis, <WcIcon/>],
-                    ['Age', age, setAge, ageDis, setAgeDis, <AlarmIcon/>],
-                    ['Phone Number', phoneNumber, setPhoneNumber, phoneNumberDis, setPhoneNumberDis, <PhoneAndroidIcon/>],
-                    ['City', city, setCity, cityDis, setCityDis, <ApartmentIcon/>],
-                    //['Password', password, setPassword, passwordDis, setPasswordDis, <LockIcon/>],
-                    ['Insurance Type', insurance, setInsurance, insuranceDis, setInsuranceDis, <LocalHospitalIcon/>]
+                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>],
+                    ['Email Address', email, setEmail, <EmailIcon/>],
+                    ['Username', username, setUsername, <AccountCircleIcon/>],
+                    ['Gender', gender, setGender, <WcIcon/>],
+                    ['Age', age, setAge, <AlarmIcon/>],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>],
+                    ['City', city, setCity, <ApartmentIcon/>],
+                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>]
                     ];
 
     const buttonHandler1 = () => {
@@ -245,7 +232,7 @@ export default function Profile () {
     }
 
     return (
-        <React.Fragment>
+        <div>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -253,17 +240,17 @@ export default function Profile () {
                 </Toolbar>
             </AppBar>
             <div className={classes.content}>
-                <Grid direction="column" container spacing={3}>
-                    <Grid direction="row" container item spacing={3}>
+                <Grid container direction="column"  spacing={3}>
+                    <Grid container direction="row"  item spacing={3}>
                         <Avatar className={classes.large} src={profileImage}></Avatar>
-                        <Grid direction="column" item justify="space-around" alignItems="flex-end">
+                        <Grid >
                             <br></br>
                             <br></br>
                             <br></br>
                             {isDoctor ? (
                                 <div>
-                                    <h2>{"Dr. " + firstName + " " + lastName}</h2>
-                                    <h3>{"specialized of " + specialization}</h3>
+                                    <h2>{"Doctor " + firstName + " " + lastName}</h2>
+                                    <h3>{specialization}</h3>
                                     <h4>*****</h4>
                                 </div>
                             )
@@ -279,7 +266,7 @@ export default function Profile () {
                 </Grid>
                 <br/>
                 <Grid container direction="row" spacing={0} className={classes.root}>  
-                    <Grid item xs={isDoctor ? 4 : ''}>
+                    <Grid item xs={isDoctor ? 4 : 4}>
                         <Accordion className={classes.accordion} variant="outlined">
                             <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -294,23 +281,21 @@ export default function Profile () {
                                     <Container component="main" maxWidth="xs">                
                                         <Box display="flex" justifyContent="space-between" >
                                             <Grid container spacing={2} alignItems="flex-start">
-                                                    {fields.map((item) => {
+                                                    {fields.map((item, index) => {
                                                         return(
-                                                            <Grid item xs={12}>
+                                                            <Grid item xs={12} key={index.toString()}>
                                                                 <TextField 
-                                                                    color="white"
-                                                                     backgroundColor="white"
-                                                                    onMouseEnter={() => item[4](true)}
-                                                                    onMouseLeave={() => item[4](false)}
-                                                                    disabled={item[3] && !editProfile}
+                                                                    key={index.toString()}
+                                                                    onMouseEnter={() => setDisabled(index)}
+                                                                    onMouseLeave={() => setDisabled(-1)}
+                                                                    disabled={(disabled === index) && !editProfile}
                                                                     variant="outlined"
-                                                                    
                                                                     fullWidth 
                                                                     label={item[0]}
                                                                     value={item[1]}
                                                                     onChange={event => item[2](event.target.value)}
                                                                     InputProps={{
-                                                                        startAdornment: (<InputAdornment position="start">{item[5]}</InputAdornment>)
+                                                                        startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>)
                                                                     }}
                                                                     />
                                                             </Grid>
@@ -353,6 +338,6 @@ export default function Profile () {
                     }
                 </Grid> 
             </div>
-        </React.Fragment>
+        </div>
     );
 }
