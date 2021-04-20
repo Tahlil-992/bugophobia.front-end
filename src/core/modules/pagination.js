@@ -14,7 +14,6 @@ export const Pagination = (
         onForwardLastPage,
         onBackwardFirstPage
     }) => {
-        console.log("cur = " + page + " " + pageCount)
     return (
         <Box mb={2} display="flex" flexDirection="row" justifyContent="center" alignItems={"center"}>
             <Box display="flex" flexDirection="row" justifyContent="center" alignItems={"center"}>

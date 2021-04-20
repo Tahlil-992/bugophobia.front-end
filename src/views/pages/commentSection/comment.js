@@ -48,19 +48,24 @@ const callDeleteCommentAPI = async ({ id }, isRemembered) => {
 
 const Comment = ({ commentInfo, reload, remember_me }) => {
 
-    const { comment_text, created, id, patient } = commentInfo;
+    // const { comment_text, created, id, patient } = commentInfo;
 
+    const [commentProps, setCommentProps] = useState(
+        { comment_text: commentInfo.comment_text,
+        created: commentInfo.created,
+        id: commentInfo.id, 
+        patient: commentInfo.patient });
     const [current_date] = useState(new Date());
     const [created_date] = useState({
-        year: created.split("T")[0].split("-")[0],
-        month: created.split("T")[0].split("-")[1],
-        day: created.split("T")[0].split("-")[2]
+        year: commentProps.created.split("T")[0].split("-")[0],
+        month: commentProps.created.split("T")[0].split("-")[1],
+        day: commentProps.created.split("T")[0].split("-")[2]
     })
-
     const [onReload, setOnReload] = useState(false);
     const [onEdit, setOnEdit] = useState(false);
-    const [editedContent, setEditedContent] = useState(comment_text);
+    const [editedContent, setEditedContent] = useState(commentProps.comment_text);
     const [isPendingEdit, setIsPendingEdit] = useState(false);
+    const [onGetEditedComment, setOnGetEditedComment] = useState(false);
 
     useEffect(() => {
         if (onReload) {
@@ -68,6 +73,18 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
         }
         setOnReload(false);
     }, [onReload])
+    
+    useEffect(async() => {
+        if (isPendingEdit) {
+            await callEditAPI();
+        }
+    }, [isPendingEdit])
+
+    useEffect(async () => {
+        if (onGetEditedComment) {
+            await callGetSpecificAPI();
+        }
+    }, [onGetEditedComment])
 
     const day_postfix = (day) => {
         switch (day) {
@@ -92,7 +109,7 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
 
     const callDeleteAPI = async () => {
         try {
-            const response = await callDeleteCommentAPI({ id }, remember_me);
+            const response = await callDeleteCommentAPI({ id: commentProps.id }, remember_me);
             if (response.status === 204) {
                 setOnReload(true);
             }
@@ -103,26 +120,48 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
     }
 
     const callEditAPI = async () => {
+        let pend = true;
+        let onGet = false;
         try {
-            const response = await callUpdateCommentAPI({ id: id, comment_text: editedContent }, remember_me);
+            const response = await callUpdateCommentAPI({ id: commentProps.id, comment_text: editedContent }, remember_me);
             if (response.status === 200) {
-                // set SpecificReload -> true
+                pend = false;
+                onGet = true;
             }
         }
         catch {
+            pend = false;
+            onGet = false;
             console.log("Error while trying to edit comment");
+        }
+        finally {
+            setOnGetEditedComment(onGet);
+            setIsPendingEdit(pend);
         }
     }
 
     const callGetSpecificAPI = async () => {
+        let pend = true;
+        let onGet = true;
+        let content = null;
         try {
-            const response = await callGetSpecificCommentAPI({ id }, remember_me);
+            const response = await callGetSpecificCommentAPI({ id: commentProps.id }, remember_me);
             if (response.status === 200) {
-                // show new comment
+                pend = false;
+                onGet = false;
+                content = response.payload.comment_text;
             }
         }
         catch {
+            pend = false;
+            onGet = false;
             // reload whole page or just do nothing
+        }
+        finally {
+            setIsPendingEdit(pend);
+            setOnGetEditedComment(onGet);
+            setCommentProps({ ...commentProps, comment_text: content || commentProps.comment_text});
+            setEditedContent(content || commentProps.comment_text);
         }
     }
 
@@ -136,7 +175,7 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
             <Grid item xs={12} md={10}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant={"body2"} color="secondary">
-                        {patient.user.username}
+                        {commentProps.patient.user.username}
                     </Typography>
                     <Typography variant="caption" color={"textSecondary"}>
                         {!isToday(current_date, created_date) ? months[Number(created_date.month) - 1] + " " + created_date.day + day_postfix(created_date.day)
@@ -146,7 +185,7 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
                 </Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     {!onEdit && <Typography variant={"body2"} color={"textPrimary"}>
-                        {comment_text}
+                        {commentProps.comment_text}
                     </Typography>}
                     {onEdit &&
                         <TextField
@@ -169,13 +208,13 @@ const Comment = ({ commentInfo, reload, remember_me }) => {
                                             <IconButton 
                                                 disabled={editedContent === ""} 
                                                 color="primary"
-                                                // onClick={() => {setIsLoading(true); setOnSubmit(true);}}
+                                                onClick={() => {setIsPendingEdit(true); setOnEdit(false);}}
                                                 >
                                                 <SendIcon />
                                             </IconButton>
                                             <IconButton 
                                                 color="secondary"
-                                                onClick={() => {setOnEdit(false); setEditedContent(comment_text)}}>
+                                                onClick={() => {setOnEdit(false); setEditedContent(commentProps.comment_text)}}>
                                                 <ClearIcon />
                                             </IconButton>
                                         </>}

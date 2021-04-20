@@ -37,7 +37,6 @@ const CommentSection = ({ remember_me }) => {
             setComments(response.payload.results.reverse());
             if (response.status === 200) {
                 setMessage("Success");
-                console.log(response);
             }
         }
         catch {

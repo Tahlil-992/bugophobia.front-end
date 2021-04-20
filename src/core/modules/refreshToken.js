@@ -4,8 +4,8 @@ import axios from "axios";
 const callAPI = async (request, sendToken = true) => {
     const accessToken = await (localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken"));
     const authorization = sendToken && { "Authorization": `Bearer ${accessToken}` };
-    console.log(request.data);
-    console.log("n\n" + request.data || {})
+    // console.log(request.data);
+    // console.log("n\n" + request.data || {})
     try {
         const response = await axios({
             url: request.url,
