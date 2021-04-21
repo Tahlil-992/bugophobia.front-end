@@ -30,12 +30,22 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
+import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import { resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from '../../core/Authentication/action/authActions';
 
+const callTopDoctorsAPI = async (isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/doctors/TopDoctors/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -272,7 +282,7 @@ function Explore({ signOut }) {
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
-                            <Paper className={classes.paper} style={{ backgroundColor: 'lightblue', border: '3px solid #10217d' }}>
+                            <Paper className={classes.paper} style={{ backgroundColor: 'lightblue', border: '3px solid #10217d', borderRadius:'10px' }}>
                                 <React.Fragment>
                                     <Typography component="h2" variant="h6" color="primary" gutterBottom>
                                         Top Doctors
@@ -281,12 +291,11 @@ function Explore({ signOut }) {
                                         <div className="row__cards">
                                             {cards.map((card) => (
                                                 <Grid item key={card} xs={12} sm={6} md={4}>
-                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', minWidth: '200px', marginRight:'10px' }}>
+                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', minWidth: '200px', scrollMarginInline:'10px' ,marginRight: '10px', border:'1px solid #10217d', borderRadius:'10px', height:'100%', width:'50%' }}>
                                                         <CardMedia
                                                             className={classes.cardMedia}
                                                             image={DoctorImage}
-                                                            title="Image title"
-                                                        />
+                                                            title="Image title"/>
                                                         <CardContent className={classes.cardContent}>
                                                             <Typography gutterBottom variant="h5" component="h2">
                                                                 Doctor's name
