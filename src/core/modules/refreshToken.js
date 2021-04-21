@@ -47,6 +47,7 @@ export const callAPIHandler = async (request, sendToken, isRemembered) => {
     }
     catch (e) {
         if (e.status === 401) {
+            console.log("access expired");
             try {
                 const refreshRequest = { url: "/auth/token/refresh/", method: "POST" };
                 const refreshResponse = callAPI(refreshRequest, true);
@@ -63,6 +64,7 @@ export const callAPIHandler = async (request, sendToken, isRemembered) => {
             }
             catch (e) {
                 if (e.status === 401) {
+                    console.log("refresh expired");
                     if (isRemembered) {
                         await resetLocalStorage();
                     }
@@ -72,9 +74,13 @@ export const callAPIHandler = async (request, sendToken, isRemembered) => {
                     // location.replace("http://localhost:3000/");
                 }
                 else {
+                    console.log("refresh not expired");
                     throw e;
                 }
             }
+        }
+        else {
+            console.log("access not expired");
         }
 
     }

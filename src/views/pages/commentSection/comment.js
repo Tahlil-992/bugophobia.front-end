@@ -187,7 +187,8 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
                             "Today"}
                     </Typography>
                 </Box>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
+                    <Box style={{wordWrap: "break-word"}}>
                     {!onEdit && <Typography variant={"body2"} color={"textPrimary"}>
                         {commentProps.comment_text}
                     </Typography>}
@@ -226,6 +227,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
                                     </InputAdornment>)
                             }}
                         />}
+                        </Box>
                     <Box display="flex" justifyContent="center" alignItems="center">
                         {!onEdit && <IconButton>
                             <EditIcon onClick={() => setOnEdit(true)} color="primary" />

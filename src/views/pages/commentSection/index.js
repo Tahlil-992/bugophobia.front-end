@@ -61,7 +61,8 @@ const CommentSection = ({ remember_me }) => {
             setPageCounts(Math.ceil(response.payload.count / limit));
             setComments(response.payload.results.reverse());
             if (response.status === 200) {
-                setMessage({ text: "", type: Severity.SUCCESS });
+                if (message.text !== "")
+                    setMessage({ text: message.text, type: Severity.SUCCESS });
             }
         }
         catch {
@@ -74,6 +75,8 @@ const CommentSection = ({ remember_me }) => {
     }
 
     const handleClose = () => {
+        console.log("MESSAGE = " + message.text);
+        console.log("TYPE = " + message.type);
         setOpenSnackBar(false);
     }
 
@@ -101,7 +104,7 @@ const CommentSection = ({ remember_me }) => {
                     count={count} 
                     setMessage={(msg) => {setMessage(msg);}}/>
             </Box>
-            <Snackbar
+            {openSnackBar && <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={openSnackBar}
                 autoHideDuration={6000}
@@ -130,7 +133,7 @@ const CommentSection = ({ remember_me }) => {
                         </IconButton>
                     </Box>
                 </Paper>
-            </Snackbar>
+            </Snackbar>}
         </Container>
 
 
