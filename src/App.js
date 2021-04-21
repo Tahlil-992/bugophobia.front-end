@@ -4,6 +4,7 @@ import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
 import LandingPage from "../src/views/pages/LandingPage";
 import Explore from "../src/views/pages/Explore";
+import Profile from "../src/views/pages/Profile";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import { useEffect } from "react";
@@ -75,14 +76,15 @@ function App({ setIsDoctor, login, rememberMe }) {
             <Route exact path="/">
               {is_doctor ? <Redirect to="/doctor/explore" /> : <Redirect to="/patient/explore" />}
             </Route>
-            <Route path="*">
-              {is_doctor ? <Redirect to="/doctor/explore" /> : <Redirect to="/patient/explore" />}
-            </Route>
+            
             <Route exact path="/patient/explore">
               <Explore />
             </Route>
             <Route exact path="/doctor/explore">
               <Explore />
+            </Route>
+            <Route exact path="/profile">
+              <Profile />
             </Route>
           </>
         )}
