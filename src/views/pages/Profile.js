@@ -24,6 +24,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
+import CommentSection from "./commentSection";
 
 const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
@@ -266,7 +267,7 @@ export default function Profile () {
                 </Grid>
                 <br/>
                 <Grid container direction="row" spacing={0} className={classes.root}>  
-                    <Grid item xs={isDoctor ? 4 : 4}>
+                    <Grid item md={isDoctor ? 4 : 4} xs={12}>
                         <Accordion className={classes.accordion} variant="outlined">
                             <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -315,7 +316,7 @@ export default function Profile () {
                         </Accordion>
                     </Grid>
                     {isDoctor ?
-                        <Grid item xs={7}>
+                        <Grid item md={7} xs={12}>
                             <Accordion className={classes.accordion} variant="outlined">
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
@@ -325,11 +326,14 @@ export default function Profile () {
                                         <Typography >Comments</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    <div >
+                                    {/* <div >
                                         <Container component="main" maxWidth="xs">
                                             <h3><center>No Comments Here!</center></h3>
                                         </Container>
-                                    </div>
+                                    </div> */}
+                                    <Box display="flex" flex={1} position="relative" maxHeight="75vh" overflow="auto">
+                                        <CommentSection/>
+                                    </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> 

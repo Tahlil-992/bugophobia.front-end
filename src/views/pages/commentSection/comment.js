@@ -47,7 +47,7 @@ const callDeleteCommentAPI = async ({ id }, isRemembered) => {
     }
 }
 
-const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
+const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
 
     // const { comment_text, created, id, patient } = commentInfo;
 
@@ -135,6 +135,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
         catch {
             pend = false;
             onGet = false;
+            setMessage({type: Severity.ERROR, text: "Something went wrong while tring to edit your comment!"});
             console.log("Error while trying to edit comment");
         }
         finally {
@@ -192,7 +193,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
                     {!onEdit && <Typography variant={"body2"} color={"textPrimary"}>
                         {commentProps.comment_text}
                     </Typography>}
-                    {onEdit &&
+                    {onEdit && commentProps.patient.user.email === email &&
                         <TextField
                             margin={"1em 0 0 0"}
                             variant={"filled"}
@@ -228,14 +229,14 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
                             }}
                         />}
                         </Box>
-                    <Box display="flex" justifyContent="center" alignItems="center">
+                    {commentProps.patient.user.email === email && <Box display="flex" justifyContent="center" alignItems="center">
                         {!onEdit && <IconButton>
                             <EditIcon onClick={() => setOnEdit(true)} color="primary" />
                         </IconButton>}
                         <IconButton disabled={onEdit} onClick={async() => {await callDeleteAPI();}}>
                             <DeleteIcon color={onEdit ? "disabled" : "secondary"} />
                         </IconButton>
-                    </Box>
+                    </Box>}
                 </Box>
             </Grid>
         </Grid>
@@ -245,5 +246,6 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage }) => {
 export default connect(state => {
     return {
         remember_me: state.authReducer.authData.remember_me,
+        email: state.authReducer.authData.email,
     }
 }, null)(Comment);

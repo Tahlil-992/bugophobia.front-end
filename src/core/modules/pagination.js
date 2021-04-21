@@ -15,7 +15,7 @@ export const Pagination = (
         onBackwardFirstPage
     }) => {
     return (
-        <Box mb={2} display="flex" flexDirection="row" justifyContent="center" alignItems={"center"}>
+        <Box mb={2} display="flex" flexDirection="row" justifyContent="center" alignItems={"center"} marginTop="1em">
             <Box display="flex" padding={"0"} borderRadius="15px" flexDirection="row" justifyContent="center" alignItems={"center"} style={{backgroundColor: "#dddddd"}}>
                 <IconButton disabled={page === 1} style={{padding: "0"}} onClick={onBackwardFirstPage}>
                     <FirstPageIcon fontSize="large"/>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CommentFragment } from "./CommentFragment";
+import CommentFragment from "./CommentFragment";
 // import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
@@ -93,8 +93,8 @@ const CommentSection = ({ remember_me }) => {
     }, [onSendReq])
 
     return (
-        <Container>
-            <Box>
+        <Container style={{padding: "0"}}>
+            <Box minWidth="100%" maxWidth="100%">
                 <CommentFragment
                     comments={comments}
                     reload={(page) => { setOnSendReq(true); setIsLoading(true); setParams({ page: page }); }}
