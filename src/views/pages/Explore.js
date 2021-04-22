@@ -32,14 +32,11 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
-<<<<<<< HEAD
 import { resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from '../../core/Authentication/action/authActions';
-=======
 import { Link } from "react-router-dom";
->>>>>>> d111273... cards
 
 const callTopDoctorsAPI = async () => {
     try {
