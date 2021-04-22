@@ -55,3 +55,21 @@
     border-radius: 10px;
     background-color: #719fb0;
 }
+
+.column__cards {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.column__cards::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: lightblue;
+}
+.column__cards::-webkit-scrollbar {
+    width: 12px;
+    border-radius: 10px;
+    background-color: lightblue;
+}
+.column__cards::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #719fb0;
+}

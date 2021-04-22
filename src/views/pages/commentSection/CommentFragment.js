@@ -13,30 +13,28 @@ import Box from '@material-ui/core/Box';
 import { connect } from "react-redux";
 
 const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMessage, isdoctor }) => {
-    const [curComments, setCurComments] = useState(comments);
+    // const [curComments, setCurComments] = useState(comments);
     const [msgType, setMsgType] = useState({type: ""});
     const [direction, setDirection] = useState("right");
     const [onSlide, setOnSlide] = useState(true);
 
-    useEffect(() => {
-        // if (direction !== "") {
-        //     setOnSlide(true);
-        // }
-        if (direction === "left") {
-            setCurComments(comments);
-        }
-        else {
-            setCurComments(comments);
-        }
-        // console.log("A:" + direction);
-        setDirection("");
-        // console.log("B:" + direction);
-    }, [direction]);
+    // useEffect(() => {
+    //     // if (direction !== "") {
+    //     //     setOnSlide(true);
+    //     // }
+    //     if (direction === "left") {
+    //         setCurComments(comments);
+    //     }
+    //     else {
+    //         setCurComments(comments);
+    //     }
+    //     // console.log("A:" + direction);
+    //     setDirection("");
+    //     // console.log("B:" + direction);
+    // }, [direction]);
 
     return (
         <Box minWidth="100%" maxWidth="100%">
-        {/* <Paper elevation={0} style={{position: "relative", overflow: "auto", height:"75vh", minWidth: "100%", maxWidth: "100%", margin: "auto", backgroundColor: "lightblue" }}> */}
-            
             {show && comments.map((comment, index) => {
                 return (
                     <Box key={"Box-comment-" + comment.id}>
@@ -103,7 +101,6 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
                 onForwardLastPage={() => {setDirection("right"); setOnSlide(true); reload(pageCount);}}
                 onBackwardFirstPage={() => {setDirection("left"); setOnSlide(true); reload(1);}} />
             </Box>
-        {/* </Paper> */}
         </Box>
     );
 }

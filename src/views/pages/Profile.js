@@ -331,7 +331,7 @@ export default function Profile () {
                                             <h3><center>No Comments Here!</center></h3>
                                         </Container>
                                     </div> */}
-                                    <Box display="flex" flex={1} position="relative" maxHeight="75vh" overflow="auto">
+                                    <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
                                         <CommentSection username={username}/>
                                     </Box>
                                 </AccordionDetails>
