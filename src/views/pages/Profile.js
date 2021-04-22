@@ -30,6 +30,7 @@ import CommentSection from "./commentSection";
 import PropTypes from 'prop-types';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import StarRating from "./RatingComponent/rating";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -474,6 +475,22 @@ export default function Profile () {
                         </Grid>
                         <Grid item>
                             <Input type="file" onChange={onFileChange} style={{marginBottom: "1em"}}></Input>
+                                {isDoctor ? (
+                                    <center>
+                                        <h3>{"Doctor " + firstName + " " + lastName}</h3>
+                                        <h4>{specialization}</h4>
+                                        <Box>
+                                            <StarRating />
+                                        </Box>
+                                    </center>
+                                )
+                                :
+                                (
+                                    <center>
+                                        <h2>{firstName + " " + lastName}</h2>
+                                        <h3>{"User"}</h3>
+                                    </center>
+                                )}
                         </Grid>
                         <Grid item container className={classes.tab2} direction="column">
                             <Grid item style={{width: "inherit"}}>
