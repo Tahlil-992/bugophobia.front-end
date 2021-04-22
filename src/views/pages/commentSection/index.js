@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import CommentFragment from "./CommentFragment";
-// import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import { callAPIHandler } from "../../../core/modules/refreshToken";
@@ -11,7 +10,6 @@ import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
-import { makeStyles } from "@material-ui/core";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 const limit = 5;
@@ -35,9 +33,9 @@ const SUCCESS_BACKGROUND = "#c2fcc2";
 const ERROR_COLOR = "#611a15";
 const ERROR_BACKGROUND = "#f9a099";
 
-const CommentSection = ({ remember_me }) => {
+const CommentSection = ({ remember_me, username }) => {
 
-
+    console.log("USER => " + username);
     const [message, setMessage] = useState({ type: "", text: "" });
     const [comments, setComments] = useState([]);
     const [onSendReq, setOnSendReq] = useState(true);
@@ -48,6 +46,10 @@ const CommentSection = ({ remember_me }) => {
     const [openSnackBar, setOpenSnackBar] = useState(false);
 
     useEffect(() => {
+        setOnSendReq(true);
+    }, [username])
+
+    useEffect(() => {
         if (message.text !== "") {
             setOpenSnackBar(true);
         }
@@ -55,7 +57,7 @@ const CommentSection = ({ remember_me }) => {
 
     const callAPI = async () => {
         try {
-            const response = await callGetCommentsAPI({ doctor_username: "zodoc", page: params.page }, remember_me)
+            const response = await callGetCommentsAPI({ doctor_username: username, page: params.page }, remember_me)
             console.log(response);
             setCount(response.payload.count);
             setPageCounts(Math.ceil(response.payload.count / limit));

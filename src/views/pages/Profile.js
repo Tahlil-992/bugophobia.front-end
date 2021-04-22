@@ -332,7 +332,7 @@ export default function Profile () {
                                         </Container>
                                     </div> */}
                                     <Box display="flex" flex={1} position="relative" maxHeight="75vh" overflow="auto">
-                                        <CommentSection/>
+                                        <CommentSection username={username}/>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>

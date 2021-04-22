@@ -3,7 +3,6 @@ import Card from "@material-ui/core/Card";
 import React, { useState, useEffect } from "react";
 import Comment from "./comment";
 import AddComment from "./AddComment";
-import Paper from "@material-ui/core/Paper";
 import { LoadingSpinner } from "../../../assets/loading.spinner";
 import { Pagination } from "../../../core/modules/pagination";
 import Divider from "@material-ui/core/Divider";
@@ -11,7 +10,6 @@ import Typography from "@material-ui/core/Typography"
 import { Severity } from ".";
 import Slide from '@material-ui/core/Slide';
 import Box from '@material-ui/core/Box';
-import Zoom from '@material-ui/core/Zoom';
 import { connect } from "react-redux";
 
 const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMessage, isdoctor }) => {
@@ -30,9 +28,9 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
         else {
             setCurComments(comments);
         }
-        console.log("A:" + direction);
+        // console.log("A:" + direction);
         setDirection("");
-        console.log("B:" + direction);
+        // console.log("B:" + direction);
     }, [direction]);
 
     return (
