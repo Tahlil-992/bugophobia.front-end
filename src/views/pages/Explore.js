@@ -31,6 +31,10 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import DoctorImage from "../../assets/images/doctor.png";
+import { resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
+import { useHistory } from "react-router-dom";
+import { connect } from "react-redux";
+import { signOut } from '../../core/Authentication/action/authActions';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -176,7 +180,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-export default function Explore() {
+
+function Explore({ signOut }) {
+
+    const handleSignOut = () => {
+        resetLocalStorage();
+        resetSessionStorage();
+        signOut();
+        document.location.reload();
+    }    
+
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleDrawerOpen = () => {
@@ -236,7 +249,7 @@ export default function Explore() {
                             </ListItemIcon>
                             <ListItemText primary="Profile" />
                         </ListItem>
-                        <ListItem button>
+                        <ListItem button onClick={handleSignOut}>
                             <ListItemIcon>
                                 <ExitToAppIcon />
                             </ListItemIcon>
@@ -299,3 +312,9 @@ export default function Explore() {
         </div>
     );
 }
+
+export default connect(null, state => {
+    return {
+        signOut: () => signOut(),
+    };
+})(Explore)
