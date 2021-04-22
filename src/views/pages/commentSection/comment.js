@@ -189,7 +189,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
                     </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
-                    <Box style={{wordWrap: "break-word"}}>
+                    <Box style={{wordWrap: "break-word"}} display="flex" flex={1}>
                     {!onEdit && <Typography variant={"body2"} color={"textPrimary"}>
                         {commentProps.comment_text}
                     </Typography>}
