@@ -29,6 +29,7 @@ import CommentSection from "./commentSection";
 import PropTypes from 'prop-types';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import StarRating from "./RatingComponent/rating";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -364,7 +365,9 @@ export default function Profile () {
                                     <center>
                                         <h3>{"Doctor " + firstName + " " + lastName}</h3>
                                         <h4>{specialization}</h4>
-                                        <h5>*****</h5>
+                                        <Box>
+                                            <StarRating />
+                                        </Box>
                                     </center>
                                 )
                                 :
