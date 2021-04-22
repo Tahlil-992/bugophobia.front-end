@@ -25,7 +25,7 @@ export const authReducer = (currentState = initialstate, action) => {
     case SIGNOUT:
       return {
         ...currentState,
-        authData: initialstate,
+        ...initialstate,
       };
     case REMEMBER_ME:
       return {
