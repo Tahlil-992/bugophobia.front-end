@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -32,14 +32,19 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
+<<<<<<< HEAD
 import { resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from '../../core/Authentication/action/authActions';
+=======
+import { Link } from "react-router-dom";
+>>>>>>> d111273... cards
 
-const callTopDoctorsAPI = async (isRemembered) => {
+const callTopDoctorsAPI = async () => {
     try {
-        const response = callAPIHandler({ method: "GET", url: `/doctors/TopDoctors/` }, true, isRemembered);
+        var response = callAPIHandler({ method: "GET", url: `/profile/list_doctors/` }, true, true);
+        
         return response;
     }
     catch (e) {
@@ -189,17 +194,50 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateZ(0)',
     },
 }));
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 function Explore({ signOut }) {
-
     const handleSignOut = () => {
         resetLocalStorage();
         resetSessionStorage();
         signOut();
         document.location.reload();
     }    
-
+    const [username, setUsername] = useState("");
+    const [specialization, setSpecialization] = useState("");
+    const [cards, setcards] = useState([]);
+    const specializationMap = (spec) => {
+        switch (spec) {
+            case 'C': return 'Cardiologist';
+            case 'D': return 'Dermatologist';
+            case 'G': return 'General Practitioner';
+            case 'GY': return 'Gynecologist';
+            case 'I': return 'Internist';
+            case 'N': return 'Neurologist';
+            case 'O': return 'Obstetrician';
+            case 'OP': return 'Ophthalmologist';
+            case 'OT': return 'Otolaryngologist';
+            case 'P': return 'Pediatrician';
+            case 'PS': return 'Psychiatrist';
+            case 'U': return 'Urologist';
+            default: return '';
+        }
+    }
+    const callGetAPI = async () => {
+        try {
+            const response = await callTopDoctorsAPI();
+            let payload = response.payload;
+            setcards(payload);
+            setUsername((payload.user.username));
+            setSpecialization(specializationMap(payload.filed_of_specialization));
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    const [sent, setSent] = useState(false);
+    if (!sent){
+        callGetAPI();
+        setSent(true);
+    }
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleDrawerOpen = () => {
@@ -253,12 +291,14 @@ function Explore({ signOut }) {
                 <Divider />
                 <List>
                     <div>
-                        <ListItem button>
-                            <ListItemIcon>
-                                <AccountCircleIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Profile" />
-                        </ListItem>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/profile">
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <AccountCircleIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Profile" />
+                            </ListItem>
+                        </Link>
                         <ListItem button onClick={handleSignOut}>
                             <ListItemIcon>
                                 <ExitToAppIcon />
@@ -282,7 +322,7 @@ function Explore({ signOut }) {
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
-                            <Paper className={classes.paper} style={{ backgroundColor: 'lightblue', border: '3px solid #10217d', borderRadius:'10px' }}>
+                            <Paper className={classes.paper} style={{ backgroundColor: 'lightblue', border: '3px solid #10217d', borderRadius: '10px' }}>
                                 <React.Fragment>
                                     <Typography component="h2" variant="h6" color="primary" gutterBottom>
                                         Top Doctors
@@ -291,17 +331,17 @@ function Explore({ signOut }) {
                                         <div className="row__cards">
                                             {cards.map((card) => (
                                                 <Grid item key={card} xs={12} sm={6} md={4}>
-                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', minWidth: '200px', scrollMarginInline:'10px' ,marginRight: '10px', border:'1px solid #10217d', borderRadius:'10px', height:'100%', width:'50%' }}>
+                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', minWidth: '200px', scrollMarginInline: '10px', marginRight: '10px', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '50%' }}>
                                                         <CardMedia
                                                             className={classes.cardMedia}
                                                             image={DoctorImage}
-                                                            title="Image title"/>
+                                                            title="Image title" />
                                                         <CardContent className={classes.cardContent}>
                                                             <Typography gutterBottom variant="h5" component="h2">
-                                                                Doctor's name
+                                                                {card.user.username}
                                                             </Typography>
                                                             <Typography>
-                                                                Description
+                                                                {specializationMap(card.filed_of_specialization)}
                                                             </Typography>
                                                         </CardContent>
                                                         <CardActions>
