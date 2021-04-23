@@ -11,6 +11,7 @@ import ForgetPassword from "../src/views/pages/ForgetPassword";
 import LandingPage from "../src/views/pages/LandingPage";
 import Explore from "../src/views/pages/Explore";
 import Profile from "../src/views/pages/Profile";
+import ViewProfile from "../src/views/pages/ViewProfile";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import CommentSection from "./views/pages/commentSection";
@@ -92,6 +93,9 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/profile">
               <Profile />
+            </Route>
+            <Route exact path="/view-profile">
+              <ViewProfile />
             </Route>
             <Route exact path="/comment">
               <CommentSection />
