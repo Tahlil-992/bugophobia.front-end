@@ -25,6 +25,7 @@ import PatientImage from "../../assets/images/patient.png";
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import PropTypes from 'prop-types';
+import CommentSection from './commentSection'
 
 
 function TabPanel(props) {
@@ -462,11 +463,9 @@ export default function Profile () {
                                 </div>
                         </TabPanel>
                         <TabPanel value={tabValue} index={1}>
-                            <div >
-                                <Container component="main" maxWidth="xs">
-                                    <h3><center>No Comments Here!</center></h3>
-                                </Container>
-                            </div>
+                            <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                <CommentSection username={username}/>
+                            </Box>
                         </TabPanel>
                     </Grid>
                 </Grid> 
