@@ -25,7 +25,7 @@ import PatientImage from "../../assets/images/patient.png";
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import PropTypes from 'prop-types';
-import CommentSection from './commentSection'
+import CommentSection from './commentSection';
 
 
 function TabPanel(props) {
