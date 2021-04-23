@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StyledBadge = withStyles((theme) => ({
     badge: {
-      backgroundColor: 'lightblue',
+      backgroundColor: "inherit",
     },
   }))(Badge);
 
@@ -415,7 +415,7 @@ export default function Profile () {
                                 variant="fullWidth"
                                 aria-label="full width tabs example"
                                 >
-                                    <Tab label="Details" icon={<AccountCircleIcon/>} {...a11yProps(0)} />
+                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} />
                                     <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps(1)} />                                    
                             </Tabs>
                             :
@@ -428,7 +428,7 @@ export default function Profile () {
                                 variant="fullWidth"
                                 aria-label="full width tabs example"
                                 >
-                                    <Tab label="Details" icon={<AccountCircleIcon/>} {...a11yProps(0)} />  
+                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} />  
                             </Tabs>
                         }
                         <TabPanel value={tabValue} index={0} className={classes.accordion}>
