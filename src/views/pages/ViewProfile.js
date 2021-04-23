@@ -144,13 +144,13 @@ export default function Profile () {
 
     const str = isDoctor ? "doctor" : "patient";
 
-    const [isViewedDoctor, setIsViewedDoctor] = useState(true);
-    const [viewedUsername, setViewedUsername] = useState("ab");
+    const [isViewedDoctor, setIsViewedDoctor] = useState(((localStorage.getItem("isvieweddoctor") === "true") ? true : false));
+    const [viewedUsername, setViewedUsername] = useState((localStorage.getItem("viewedusername")));
 
     const [isSaved, setIsSaved] = useState(false);
     const [id, setId] = useState(0);
 
-    const [tabValue, setTabValue] = React.useState(0);
+    const [tabValue, setTabValue] = useState(0);
 
     const handleChange = (event, newValue) => {
         setTabValue(newValue);
@@ -364,11 +364,11 @@ export default function Profile () {
                     <Grid item> { isViewedDoctor ?
                         <StyledBadge 
                             badgeContent={isSaved ?
-                                <IconButton onClick={deleteButtonHandler} style={{bgcolor: "lightblue"}} title="Remove from Favorites">
+                                <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
                                     <FavoriteIcon color="secondary" fontSize="large" />
                                 </IconButton>
                                 :
-                                <IconButton onClick={saveButtonHandler} style={{bgcolor: "lightblue"}} title="Add to Favorites">
+                                <IconButton onClick={saveButtonHandler} title="Add to Favorites">
                                     <FavoriteBorderIcon color="secondary" fontSize="large" />
                                 </IconButton>
                             } 
