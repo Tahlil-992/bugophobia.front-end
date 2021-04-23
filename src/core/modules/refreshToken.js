@@ -4,6 +4,8 @@ import axios from "axios";
 const callAPI = async (request, sendToken = true) => {
     const accessToken = await (localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken"));
     const authorization = sendToken && { "Authorization": `Bearer ${accessToken}` };
+    // console.log(request.data);
+    // console.log("n\n" + request.data || {})
     try {
         const response = await axios({
             url: request.url,
@@ -15,8 +17,8 @@ const callAPI = async (request, sendToken = true) => {
                 "Content-Type": "application/json",
 
             },
-            data: ["PUT", "POST"].includes(request.method) ? request.data : {},
-            params: ["DELETE", "GET"].includes(request.method) ? request.params : {},
+            data: request.data || {},
+            params: request.params || {},
         })
         return {
             status: response.status,
@@ -45,6 +47,7 @@ export const callAPIHandler = async (request, sendToken, isRemembered) => {
     }
     catch (e) {
         if (e.status === 401) {
+            console.log("access expired");
             try {
                 const refreshRequest = { url: "/auth/token/refresh/", method: "POST" };
                 const refreshResponse = callAPI(refreshRequest, true);
@@ -61,6 +64,7 @@ export const callAPIHandler = async (request, sendToken, isRemembered) => {
             }
             catch (e) {
                 if (e.status === 401) {
+                    console.log("refresh expired");
                     if (isRemembered) {
                         await resetLocalStorage();
                     }
@@ -70,9 +74,13 @@ export const callAPIHandler = async (request, sendToken, isRemembered) => {
                     // location.replace("http://localhost:3000/");
                 }
                 else {
+                    console.log("refresh not expired");
                     throw e;
                 }
             }
+        }
+        else {
+            console.log("access not expired");
         }
 
     }

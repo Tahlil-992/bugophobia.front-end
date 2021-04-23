@@ -1,4 +1,10 @@
-import { Switch, Route, Redirect, useHistory } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+  Switch,
+  Route,
+  Redirect,
+  useHistory
+} from "react-router-dom";
 import SignUpForm from "../src/views/pages/SignUpForm";
 import LoginForm from "../src/views/pages/LoginForm";
 import ForgetPassword from "../src/views/pages/ForgetPassword";
@@ -7,7 +13,7 @@ import Explore from "../src/views/pages/Explore";
 import Profile from "../src/views/pages/Profile";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
-import { useEffect } from "react";
+import CommentSection from "./views/pages/commentSection";
 
 function App({ setIsDoctor, login, rememberMe }) {
 
@@ -68,6 +74,7 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/">
               <LandingPage />
+              {/* <CommentSection/> */}
             </Route>
           </>
         ) :
@@ -85,6 +92,9 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/profile">
               <Profile />
+            </Route>
+            <Route exact path="/comment">
+              <CommentSection />
             </Route>
           </>
         )}
