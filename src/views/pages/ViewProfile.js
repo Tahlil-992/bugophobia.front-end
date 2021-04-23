@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Button, Container, Link, makeStyles, Toolbar } from '@material-ui/core';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { AppBar, Avatar, Badge, Button, ButtonBase, Container, IconButton, Link, makeStyles, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -20,9 +16,49 @@ import WorkIcon from '@material-ui/icons/Work';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import CommentIcon from '@material-ui/icons/Comment';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import PropTypes from 'prop-types';
+
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box p={3}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+};
+  
+function a11yProps(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
 
 const callProfileAPI = async (data, is_viewed_doctor, isRemembered) => {
     try {
@@ -71,24 +107,24 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
       },
     },
-    accordion:{
-        backgroundColor: 'lightblue',
-        borderWidth: "3px",
-        borderColor: "#10217d",
-        
-    },
-    content: {
-        padding: "8px",
-        '& > *': {
-            margin: theme.spacing(2),
-          },
-    },
     large: {
-      width: theme.spacing(30),
-      height: theme.spacing(30),
-      margin: theme.spacing(2),
+      width: theme.spacing(20),
+      height: theme.spacing(20),
+      margin: theme.spacing(0),
     },
+    tab: {
+        maxWidth: 500,
+    },
+    grid: {
+        marginTop: "2rem",
+    }
 }));
+
+const StyledBadge = withStyles((theme) => ({
+    badge: {
+      backgroundColor: 'lightblue',
+    },
+  }))(Badge);
 
 export default function Profile () {
 
@@ -109,10 +145,20 @@ export default function Profile () {
     const str = isDoctor ? "doctor" : "patient";
 
     const [isViewedDoctor, setIsViewedDoctor] = useState(true);
-    const [viewedUsername, setViewedUsername] = useState("doctor2");
+    const [viewedUsername, setViewedUsername] = useState("ab");
 
     const [isSaved, setIsSaved] = useState(false);
     const [id, setId] = useState(0);
+
+    const [tabValue, setTabValue] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setTabValue(newValue);
+      };
+    
+      const handleChangeIndex = (index) => {
+        setTabValue(index);
+      };
 
     const specializationMap = (spec) => {
         switch(spec) {
@@ -313,55 +359,80 @@ export default function Profile () {
                     <Typography variant="h6" color="inherit" noWrap>View Profile</Typography>
                 </Toolbar>
             </AppBar>
-            <div className={classes.content}>
-                <Grid container direction="column"  spacing={3}>
-                    <Grid container direction="row"  item spacing={3}>
+            <div >
+                <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
+                    <Grid item> { isViewedDoctor ?
+                        <StyledBadge 
+                            badgeContent={isSaved ?
+                                <IconButton onClick={deleteButtonHandler} style={{bgcolor: "lightblue"}} title="Remove from Favorites">
+                                    <FavoriteIcon color="secondary" fontSize="large" />
+                                </IconButton>
+                                :
+                                <IconButton onClick={saveButtonHandler} style={{bgcolor: "lightblue"}} title="Add to Favorites">
+                                    <FavoriteBorderIcon color="secondary" fontSize="large" />
+                                </IconButton>
+                            } 
+                            >
+                            <Avatar className={classes.large} src={profileImage}></Avatar>
+                        </StyledBadge>
+                        :
                         <Avatar className={classes.large} src={profileImage}></Avatar>
-                        <Grid item>
-                            <br></br>
-                            <br></br>
-                            <br></br>
+                    }
+                    </Grid>
+                    <Grid item>
                             {isViewedDoctor ? (
-                                <div>
-                                    <h2>{"Doctor " + firstName + " " + lastName}</h2>
-                                    <h3>{specialization}</h3>
-                                    <h4>*****</h4>
-                                </div>
+                                <center>
+                                    <h3>{"Doctor " + firstName + " " + lastName}</h3>
+                                    <h4>{specialization}</h4>
+                                    <h5>*****</h5>
+                                </center>
                             )
                             :
                             (
-                                <div>
+                                <center>
                                     <h2>{firstName + " " + lastName}</h2>
                                     <h3>{"User"}</h3>
-                                </div>
+                                </center>
                             )}
-                        </Grid>
+                    </Grid>
+                    <Grid item>
                         {isViewedDoctor ?
                             (
-                            <Grid spacing={2}>
-                                <Button class="button" style={{margin: "10px"}}>Take a Visit Time</Button>
-                                <Button class="button" onClick={isSaved ? deleteButtonHandler : saveButtonHandler}>{isSaved ? "Delete Saved" : "Save Profile"}</Button>
-                            </Grid>
+                                <Button class="button" >Take a Visit Time</Button>
                             )
                             :
                             <></>
                         }
                     </Grid>
-                </Grid>
-                <br/>
-                <Grid container direction="row" spacing={0} className={classes.root}>  
-                    <Grid item xs={isViewedDoctor ? 4 : 4}>
-                        <Accordion className={classes.accordion} variant="outlined">
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1a-content"
-                                id="panel1a-header"
+                    <Grid item>
+                        {isViewedDoctor ? 
+                            <Tabs
+                                value={tabValue}
+                                onChange={handleChange}
+                                indicatorColor="primary"
+                                textColor="primary"
+                                className={classes.tab}
+                                variant="fullWidth"
+                                aria-label="full width tabs example"
                                 >
-                                <Typography >Details</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
+                                    <Tab label="Details" icon={<AccountCircleIcon/>} {...a11yProps(0)} />
+                                    <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps(1)} />                                    
+                            </Tabs>
+                            :
+                            <Tabs
+                                value={tabValue}
+                                onChange={handleChange}
+                                indicatorColor="primary"
+                                textColor="primary"
+                                className={classes.tab}
+                                variant="fullWidth"
+                                aria-label="full width tabs example"
+                                >
+                                    <Tab label="Details" icon={<AccountCircleIcon/>} {...a11yProps(0)} />  
+                            </Tabs>
+                        }
+                        <TabPanel value={tabValue} index={0} className={classes.accordion}>
                                 <div>
-                                    <font color="white">
                                     <Container component="main" maxWidth="xs">                
                                         <Box display="flex" justifyContent="space-between" >
                                             <Grid container spacing={2} alignItems="flex-start">
@@ -388,33 +459,16 @@ export default function Profile () {
                                             </Grid>
                                         </Box>
                                     </Container>
-                                    </font>
                                 </div>
-                            </AccordionDetails>
-                        </Accordion>
+                        </TabPanel>
+                        <TabPanel value={tabValue} index={1}>
+                            <div >
+                                <Container component="main" maxWidth="xs">
+                                    <h3><center>No Comments Here!</center></h3>
+                                </Container>
+                            </div>
+                        </TabPanel>
                     </Grid>
-                    {isViewedDoctor ?
-                        <Grid item xs={7}>
-                            <Accordion className={classes.accordion} variant="outlined">
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                    >
-                                        <Typography >Comments</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <div >
-                                        <Container component="main" maxWidth="xs">
-                                            <h3><center>No Comments Here!</center></h3>
-                                        </Container>
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid> 
-                        : 
-                        <></>
-                    }
                 </Grid> 
             </div>
         </div>
