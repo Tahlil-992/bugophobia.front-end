@@ -34,6 +34,36 @@ const callProfileAPI = async (data, is_viewed_doctor, isRemembered) => {
     }
 }
 
+const callSaveProfileAPI = async (data, isRemembered) => {
+    try {
+        const response = callAPIHandler({method:"POST", url: "/profile/save/", data: data}, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callRemoveSaveProfileAPI = async (id, isRemembered) => {
+    try {
+        const response = callAPIHandler({method:"DELETE", url: `/profile/remove_save/${id}/`}, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callGetSaveProfileAPI = async (isRemembered) => {
+    try {
+        const response = callAPIHandler({method:"GET", url: "/profile/save/"}, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const useStyles = makeStyles((theme) => ({
     root: {
       display: 'flex',
@@ -78,8 +108,11 @@ export default function Profile () {
 
     const str = isDoctor ? "doctor" : "patient";
 
-    const [isViewedDoctor, setIsViewedDoctor] = useState(false);
-    const [viewedUsername, setViewedUsername] = useState("patient1");
+    const [isViewedDoctor, setIsViewedDoctor] = useState(true);
+    const [viewedUsername, setViewedUsername] = useState("doctor2");
+
+    const [isSaved, setIsSaved] = useState(false);
+    const [id, setId] = useState(0);
 
     const specializationMap = (spec) => {
         switch(spec) {
@@ -188,10 +221,61 @@ export default function Profile () {
         }
     }
 
+    const callGetSaveAPI = async () => {
+        try {
+            const response = await callGetSaveProfileAPI(isRemembered);
+            if (response.status === 200) {
+                let payload = response.payload;
+                payload.map((doctor) => {
+                    if (doctor.doctor.user.username === viewedUsername) {
+                        setIsSaved(true);
+                        setId(doctor.id);
+                    }
+                })
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
     const [sent, setSent] = useState(false);
     if (!sent){
         callGetAPI();
+        callGetSaveAPI();
         setSent(true);
+    }
+
+    const saveButtonHandler = async () => {
+        try {
+            const data = {doctor: viewedUsername};
+            const response = await callSaveProfileAPI(data, isRemembered);
+            if (response.status === 201) {
+                setIsSaved(true);
+                setId(response.payload.id);
+            }
+        }
+        catch (error) {
+            console.log(error);
+            if (error.status === 406) {
+                //alert("user has already saved the profile!")
+            }
+
+        }
+    }
+
+    const deleteButtonHandler = async () => {
+        try {
+            const response = await callRemoveSaveProfileAPI(id, isRemembered);
+            if (response.status === 204) {
+                setIsSaved(false);
+                setId(5);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
 
     const [disabled, setDisabled] = useState(-1);
@@ -226,14 +310,14 @@ export default function Profile () {
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
-                    <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
+                    <Typography variant="h6" color="inherit" noWrap>View Profile</Typography>
                 </Toolbar>
             </AppBar>
             <div className={classes.content}>
                 <Grid container direction="column"  spacing={3}>
                     <Grid container direction="row"  item spacing={3}>
                         <Avatar className={classes.large} src={profileImage}></Avatar>
-                        <Grid >
+                        <Grid item>
                             <br></br>
                             <br></br>
                             <br></br>
@@ -252,6 +336,16 @@ export default function Profile () {
                                 </div>
                             )}
                         </Grid>
+                        {isViewedDoctor ?
+                            (
+                            <Grid spacing={2}>
+                                <Button class="button" style={{margin: "10px"}}>Take a Visit Time</Button>
+                                <Button class="button" onClick={isSaved ? deleteButtonHandler : saveButtonHandler}>{isSaved ? "Delete Saved" : "Save Profile"}</Button>
+                            </Grid>
+                            )
+                            :
+                            <></>
+                        }
                     </Grid>
                 </Grid>
                 <br/>
