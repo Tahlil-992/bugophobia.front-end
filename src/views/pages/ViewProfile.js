@@ -351,7 +351,6 @@ export default function Profile () {
                     ['City', city, setCity, <ApartmentIcon/>],
                     ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>]
                     ];
-
     return (
         <div>
             <AppBar position="relative">
