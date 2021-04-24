@@ -361,9 +361,9 @@ export default function Profile () {
             </AppBar>
             <div >
                 <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
-                    <Grid item> { isViewedDoctor ?
+                    <Grid item> { isViewedDoctor  && !isDoctor ?
                         <StyledBadge 
-                            badgeContent={isSaved ?
+                            badgeContent={isSaved ? 
                                 <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
                                     <FavoriteIcon color="secondary" fontSize="large" />
                                 </IconButton>
