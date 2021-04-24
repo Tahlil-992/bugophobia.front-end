@@ -234,10 +234,18 @@ function Explore({ signOut }) {
     const callGetAPI = async () => {
         try {
             const response1 = await callTopDoctorsAPI();
-            const response2 = await callSavedProfilesAPI();
             setcards(response1.payload);
+            //alert(cards.length);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    const callGetAPI2 = async () => {
+        try {
+            const response2 = await callSavedProfilesAPI();
             setSavedAccounts(response2.payload);
-            alert(SavedAccounts[0].doctor.user.username);
+            //alert(cards.length);
         }
         catch (error) {
             console.log(error);
@@ -246,6 +254,7 @@ function Explore({ signOut }) {
     const [sent, setSent] = useState(false);
     if (!sent) {
         callGetAPI();
+        callGetAPI2();
         setSent(true);
     }
     const classes = useStyles();
