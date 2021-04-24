@@ -12,19 +12,16 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import { useTheme } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -33,6 +30,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
+import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
@@ -42,15 +40,6 @@ import { Link } from "react-router-dom";
 const callTopDoctorsAPI = async () => {
     try {
         var response = callAPIHandler({ method: "GET", url: `/profile/list_doctors/` }, true, true);
-        return response;
-    }
-    catch (e) {
-        throw e;
-    }
-}
-const callSavedProfilesAPI = async () => {
-    try {
-        var response = callAPIHandler({ method: "GET", url: `/profile/save/` }, true, true);
         return response;
     }
     catch (e) {
@@ -213,7 +202,6 @@ function Explore({ signOut }) {
         document.location.reload();
     }
     const [cards, setcards] = useState([]);
-    const [SavedAccounts, setSavedAccounts] = useState([]);
     const specializationMap = (spec) => {
         switch (spec) {
             case 'C': return 'Cardiologist';
@@ -233,19 +221,8 @@ function Explore({ signOut }) {
     }
     const callGetAPI = async () => {
         try {
-            const response1 = await callTopDoctorsAPI();
-            setcards(response1.payload);
-            //alert(cards.length);
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
-    const callGetAPI2 = async () => {
-        try {
-            const response2 = await callSavedProfilesAPI();
-            setSavedAccounts(response2.payload);
-            //alert(cards.length);
+            const response = await callTopDoctorsAPI();
+            setcards(response.payload);
         }
         catch (error) {
             console.log(error);
@@ -254,7 +231,6 @@ function Explore({ signOut }) {
     const [sent, setSent] = useState(false);
     if (!sent) {
         callGetAPI();
-        callGetAPI2();
         setSent(true);
     }
     const classes = useStyles();
@@ -321,27 +297,20 @@ function Explore({ signOut }) {
                                 <ListItemText primary="Profile" />
                             </ListItem>
                         </Link>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <BookmarksIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Saved Accounts" />
+                            </ListItem>
+                        </Link>
                         <ListItem button onClick={handleSignOut}>
                             <ListItemIcon>
                                 <ExitToAppIcon />
                             </ListItemIcon>
                             <ListItemText primary="Sign out" />
                         </ListItem>
-                    </div>
-                </List>
-                <Divider />
-                <List>
-                    <div>
-                        <ListSubheader inset>Saved Accounts</ListSubheader>
-                        {/*list of saved accounts*/}
-                        {SavedAccounts.map((account, index) => (
-                            <Link to="/view-profile" style={{textDecoration: 'none', color: 'black'}}>
-                                <ListItem key={index.toString()} button onClick={() => ViewProfile(account.doctor.user.username)}>
-                                    <ListItemIcon><AccountBoxIcon /></ListItemIcon>
-                                    <ListItemText primary={account.doctor.user.username} />
-                                </ListItem>
-                            </Link>
-                        ))}
                     </div>
                 </List>
             </Drawer>

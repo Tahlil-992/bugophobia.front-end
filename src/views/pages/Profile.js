@@ -324,7 +324,7 @@ export default function Profile () {
     }
 
     return (
-        <div>
+        <div style={{backgroundColor:'#E0E0E0'}}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
