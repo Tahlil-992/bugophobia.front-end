@@ -3,10 +3,10 @@ import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { AppBar, Avatar, Button, Container, IconButton, Link, makeStyles, Toolbar } from '@material-ui/core';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+// import Accordion from '@material-ui/core/Accordion';
+// import AccordionSummary from '@material-ui/core/AccordionSummary';
+// import AccordionDetails from '@material-ui/core/AccordionDetails';
+// import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -109,7 +109,7 @@ const useStyles = makeStyles((theme) => ({
       },
     },
     accordion:{
-        backgroundColor: 'lightblue',
+        backgroundColor: '#E0E0E0',
         borderWidth: "3px",
         borderColor: "#10217d",
         
@@ -130,13 +130,13 @@ const useStyles = makeStyles((theme) => ({
         //backgroundColor: '#719fb0',
     },
     seletedTab: {
-        backgroundColor: 'lightblue',
+        backgroundColor: '#E0E0E0',
     },
     unseletedTab: {
         backgroundColor: '#719fb0',
     },
     tab2: {
-        maxWidth: 500,
+        width: 700,
     },
     grid: {
         marginTop: "0rem",

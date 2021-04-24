@@ -40,7 +40,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     <Typography variant="h6" color="inherit" noWrap>Let's Get Started</Typography>
                 </Toolbar>
             </AppBar>
-            <div className={classes.heroContent} style={{ backgroundColor: 'lightblue', height: '60vh' }}>
+            <div className={classes.heroContent} style={{ backgroundColor: '#E0E0E0', height: '60vh' }}>
                 <Container maxWidth="sm" >
                     <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
                         Virtual Healthcare
@@ -76,7 +76,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </div>
                 </Container>
             </div>
-            <footer className={classes.footer} style={{ backgroundColor: 'lightblue', height: '126px' }}>
+            <footer className={classes.footer} style={{ backgroundColor: '#E0E0E0', height: '126px' }}>
                 <Typography variant="h6" align="center" gutterBottom>
                     Footer
                 </Typography>

@@ -167,7 +167,7 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         height: '100vh',
         overflow: 'auto',
-        backgroundColor: 'lightblue',
+        backgroundColor: '#E0E0E0',
     },
     container: {
         paddingTop: theme.spacing(4),
@@ -350,7 +350,7 @@ function Explore({ signOut }) {
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
-                            <div className={classes.paper} style={{ backgroundColor: 'lightblue' }}>
+                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0' }}>
                                 <React.Fragment>
                                     <Typography component="h2" variant="h6" color="primary" gutterBottom>
                                         Top Doctors
@@ -358,8 +358,8 @@ function Explore({ signOut }) {
                                     <Container className={classes.cardGrid}>
                                         <Grid container spacing={4}>
                                             {cards.map((card) => (
-                                                <Grid item key={card} xs={12} sm={4} md={2} style={{ backgroundColor: 'lightblue' }}>
-                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '180px' }}>
+                                                <Grid item key={card} xs={12} sm={4} md={2} style={{ backgroundColor: '#E0E0E0' }}>
+                                                    <Card className={classes.card} style={{ backgroundColor: '#E0E0E0', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '180px' }}>
                                                         <CardMedia
                                                             className={classes.cardMedia}
                                                             image={DoctorImage}

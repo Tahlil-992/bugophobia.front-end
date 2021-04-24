@@ -114,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(0),
     },
     tab: {
-        maxWidth: 500,
+        width: 700,
     },
     grid: {
         marginTop: "2rem",

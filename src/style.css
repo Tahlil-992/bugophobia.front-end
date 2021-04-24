@@ -44,16 +44,16 @@
 }
 .row__cards::-webkit-scrollbar-track {
     border-radius: 10px;
-    background-color: lightblue;
+    background-color: #E0E0E0;
 }
 .row__cards::-webkit-scrollbar {
     width: 12px;
     border-radius: 10px;
-    background-color: lightblue;
+    background-color: #E0E0E0;
 }
 .row__cards::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #719fb0;
+    background-color: #E0E0E0;
 }
 
 .column__cards {
@@ -62,14 +62,14 @@
 }
 .column__cards::-webkit-scrollbar-track {
     border-radius: 10px;
-    background-color: lightblue;
+    background-color: #E0E0E0;
 }
 .column__cards::-webkit-scrollbar {
     width: 12px;
     border-radius: 10px;
-    background-color: lightblue;
+    background-color: #E0E0E0;
 }
 .column__cards::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #719fb0;
+    background-color: #10217d;
 }

@@ -28,7 +28,7 @@ export default function ForgetPass() {
                     <Typography variant="h6" color="inherit" noWrap>Forget Password Page</Typography>
                 </Toolbar>
             </AppBar>
-            <Box style={{ display: 'flex', backgroundColor: 'lightblue', height: '690px', alignItems: 'center' }}>
+            <Box style={{ display: 'flex', backgroundColor: '#E0E0E0', height: '690px', alignItems: 'center' }}>
                 <Container component="main" maxWidth="xs">
                     <div class="paper">
                         <div className="form">
