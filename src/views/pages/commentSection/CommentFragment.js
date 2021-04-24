@@ -35,7 +35,7 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
     // }, [direction]);
 
     return (
-        <Paper minWidth="100%" borderRadius="7px 7px 0 0" maxWidth="100%" elevation={3} style={{backgroundColor: "rgb(0,163,128)"}}>
+        <Paper minWidth="100%" borderRadius="7px 7px 0 0" maxWidth="100%" elevation={3} style={{backgroundColor: "rgb(0,163,128, 0.8)"}}>
             {show && comments.map((comment, index) => {
                 return (
                     <Box key={"Box-comment-" + comment.id} padding={index == 0 ? "1em 0 0 0" : "0}"}>
@@ -87,7 +87,7 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
             {!show && <LoadingSpinner />}
             {count === 0 && msgType !== Severity.ERROR &&
                 <Typography
-                    style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "rgb(0,163,128)", marginRight: "1em", marginLeft: "1em" }}>
+                    style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "rgb(0,163,128, 0.8)", marginRight: "1em", marginLeft: "1em" }}>
                     Be the first to comment
                 </Typography>}
             <Box 
