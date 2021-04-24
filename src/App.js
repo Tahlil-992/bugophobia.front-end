@@ -12,6 +12,7 @@ import LandingPage from "../src/views/pages/LandingPage";
 import Explore from "../src/views/pages/Explore";
 import Profile from "../src/views/pages/Profile";
 import ViewProfile from "../src/views/pages/ViewProfile";
+import SavedAccounts from "../src/views/pages/SavedAccounts";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import CommentSection from "./views/pages/commentSection";
@@ -99,6 +100,9 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/comment">
               <CommentSection />
+            </Route>
+            <Route exact path="/SavedAccounts">
+              <SavedAccounts />
             </Route>
           </>
         )}
