@@ -33,9 +33,9 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
-import { resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
+import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { signOut } from '../../core/Authentication/action/authActions';
 import { Link } from "react-router-dom";
 
@@ -236,7 +236,8 @@ function Explore({ signOut }) {
             const response1 = await callTopDoctorsAPI();
             const response2 = await callSavedProfilesAPI();
             setcards(response1.payload);
-            setSavedAccounts(response2.payload)
+            setSavedAccounts(response2.payload);
+            alert(SavedAccounts[0].doctor.user.username);
         }
         catch (error) {
             console.log(error);
@@ -255,6 +256,9 @@ function Explore({ signOut }) {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+    const ViewProfile = (username) => {
+        setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
+    }
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
     const theme = useTheme();
     return (
@@ -321,13 +325,13 @@ function Explore({ signOut }) {
                     <div>
                         <ListSubheader inset>Saved Accounts</ListSubheader>
                         {/*list of saved accounts*/}
-                        {SavedAccounts.map((account) => (
-                            <ListItem button>
-                            <ListItemIcon>
-                                <AccountBoxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="saved profile" />
-                        </ListItem>
+                        {SavedAccounts.map((account, index) => (
+                            <Link to="/view-profile" style={{textDecoration: 'none', color: 'black'}}>
+                                <ListItem key={index.toString()} button onClick={() => ViewProfile(account.doctor.user.username)}>
+                                    <ListItemIcon><AccountBoxIcon /></ListItemIcon>
+                                    <ListItemText primary={account.doctor.user.username} />
+                                </ListItem>
+                            </Link>
                         ))}
                     </div>
                 </List>
@@ -360,7 +364,9 @@ function Explore({ signOut }) {
                                                             </Typography>
                                                         </CardContent>
                                                         <CardActions>
-                                                            <Button size="small" color="primary">View Profile</Button>
+                                                            <Link to="/view-profile" style={{textDecoration: 'none'}}>
+                                                                <Button onClick={() => ViewProfile(card.user.username)} size="small" color="primary">View Profile</Button>
+                                                            </Link>
                                                         </CardActions>
                                                     </Card>
                                                 </Grid>
