@@ -60,7 +60,7 @@ const CommentSection = ({ remember_me, username }) => {
             const response = await callGetCommentsAPI({ doctor_username: username, page: params.page }, remember_me)
             console.log(response);
             setCount(response.payload.count);
-            setPageCounts(Math.ceil(response.payload.count / limit));
+            setPageCounts(Math.ceil(response.payload.count !== 0 ? response.payload.count / limit : 1));
             setComments(response.payload.results.reverse());
             if (response.status === 200) {
                 if (message.text !== "")
@@ -104,7 +104,8 @@ const CommentSection = ({ remember_me, username }) => {
                     page={params.page}
                     pageCount={pageCounts}
                     count={count} 
-                    setMessage={(msg) => {setMessage(msg);}}/>
+                    setMessage={(msg) => {setMessage(msg);}}
+                    username={username}/>
             </Box>
             {openSnackBar && <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}

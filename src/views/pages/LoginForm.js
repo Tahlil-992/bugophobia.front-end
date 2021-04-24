@@ -133,7 +133,7 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                     <Typography variant="h6" color="inherit" noWrap>Login Page</Typography>
                 </Toolbar>
             </AppBar>
-            <Box style={{ display: 'flex', backgroundColor: 'lightblue', height: '690px', alignItems: 'center' }}>
+            <Box style={{ display: 'flex', backgroundColor: '#E0E0E0', height: '690px', alignItems: 'center' }}>
                 <Container component="main" maxWidth="xs">
                     <div class="paper">
                         <div className="form">

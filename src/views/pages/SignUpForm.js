@@ -219,7 +219,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
           {!isdoctor && <Typography variant="h6" color="inherit" noWrap>Patient SignUp Page</Typography>}
         </Toolbar>
       </AppBar>
-      <Box style={{ display: 'flex', backgroundColor: 'lightblue', height: '690px', alignItems: 'center' }}>
+      <Box style={{ display: 'flex', backgroundColor: '#E0E0E0', height: '690px', alignItems: 'center' }}>
         <Container component="main" maxWidth="xs">
           <div className="paper">
             <div class="form">
