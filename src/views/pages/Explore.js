@@ -24,6 +24,7 @@ import { useTheme } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -41,7 +42,15 @@ import { Link } from "react-router-dom";
 const callTopDoctorsAPI = async () => {
     try {
         var response = callAPIHandler({ method: "GET", url: `/profile/list_doctors/` }, true, true);
-        
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+const callSavedProfilesAPI = async () => {
+    try {
+        var response = callAPIHandler({ method: "GET", url: `/profile/save/` }, true, true);
         return response;
     }
     catch (e) {
@@ -180,8 +189,13 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
     },
+    cardGrid: {
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+    },
     cardMedia: {
-        paddingTop: '100%',
+        height: '180px',
+        width: '180px',
     },
     cardContent: {
         flexGrow: 1,
@@ -197,10 +211,9 @@ function Explore({ signOut }) {
         resetSessionStorage();
         signOut();
         document.location.reload();
-    }    
-    const [username, setUsername] = useState("");
-    const [specialization, setSpecialization] = useState("");
+    }
     const [cards, setcards] = useState([]);
+    const [SavedAccounts, setSavedAccounts] = useState([]);
     const specializationMap = (spec) => {
         switch (spec) {
             case 'C': return 'Cardiologist';
@@ -220,18 +233,17 @@ function Explore({ signOut }) {
     }
     const callGetAPI = async () => {
         try {
-            const response = await callTopDoctorsAPI();
-            let payload = response.payload;
-            setcards(payload);
-            setUsername((payload.user.username));
-            setSpecialization(specializationMap(payload.filed_of_specialization));
+            const response1 = await callTopDoctorsAPI();
+            const response2 = await callSavedProfilesAPI();
+            setcards(response1.payload);
+            setSavedAccounts(response2.payload)
         }
         catch (error) {
             console.log(error);
         }
     }
     const [sent, setSent] = useState(false);
-    if (!sent){
+    if (!sent) {
         callGetAPI();
         setSent(true);
     }
@@ -308,9 +320,15 @@ function Explore({ signOut }) {
                 <List>
                     <div>
                         <ListSubheader inset>Saved Accounts</ListSubheader>
-                        <ListItem button>
-                            {/*list of saved accounts*/}
+                        {/*list of saved accounts*/}
+                        {SavedAccounts.map((account) => (
+                            <ListItem button>
+                            <ListItemIcon>
+                                <AccountBoxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="saved profile" />
                         </ListItem>
+                        ))}
                     </div>
                 </List>
             </Drawer>
@@ -319,16 +337,16 @@ function Explore({ signOut }) {
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
-                            <Paper className={classes.paper} style={{ backgroundColor: 'lightblue', border: '3px solid #10217d', borderRadius: '10px' }}>
+                            <div className={classes.paper} style={{ backgroundColor: 'lightblue' }}>
                                 <React.Fragment>
                                     <Typography component="h2" variant="h6" color="primary" gutterBottom>
                                         Top Doctors
                                     </Typography>
-                                    <div className="row">
-                                        <div className="row__cards">
+                                    <Container className={classes.cardGrid}>
+                                        <Grid container spacing={4}>
                                             {cards.map((card) => (
-                                                <Grid item key={card} xs={12} sm={6} md={4}>
-                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', minWidth: '200px', scrollMarginInline: '10px', marginRight: '10px', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '50%' }}>
+                                                <Grid item key={card} xs={12} sm={4} md={2} style={{ backgroundColor: 'lightblue' }}>
+                                                    <Card className={classes.card} style={{ backgroundColor: 'lightblue', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '180px' }}>
                                                         <CardMedia
                                                             className={classes.cardMedia}
                                                             image={DoctorImage}
@@ -347,10 +365,10 @@ function Explore({ signOut }) {
                                                     </Card>
                                                 </Grid>
                                             ))}
-                                        </div>
-                                    </div>
+                                        </Grid>
+                                    </Container>
                                 </React.Fragment>
-                            </Paper>
+                            </div>
                         </Grid>
                     </Grid>
                 </Container>
