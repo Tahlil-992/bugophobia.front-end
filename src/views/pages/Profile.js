@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Button, Container, Link, makeStyles, Toolbar } from '@material-ui/core';
+import { AppBar, Avatar, Button, Container, IconButton, Link, makeStyles, Toolbar } from '@material-ui/core';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -21,10 +21,74 @@ import WorkIcon from '@material-ui/icons/Work';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CommentIcon from '@material-ui/icons/Comment';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
 import CommentSection from "./commentSection";
+import PropTypes from 'prop-types';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`vertical-tabpanel-${index}`}
+        aria-labelledby={`vertical-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box p={3}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+  function TabPanel2(props) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box p={3}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+TabPanel2.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+};
+  
+  function a11yProps(index) {
+    return {
+      id: `vertical-tab-${index}`,
+      'aria-controls': `vertical-tabpanel-${index}`,
+    };
+  }
+
+  function a11yProps2(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
 
 const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
@@ -57,10 +121,26 @@ const useStyles = makeStyles((theme) => ({
           },
     },
     large: {
-      width: theme.spacing(30),
-      height: theme.spacing(30),
+      width: theme.spacing(20),
+      height: theme.spacing(20),
       margin: theme.spacing(2),
     },
+    tabs: {
+        borderRight: `1px solid ${theme.palette.divider}`,
+        //backgroundColor: '#719fb0',
+    },
+    seletedTab: {
+        backgroundColor: 'lightblue',
+    },
+    unseletedTab: {
+        backgroundColor: '#719fb0',
+    },
+    tab2: {
+        maxWidth: 500,
+    },
+    grid: {
+        marginTop: "0rem",
+    }
 }));
 
 export default function Profile () {
@@ -80,6 +160,17 @@ export default function Profile () {
     }
 
     const str = isDoctor ? "doctor" : "patient";
+
+    const [tabValue, setTabValue] = useState(0);
+    const [tabValue2, setTabValue2] = useState(0);
+
+    const handleChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
+
+    const handleChange2 = (event, newValue) => {
+        setTabValue2(newValue);
+    };
 
     const specializationMap = (spec) => {
         switch(spec) {
@@ -240,108 +331,122 @@ export default function Profile () {
                     <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
                 </Toolbar>
             </AppBar>
-            <div className={classes.content}>
-                <Grid container direction="column"  spacing={3}>
-                    <Grid container direction="row"  item spacing={3}>
-                        <Avatar className={classes.large} src={profileImage}></Avatar>
-                        <Grid >
-                            <br></br>
-                            <br></br>
-                            <br></br>
-                            {isDoctor ? (
-                                <div>
-                                    <h2>{"Doctor " + firstName + " " + lastName}</h2>
-                                    <h3>{specialization}</h3>
-                                    <h4>*****</h4>
-                                </div>
-                            )
-                            :
-                            (
-                                <div>
-                                    <h2>{firstName + " " + lastName}</h2>
-                                    <h3>{"User"}</h3>
-                                </div>
-                            )}
-                        </Grid>
-                    </Grid>
+            <Grid container>
+                <Grid item >
+                <Tabs
+                    orientation="vertical"
+                    variant="fullWidth"
+                    value={tabValue}
+                    onChange={handleChange}
+                    aria-label="Vertical tabs example"
+                    className={classes.tabs}
+                    >
+                        {/*
+                        <Tab label="About you" {...a11yProps(0)} />
+                        <Tab label="Comments" {...a11yProps(1)} />
+                        <Tab label="Change Password" {...a11yProps(2)} />
+                        <Tab label="Payment" {...a11yProps(3)} />
+                        <Tab label="Notifications" {...a11yProps(4)} />
+                        <Tab label="About us" {...a11yProps(5)} />
+                        */}
+                </Tabs>
                 </Grid>
-                <br/>
-                <Grid container direction="row" spacing={0} className={classes.root}>  
-                    <Grid item md={isDoctor ? 4 : 4} xs={12}>
-                        <Accordion className={classes.accordion} variant="outlined">
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1a-content"
-                                id="panel1a-header"
-                                >
-                                <Typography >Details</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <div>
-                                    <font color="white">
-                                    <Container component="main" maxWidth="xs">                
-                                        <Box display="flex" justifyContent="space-between" >
-                                            <Grid container spacing={2} alignItems="flex-start">
-                                                    {fields.map((item, index) => {
-                                                        return(
-                                                            <Grid item xs={12} key={index.toString()}>
-                                                                <TextField 
-                                                                    key={index.toString()}
-                                                                    onMouseEnter={() => setDisabled(index)}
-                                                                    onMouseLeave={() => setDisabled(-1)}
-                                                                    disabled={(disabled === index) && !editProfile}
-                                                                    variant="outlined"
-                                                                    fullWidth 
-                                                                    label={item[0]}
-                                                                    value={item[1]}
-                                                                    onChange={event => item[2](event.target.value)}
-                                                                    InputProps={{
-                                                                        startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>)
-                                                                    }}
-                                                                    />
-                                                            </Grid>
-                                                            )
-                                                        })}
-                                            </Grid>
-                                        </Box>
-                                        <Box display="flex" justifyContent="space-between">
-                                            <Button variant="contained" class="button" onClick={buttonHandler1}>
-                                                {buttonLable1}
-                                            </Button>
-                                        </Box>
-                                    </Container>
-                                    </font>
-                                </div>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid>
-                    {isDoctor ?
-                        <Grid item md={7} xs={12}>
-                            <Accordion className={classes.accordion} variant="outlined">
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
+                <Grid item xs>
+                    <TabPanel value={tabValue} index={0}>
+                        <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
+                        <Grid item> 
+                            <IconButton>
+                                <Avatar className={classes.large} src={profileImage}></Avatar>
+                            </IconButton>
+                        </Grid>
+                        <Grid item>
+                                {isDoctor ? (
+                                    <center>
+                                        <h3>{"Doctor " + firstName + " " + lastName}</h3>
+                                        <h4>{specialization}</h4>
+                                        <h5>*****</h5>
+                                    </center>
+                                )
+                                :
+                                (
+                                    <center>
+                                        <h2>{firstName + " " + lastName}</h2>
+                                        <h3>{"User"}</h3>
+                                    </center>
+                                )}
+                        </Grid>
+                        <Grid item>
+                            {isDoctor ? 
+                                <Tabs
+                                    value={tabValue2}
+                                    onChange={handleChange2}
+                                    indicatorColor="primary"
+                                    
+                                    textColor="primary"
+                                    className={classes.tab2}
+                                    variant="fullWidth"
+                                    aria-label="full width tabs example"
                                     >
-                                        <Typography >Comments</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    {/* <div >
-                                        <Container component="main" maxWidth="xs">
-                                            <h3><center>No Comments Here!</center></h3>
+                                        <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps2(0)} />
+                                        <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps2(1)} />                                    
+                                </Tabs>
+                                :
+                                <Tabs
+                                    value={tabValue2}
+                                    onChange={handleChange2}
+                                    indicatorColor="primary"
+                                    textColor="primary"
+                                    className={classes.tab2}
+                                    variant="fullWidth"
+                                    aria-label="full width tabs example"
+                                    >
+                                        <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps2(0)} />  
+                                </Tabs>
+                            }
+                            <TabPanel2 value={tabValue2} index={0}>
+                                    <Grid container alignItems="center" direction="column">
+                                        <Grid item >
+                                        <Container component="main" maxWidth="xs">                
+                                            <Box display="flex" justifyContent="space-between" >
+                                                <Grid container spacing={2} alignItems="flex-start">
+                                                        {fields.map((item, index) => {
+                                                            return(
+                                                                <Grid item xs={12} key={index.toString()}>
+                                                                    <TextField 
+                                                                        key={index.toString()}
+                                                                        variant="outlined"
+                                                                        fullWidth 
+                                                                        label={item[0]}
+                                                                        value={item[1]}
+                                                                        
+                                                                        onChange={event => item[2](event.target.value)}
+                                                                        InputProps={{
+                                                                            startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>)
+                                                                        }}
+                                                                        />
+                                                                </Grid>
+                                                                )
+                                                            })}
+                                                </Grid>
+                                            </Box>
+                                            
                                         </Container>
-                                    </div> */}
-                                    <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
-                                        <CommentSection username={username}/>
-                                    </Box>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid> 
-                        : 
-                        <></>
-                    }
-                </Grid> 
-            </div>
+                                        </Grid>
+                                        <Grid item>
+                                            <Button class="button" >Update Your Profile</Button>
+                                        </Grid>
+                                    </Grid>
+                            </TabPanel2>
+                            <TabPanel2 value={tabValue2} index={1}>
+                                <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                    <CommentSection username={username}/>
+                                </Box>
+                            </TabPanel2>
+                        </Grid>
+                        </Grid>
+                    </TabPanel>
+                </Grid>             
+            </Grid>
         </div>
     );
 }
