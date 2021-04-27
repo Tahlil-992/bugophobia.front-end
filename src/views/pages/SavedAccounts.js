@@ -34,17 +34,31 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        backgroundColor: '#E0E0E0',
+        transition: "transform 0.15s ease-in-out",
+        "&:hover": {
+            transform: "scale3d(1.1, 1.1, 1)",
+            backgroundColor: '#D3D3D3',
+        },
     },
     cardGrid: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
     },
     cardMedia: {
-        height: '180px',
-        width: '180px',
+        height: '15vh',
+        width: '15vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex',
+        marginTop: '10px',
+        marginBottom: '10px',
     },
     cardContent: {
         flexGrow: 1,
+        display: 'flex-start',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     gridList: {
         flexWrap: 'nowrap',
@@ -89,11 +103,11 @@ export default function SavedAccounts() {
         setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
     }
     return (
-        <div style={{backgroundColor:'#E0E0E0', height:'100vh'}}>
+        <div style={{ backgroundColor: '#E0E0E0', height: '100vh' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
-                    <Typography variant="h6" color="inherit" noWrap>Login Page</Typography>
+                    <Typography variant="h6" color="inherit" noWrap>Saved accounts</Typography>
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" className={classes.container}>
@@ -101,32 +115,28 @@ export default function SavedAccounts() {
                     <Grid item xs={12}>
                         <div className={classes.paper} style={{ backgroundColor: '#E0E0E0' }}>
                             <React.Fragment>
-                                <Typography component="h2" variant="h6" color="primary" gutterBottom>
-                                    Saved Accounts
-                            </Typography>
                                 <Container className={classes.cardGrid}>
                                     <Grid container spacing={4}>
                                         {SavedAccounts.map((account) => (
-                                            <Grid item key={account} xs={12} sm={4} md={2} style={{ backgroundColor: '#E0E0E0' }}>
-                                                <Card className={classes.card} style={{ backgroundColor: '#E0E0E0', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '180px' }}>
-                                                    <CardMedia
-                                                        className={classes.cardMedia}
-                                                        image={DoctorImage}
-                                                        title="Image title" />
-                                                    <CardContent className={classes.cardContent}>
-                                                        <Typography gutterBottom variant="h5" component="h2">
-                                                            {account.doctor.user.username}
-                                                        </Typography>
-                                                        <Typography>
-                                                            {specializationMap(account.doctor.filed_of_specialization)}
-                                                        </Typography>
-                                                    </CardContent>
-                                                    <CardActions>
-                                                        <Link to="/view-profile" style={{ textDecoration: 'none' }}>
-                                                            <Button onClick={() => ViewProfile(account.doctor.user.username)} size="small" color="primary">View Profile</Button>
-                                                        </Link>
-                                                    </CardActions>
-                                                </Card>
+                                            <Grid item key={account} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
+                                                <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(account.doctor.user.username)} size="small" color="primary">
+                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                        <Grid style={{display:'flex', flexDirection:'row'}}>
+                                                            <CardMedia
+                                                                className={classes.cardMedia}
+                                                                image={DoctorImage}
+                                                                title="Image title" />
+                                                            <CardContent className={classes.cardContent}>
+                                                                <Typography gutterBottom variant="h5" component="h2">
+                                                                    {account.doctor.user.username}
+                                                                </Typography>
+                                                                <Typography>
+                                                                    {specializationMap(account.doctor.filed_of_specialization)}
+                                                                </Typography>
+                                                            </CardContent>
+                                                        </Grid>
+                                                    </Card>
+                                                </Button>
                                             </Grid>
                                         ))}
                                     </Grid>
