@@ -46,6 +46,16 @@ const callTopDoctorsAPI = async () => {
         throw e;
     }
 }
+const callProfileAPI = async (is_doctor, isRemembered) => {
+    try {
+        const urlAddress = is_doctor ? "doctor" : "patient";
+        const response = callAPIHandler({ method: "GET", url: `/auth/detail/${urlAddress}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -57,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     toolbarIcon: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
         padding: '0 8px',
         ...theme.mixins.toolbar,
     },
@@ -219,10 +229,15 @@ function Explore({ signOut }) {
             default: return '';
         }
     }
+    const [username, setUsername] = useState("");
     const callGetAPI = async () => {
         try {
-            const response = await callTopDoctorsAPI();
-            setcards(response.payload);
+            const response1 = await callTopDoctorsAPI();
+            setcards(response1.payload);
+            const response2 = await callProfileAPI(isDoctor, isRemembered);
+            if (response2.status === 200) {
+                setUsername(response2.payload.user.username);
+            }
         }
         catch (error) {
             console.log(error);
@@ -245,6 +260,16 @@ function Explore({ signOut }) {
         setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
     }
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    var isDoctor = false;
+    var isRemembered = false;
+    if (localStorage.getItem("isdoctor") == null) {
+        isDoctor = ((sessionStorage.getItem("isdoctor") === "true") ? true : false);
+        isRemembered = false;
+    }
+    else {
+        isDoctor = ((localStorage.getItem("isdoctor") === "true") ? true : false);
+        isRemembered = true;
+    }
     const theme = useTheme();
     return (
         <div className={classes.root}>
@@ -282,7 +307,10 @@ function Explore({ signOut }) {
             <Drawer variant="permanent"
                 classes={{ paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose), }} open={open}>
                 <div className={classes.toolbarIcon}>
-                    <IconButton onClick={handleDrawerClose}>
+                    <Typography component="h2" variant="h6" gutterBottom style={{ width: '80%', marginLeft: '10px' }}>
+                        {username}
+                    </Typography>
+                    <IconButton onClick={handleDrawerClose} style={{ width: '20%' }}>
                         <ChevronLeftIcon />
                     </IconButton>
                 </div>
@@ -302,7 +330,7 @@ function Explore({ signOut }) {
                                 <ListItemIcon>
                                     <BookmarksIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Saved Accounts" />
+                                <ListItemText primary="Saved accounts" />
                             </ListItem>
                         </Link>
                         <ListItem button onClick={handleSignOut}>
@@ -342,7 +370,7 @@ function Explore({ signOut }) {
                                                             </Typography>
                                                         </CardContent>
                                                         <CardActions>
-                                                            <Link to="/view-profile" style={{textDecoration: 'none'}}>
+                                                            <Link to="/view-profile" style={{ textDecoration: 'none' }}>
                                                                 <Button onClick={() => ViewProfile(card.user.username)} size="small" color="primary">View Profile</Button>
                                                             </Link>
                                                         </CardActions>
