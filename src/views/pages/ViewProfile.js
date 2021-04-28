@@ -242,9 +242,11 @@ export default function Profile () {
     const [tabValue, setTabValue] = useState(0);
 
     const [openModal, setOpenModal] = useState(false);
+    const [onRateSubmit, setOnRateSubmit] = useState(false);
 
     const handleCloseModal = () => {
         setOpenModal(false);
+        setOnRateSubmit(false);
     }
 
     const handleChange = (event, newValue) => {
@@ -584,9 +586,9 @@ export default function Profile () {
                 <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
                     <h4>{`Rate doctor ${username}.`}</h4>
                     <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
-                        <StarRating editAllowed={true} />
+                        <StarRating editAllowed={true} onSubmit={onRateSubmit}/>
                         <Box display="flex" marginTop="1.5em" justifyContent="space-between">
-                            <Button variant="contained" color="primary" style={{marginRight: "0.5em"}}>Submit</Button>
+                            <Button variant="contained" color="primary"  onClick={() => setOnRateSubmit(true)} style={{marginRight: "0.5em"}}>Submit</Button>
                             <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{marginLeft: "0.5em"}}>DISMISS</Button>
                         </Box>
                     </Box>
