@@ -1,6 +1,6 @@
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Comment from "./comment";
 import AddComment from "./AddComment";
 import { LoadingSpinner } from "../../../assets/loading.spinner";
@@ -8,7 +8,7 @@ import { Pagination } from "../../../core/modules/pagination";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography"
 import { Severity } from ".";
-import Slide from '@material-ui/core/Slide';
+// import Slide from '@material-ui/core/Slide';
 import Box from '@material-ui/core/Box';
 import { connect } from "react-redux";
 import { Paper } from "@material-ui/core";

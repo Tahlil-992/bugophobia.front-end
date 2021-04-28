@@ -26,6 +26,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import PropTypes from 'prop-types';
 import CommentSection from './commentSection';
+import StarRating from "./RatingComponent/rating";
+import Modal from "@material-ui/core/Modal";
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 function TabPanel(props) {
@@ -193,6 +196,17 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
+    modal: {
+        position: 'absolute',
+        width: 'auto',
+        backgroundColor: '#c2fcc2',
+        border: '2px solid #000',
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing(2, 4, 3),
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+    },
 }));
 
 const StyledBadge = withStyles((theme) => ({
@@ -226,6 +240,12 @@ export default function Profile () {
     const [id, setId] = useState(0);
 
     const [tabValue, setTabValue] = useState(0);
+
+    const [openModal, setOpenModal] = useState(false);
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    }
 
     const handleChange = (event, newValue) => {
         setTabValue(newValue);
@@ -454,7 +474,13 @@ export default function Profile () {
                                             } 
                                             </Typography>
                                             <Typography variant="subtitle1">{specialization}</Typography>
-                                            <Typography variant="h5">*****</Typography>
+                                            <Box display="flex" alignItems="center" justifyContent="center">
+                                                <Tooltip title="Rate this doctor">
+                                                    <Button onClick={() => setOpenModal(true)}>
+                                                        <StarRating />
+                                                    </Button>
+                                                </Tooltip>
+                                            </Box>
                                         </Box>
                                     )
                                     :
@@ -550,6 +576,22 @@ export default function Profile () {
                     </Grid>
                 </Grid> 
             </div>
+            {!isDoctor && 
+            <Modal
+                open={openModal}
+                onClose={handleCloseModal}
+            >
+                <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
+                    <h4>{`Rate doctor ${username}.`}</h4>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
+                        <StarRating editAllowed={true} />
+                        <Box display="flex" marginTop="1.5em" justifyContent="space-between">
+                            <Button variant="contained" color="primary" style={{marginRight: "0.5em"}}>Submit</Button>
+                            <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{marginLeft: "0.5em"}}>DISMISS</Button>
+                        </Box>
+                    </Box>
+                </Box>
+            </Modal>}
         </div>
     );
 }
