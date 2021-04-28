@@ -365,7 +365,7 @@ export default function Profile () {
                                     <center>
                                         <h3>{"Doctor " + firstName + " " + lastName}</h3>
                                         <h4>{specialization}</h4>
-                                        <Box>
+                                        <Box display="flex" alignItems="center" justifyContent="center">
                                             <StarRating />
                                         </Box>
                                     </center>
