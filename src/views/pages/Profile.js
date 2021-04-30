@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Button, Container, IconButton, Link, makeStyles, Toolbar } from '@material-ui/core';
+import { AppBar, Avatar, Button, Container, IconButton, Input, Link, makeStyles, MenuItem, Toolbar, withStyles } from '@material-ui/core';
 // import Accordion from '@material-ui/core/Accordion';
 // import AccordionSummary from '@material-ui/core/AccordionSummary';
 // import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -42,9 +42,9 @@ function TabPanel(props) {
         {...other}
       >
         {value === index && (
-          <Box p={3}>
+          <div width="100%">
             <Typography>{children}</Typography>
-          </Box>
+          </div>
         )}
       </div>
     );
@@ -63,7 +63,7 @@ function TabPanel(props) {
       >
         {value === index && (
           <Box p={3}>
-            <Typography>{children}</Typography>
+            {children}
           </Box>
         )}
       </div>
@@ -121,9 +121,14 @@ const useStyles = makeStyles((theme) => ({
           },
     },
     large: {
-      width: theme.spacing(20),
-      height: theme.spacing(20),
+      width: theme.spacing(16),
+      height: theme.spacing(16),
       margin: theme.spacing(2),
+      "&:hover": {
+        width: theme.spacing(20),
+        height: theme.spacing(20),
+        margin: theme.spacing(0),
+      }
     },
     tabs: {
         borderRight: `1px solid ${theme.palette.divider}`,
@@ -136,12 +141,58 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#719fb0',
     },
     tab2: {
-        width: 700,
+        width: "80vmax",
+        marginLeft: "10%",
     },
     grid: {
         marginTop: "0rem",
-    }
+    },
+    button: {
+        backgroundColor: "#155",
+        color: '#eee',
+        margin: "10px",
+        padding: "20px",
+        borderRadius: "6px",
+        '&:hover': {
+            backgroundColor: "#1cc",
+            color: '#fff',
+        },
+    },
+    textfield: {
+        backgroundColor: "#e5e5e5",
+        color: "#111",
+        '&:hover': {
+            backgroundColor: "#f0f0f0",
+            color: "#1ee",
+        },
+        '&$focused': {
+            backgroundColor: "#e9e9e9",
+        }
+    },
 }));
+
+const StyledTextField = withStyles((theme) => ({
+    root: {
+        width: "80%",
+        marginLeft: "10%",
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+            //borderColor: '#E5E5E5',
+            //background: "linear-gradient(45deg, green 30%, orange 90%)",
+            color: "#111",
+            },
+            '&:hover fieldset': {
+            borderColor: '#F0F0F0',
+            //backgroundColor: "#f0f0f0",
+            color: "#1ee",
+            },
+            '&.Mui-focused fieldset': {
+                //backgroundColor: "#f0f0f0",
+                color: "#1ee",
+            },
+        },
+    },
+  }))(TextField);
 
 export default function Profile () {
 
@@ -172,58 +223,64 @@ export default function Profile () {
         setTabValue2(newValue);
     };
 
+    const list_specialization = [
+        {value: 'C', label: 'Cardiologist',},
+        {value: 'D', label: 'Dermatologist',},
+        {value: 'G', label: 'General Practitioner',},
+        {value: 'GY', label: 'Gynecologist',},
+        {value: 'I', label: 'Internist',},
+        {value: 'N', label: 'Neurologist',},
+        {value: 'O', label: 'Obstetrician',},
+        {value: 'OP', label: 'Ophthalmologist',},
+        {value: 'OT', label: 'Otolaryngologist',},
+        {value: 'P', label: 'Pediatrician',},
+        {value: 'PS', label: 'Psychiatrist',},
+        {value: 'U', label: 'Urologist',}
+      ];
+
+    const list_insurance = [
+        {value: 'O', label: 'Omr',},
+        {value: 'H', label: 'Havades',},
+        {value: 'T', label: 'Takmili',}
+      ];
+
+    const list_gender = [
+        {value: 'M', label: 'Male',},
+        {value: 'F', label: 'Female',}
+      ];
+
     const specializationMap = (spec) => {
         switch(spec) {
-            case 'C':
-                return 'Cardiologist';
-            case 'D':
-                return 'Dermatologist';
-            case 'G':
-                return 'General Practitioner';
-            case 'GY':
-                return 'Gynecologist';
-            case 'I':
-                return 'Internist';
-            case 'N':
-                return 'Neurologist';
-            case 'O':
-                return 'Obstetrician';
-            case 'OP':
-                return 'Ophthalmologist';
-            case 'OT':
-                return 'Otolaryngologist';
-            case 'P':
-                return 'Pediatrician';
-            case 'PS':
-                return 'Psychiatrist';
-            case 'U':
-                return 'Urologist';
-            default:
-                return '';
+            case 'C': return 'Cardiologist';
+            case 'D': return 'Dermatologist';
+            case 'G': return 'General Practitioner';
+            case 'GY': return 'Gynecologist';
+            case 'I': return 'Internist';
+            case 'N': return 'Neurologist';
+            case 'O': return 'Obstetrician';
+            case 'OP': return 'Ophthalmologist';
+            case 'OT': return 'Otolaryngologist';
+            case 'P': return 'Pediatrician';
+            case 'PS': return 'Psychiatrist';
+            case 'U': return 'Urologist';
+            default: return '';
         }
     }
 
     const insuranceMap = (insur) => {
         switch(insur) {
-            case 'O':
-                return 'Omr';
-            case 'H':
-                return 'Havades';
-            case 'T':
-                return 'Takmili';
-            default:
-                return '';
+            case 'O': return 'Omr';
+            case 'H': return 'Havades';
+            case 'T': return 'Takmili';
+            default: return '';
         }
     }
 
     const genderMap = (gen) => {
         switch(gen) {
-            case 'M':
-                return 'Male';
-            case 'F':
-                return 'Female';
-            default:
-                return '';
+            case 'M': return 'Male';
+            case 'F': return 'Female';
+            default: return '';
         }
     }
 
@@ -292,35 +349,43 @@ export default function Profile () {
     const [buttonLable1, setButtonLable1] = useState("Edit Profile");
 
     const fields = isDoctor ?
-                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>],
-                    ['Email Address', email, setEmail, <EmailIcon/>],
-                    ['Username', username, setUsername, <AccountCircleIcon/>],
-                    ['Gender', gender, setGender, <WcIcon/>],
-                    ['Age', age, setAge, <AlarmIcon/>],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>],
-                    ['City', city, setCity, <ApartmentIcon/>],
-                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>],
-                    ['Filed of Specialization', specialization, setSpecialization, <WorkIcon/>],
-                    ['Work Experiece', experience, setExperience, <BuildIcon/>]
+                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false],
+                    ['Email Address', email, setEmail, <EmailIcon/>, false],
+                    ['Username', username, setUsername, <AccountCircleIcon/>, false],
+                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender],
+                    ['Age', age, setAge, <AlarmIcon/>, false],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false],
+                    ['City', city, setCity, <ApartmentIcon/>, false],
+                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>, false],
+                    ['Filed of Specialization', specialization, setSpecialization, <WorkIcon/>, true, list_specialization],
+                    ['Work Experiece', experience, setExperience, <BuildIcon/>, false]
                     ]
 
                    :
 
-                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>],
-                    ['Email Address', email, setEmail, <EmailIcon/>],
-                    ['Username', username, setUsername, <AccountCircleIcon/>],
-                    ['Gender', gender, setGender, <WcIcon/>],
-                    ['Age', age, setAge, <AlarmIcon/>],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>],
-                    ['City', city, setCity, <ApartmentIcon/>],
-                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>]
+                   [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{color: "inherit"}} />, false],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false],
+                    ['Email Address', email, setEmail, <EmailIcon/>, false],
+                    ['Username', username, setUsername, <AccountCircleIcon/>, false],
+                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender],
+                    ['Age', age, setAge, <AlarmIcon/>, false],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false],
+                    ['City', city, setCity, <ApartmentIcon/>, false],
+                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>, true, list_insurance]
                     ];
 
     const buttonHandler1 = () => {
         setButtonLable1(editProfile ? "Edit Profile" : "Save Changes");
         setEditProfile(!editProfile);
+    }
+
+    const onFileChange = event => {
+        // Update the state
+        //setProfileImage(event.target.files[0]);
+        setProfileImage(URL.createObjectURL(event.target.files[0]));
+        //alert(Object.keys(event.target.files[0]));
+        alert(URL.createObjectURL(event.target.files[0]));
     }
 
     return (
@@ -355,17 +420,17 @@ export default function Profile () {
                     <TabPanel value={tabValue} index={0}>
                         <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
                         <Grid item> 
-                            <IconButton>
-                                <Avatar className={classes.large} src={profileImage}></Avatar>
-                            </IconButton>
-                        </Grid>
-                        <Grid item>
+                            <Box display="flex">
+                            <div>
+                                <Avatar className={classes.large} src={profileImage}><Input type="file" onChange={onFileChange} /></Avatar>
+                            </div>
                                 {isDoctor ? (
-                                    <center>
-                                        <h3>{"Doctor " + firstName + " " + lastName}</h3>
-                                        <h4>{specialization}</h4>
-                                        <h5>*****</h5>
-                                    </center>
+                                    <div>
+                                        <br></br><br></br>
+                                        <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
+                                        <Typography variant="subtitle1">{specializationMap(specialization)}</Typography>
+                                        <Typography variant="h5">*****</Typography>
+                                    </div>
                                 )
                                 :
                                 (
@@ -374,6 +439,7 @@ export default function Profile () {
                                         <h3>{"User"}</h3>
                                     </center>
                                 )}
+                            </Box>
                         </Grid>
                         <Grid item>
                             {isDoctor ? 
@@ -406,39 +472,57 @@ export default function Profile () {
                             <TabPanel2 value={tabValue2} index={0}>
                                     <Grid container alignItems="center" direction="column">
                                         <Grid item >
-                                        <Container component="main" maxWidth="xs">                
+                                                       
                                             <Box display="flex" justifyContent="space-between" >
-                                                <Grid container spacing={2} alignItems="flex-start">
+                                                <Grid container spacing={4} alignItems="flex-start">
                                                         {fields.map((item, index) => {
                                                             return(
-                                                                <Grid item xs={12} key={index.toString()}>
-                                                                    <TextField 
+                                                                <Grid item xs={12} key={index.toString()} spacing={1}>
+                                                                    
+                                                                    <Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "10%"}}>{" " + item[0]}</Typography>
+                                                                    <StyledTextField 
                                                                         key={index.toString()}
                                                                         variant="outlined"
-                                                                        fullWidth 
-                                                                        label={item[0]}
+                                                                        fullWidth
+                                                                         
+                                                                        className={classes.textfield}
                                                                         value={item[1]}
-                                                                        
+                                                                        select={item[4]}
                                                                         onChange={event => item[2](event.target.value)}
                                                                         InputProps={{
-                                                                            startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>)
+                                                                            startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>)
                                                                         }}
-                                                                        />
+                                                                        >
+                                                                        {item[4] ? 
+                                                                            (
+                                                                            item[5].map((option) => (
+                                                                                <MenuItem key={option.value} value={option.value}>
+                                                                                    {option.label}
+                                                                                </MenuItem>
+                                                                            )))
+                                                                            :
+                                                                            (<></>)
+                                                                        }
+                                                                        </StyledTextField>
+                                                                    
                                                                 </Grid>
                                                                 )
                                                             })}
                                                 </Grid>
                                             </Box>
                                             
-                                        </Container>
+                                        
                                         </Grid>
                                         <Grid item>
-                                            <Button class="button" >Update Your Profile</Button>
+                                            <Button className={classes.button} >Update Your Profile</Button>
+                                        </Grid>
+                                        <Grid item>
+                                            <Input type="file" onChange={onFileChange} />
                                         </Grid>
                                     </Grid>
                             </TabPanel2>
                             <TabPanel2 value={tabValue2} index={1}>
-                                <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards" width="100%">
                                     <CommentSection username={username}/>
                                 </Box>
                             </TabPanel2>
