@@ -12,27 +12,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StarRating({ editAllowed = false, onSubmit = false }) {
+export default function StarRating({ editAllowed = false, onSubmit = false, setNewRate = () => ({}), val = 0 }) {
   const classes = useStyles();
   const [value, setValue] = useState(0);
 
   useEffect(() => {
-    if (onSubmit)
-    {
-      alert(value);
+    if (onSubmit) {
+      setNewRate(value);
     }
   }, [onSubmit])
 
 
   return (
     <div className={classes.root}>
-      <Rating 
+      <Rating
         name="rating-star"
-        defaultValue={3.5} 
-        precision={0.1} 
-        readOnly={!editAllowed} 
-        value={value}
-        onChange={(event) => setValue(event.target.value)}/>
+        defaultValue={3.5}
+        precision={editAllowed ? 1 : 0.1}
+        readOnly={!editAllowed}
+        value={editAllowed ? value : val}
+        onChange={(event) => setValue(event.target.value)} />
     </div>
   );
 }
