@@ -28,8 +28,6 @@ const useStyles = makeStyles((theme) => ({
     },
     Btn: {
         backgroundColor: '#40bad5',
-        border: '0px solid #10217d',
-        paddingTop: '100px',
         textAlign: 'center',
         fontSize: '16px',
         borderRadius: '10px',
@@ -63,10 +61,10 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                             <Grid item style={{ width: '55%', borderRadius: '10px', height: '60vh' }}>
                                 <Typography style={{ marginTop: '50px' }} component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
                                     Virtual Healthcare
-                            </Typography>
+                                </Typography>
                                 <Typography variant="h5" align="center" color="textSecondary" paragraph>
                                     Welcome !<br />Please choose which type of user you are.
-                            </Typography>
+                                </Typography>
                                 <div className={classes.heroButtons}>
                                     <Grid container spacing={10} justify="center">
                                         <Grid item>
@@ -81,14 +79,14 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                             <Link to="login" style={{ textDecoration: 'none' }}>
                                                 <Button onClick={changeToDoctor} className={classes.Btn} align="center" style={{ marginTop: '0px', padding: '10px 25px' }}>
                                                     Doctor
-                                            </Button>
+                                                </Button>
                                             </Link>
                                         </Grid>
                                         <Grid item>
                                             <Link to="login" style={{ textDecoration: 'none' }}>
                                                 <Button onClick={changeToPatient} className={classes.Btn} align="center" style={{ marginTop: '0px', padding: '10px 25px' }}>
                                                     Patient
-                                            </Button>
+                                                </Button>
                                             </Link>
                                         </Grid>
                                     </Grid>
