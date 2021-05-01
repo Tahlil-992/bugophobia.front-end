@@ -31,6 +31,8 @@ import PropTypes from 'prop-types';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StarRating from "./RatingComponent/rating";
+import Tooltip from '@material-ui/core/Tooltip';
+import Paper from '@material-ui/core/Paper';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -100,6 +102,16 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
     }
     catch (e) {
         throw e;
+    }
+}
+
+const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
+    try {
+      const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+      return response;
+    }
+    catch (e) {
+      throw e;
     }
 }
 
@@ -234,6 +246,21 @@ export default function Profile () {
 
     const classes = useStyles();
 
+    const callGetDetailRatingAPI = async () => {
+        try {
+            const response = await getRatingDetailCallAPI({ doctor_id: doctorid });
+            // console.log(response);
+            if (response.status == 200) {
+                const payload = response.payload;
+                setRateCount(payload.number);
+                setRateAvg(payload.avg);
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }   
+
     var isDoctor = false;
     var isRemembered = false;
 
@@ -331,6 +358,7 @@ export default function Profile () {
 
     const [profileImage, setProfileImage] = useState(isDoctor ? DoctorImage : PatientImage);
 
+    const [doctorid, setDoctorid] = useState(0);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -344,11 +372,16 @@ export default function Profile () {
     const [experience, setExperience] = useState("");
     const [insurance, setInsurance] = useState("");
 
+    useEffect(() => {
+        callGetDetailRatingAPI();
+    }, [doctorid])
+
     const callGetAPI = async () => {
         try {
             const response = await callProfileAPI(isDoctor, isRemembered);
             if (response.status === 200) {
                 let payload = response.payload;
+                setDoctorid(nullCheck(payload.user.id))
                 setFirstName(nullCheck(payload.user.first_name));
                 setLastName(nullCheck(payload.user.last_name));
                 setEmail(nullCheck(payload.user.email));
@@ -383,6 +416,9 @@ export default function Profile () {
 
     const [editProfile, setEditProfile] = useState(false);
     const [buttonLable1, setButtonLable1] = useState("Edit Profile");
+
+    const [rateAvg, setRateAvg] = useState(0);
+    const [rateCount, setRateCount] = useState(0);
 
     const fields = isDoctor ?
                    [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false],
@@ -480,7 +516,12 @@ export default function Profile () {
                                         <h3>{"Doctor " + firstName + " " + lastName}</h3>
                                         <h4>{specialization}</h4>
                                         <Box display="flex" alignItems="center" justifyContent="center">
-                                            <StarRating />
+                                            <Paper style={{backgroundColor: "#E0E0E0"}}>
+                                                <Button>
+                                                    <StarRating val={rateAvg}/>
+                                                    <Typography>({rateCount})</Typography>
+                                                </Button>
+                                            </Paper>
                                         </Box>
                                     </center>
                                 )
@@ -492,7 +533,7 @@ export default function Profile () {
                                     </center>
                                 )}
                         </Grid>
-                        <Grid item container className={classes.tab2} direction="column">
+                        <Grid item container className={classes.tab2} direction="column" style={{marginTop: "1em"}}>
                             <Grid item style={{width: "inherit"}}>
                             {isDoctor ? 
                                 <Tabs
