@@ -7,7 +7,6 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import { Link, useHistory } from "react-router-dom";
 import CloseIcon from '@material-ui/icons/Close';
@@ -29,6 +28,13 @@ import { callAPIHandler } from "../../core/modules/refreshToken";
 import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import h1 from "../../assets/images/login-signup/h1.jpg";
+import h2 from "../../assets/images/login-signup/h2.jpg";
+import h3 from "../../assets/images/login-signup/h3.jpg";
+import h4 from "../../assets/images/login-signup/h4.jpg";
+import h5 from "../../assets/images/login-signup/h5.jpg";
+import h6 from "../../assets/images/login-signup/h6.jpg";
+import h7 from "../../assets/images/login-signup/h7.jpg";
 
 const callSignUPAPI = async (data, isdoctor) => {
   try {
@@ -46,16 +52,36 @@ const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}
 const numRegex = RegExp(/^-?[0-9,\.]+$/);
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    height: '100vh',
+  },
+  image: {
+    backgroundImage: 'url(../../assets/images/OnlineDoctor.jpg);',
+    backgroundRepeat: 'no-repeat',
+    backgroundColor:
+      theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  },
   paper: {
-    position: 'absolute',
-    width: 400,
-    backgroundColor: '#c2fcc2',
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    margin: theme.spacing(6, 6),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+  Btn: {
+    backgroundColor: '#40bad5',
+    textAlign: 'center',
+    fontSize: '16px',
+    borderRadius: '10px',
+    textTransform: 'none',
+    height: '45px',
+    '&:hover': {
+      backgroundColor: '#5f939a',
+    },
   },
 }));
 
@@ -64,6 +90,15 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const classes = useStyles();
 
   const history = useHistory();
+
+  const images = [h1, h2, h3, h4, h5, h6, h7];
+  const [index, setindex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setindex(index => index === 6 ? 0 : index + 1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -219,168 +254,167 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
           {!isdoctor && <Typography variant="h6" color="inherit" noWrap>Patient SignUp Page</Typography>}
         </Toolbar>
       </AppBar>
-      <Box style={{ display: 'flex', backgroundColor: '#E0E0E0', height: '690px', alignItems: 'center' }}>
-        <Container component="main" maxWidth="xs">
-          <div className="paper">
-            <div class="form">
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  {isdoctor &&
-                    <TextField
-                      error={!isgmcValid}
-                      variant="outlined"
-                      required
-                      fullWidth
-                      id="MedicalLicenseNumber"
-                      label="Medical License Number"
-                      name="MedicalLicenseNumber"
-                      value={gmcNum}
-                      onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
-                      InputProps={{
-                        startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
-                      }}
-                    />
-                  }
-                </Grid>
-                <Grid item xs={12}>
+      <Grid container component="main" className={classes.root} style={{ paddingTop: '40px', paddingBottom: '40px', paddingRight: '350px', paddingLeft: '350px', height: '690px', backgroundColor: '#8ab6d6' }}>
+        <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
+        <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
+          <div className={classes.paper}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                {isdoctor &&
                   <TextField
-                    error={!isEmailValid}
+                    error={!isgmcValid}
                     variant="outlined"
                     required
                     fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    value={email}
-                    onChange={event => { setEmail(event.target.value); checkEmail(event.target.value); }}
+                    id="MedicalLicenseNumber"
+                    label="Medical License Number"
+                    name="MedicalLicenseNumber"
+                    value={gmcNum}
+                    onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
                     InputProps={{
-                      startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>),
-                      endAdornment: (<InputAdornment position="end"></InputAdornment>)
+                      startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
                     }}
-                    helperText={emailhelper}
                   />
-                </Grid>
-                <Grid item xs={12}>
-                  <br />
-                  <TextField
-                    error={!isUsernameValid}
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="username"
-                    label="Username"
-                    name="username"
-                    value={username}
-                    onChange={event => { setUsername(event.target.value); checkUsername(event.target.value); }}
-                    InputProps={{
-                      startAdornment: (<InputAdornment position="start"><AccountCircleIcon /></InputAdornment>),
-                      endAdornment: (<InputAdornment position="end"></InputAdornment>)
-                    }}
-                    helperText={userhelper}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <br />
-                  <TextField
-                    error={!(ispasswordValid && isConfigPassValid)}
-                    variant="outlined"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    id="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={event => { setPassword(event.target.value); checkPassword(event.target.value); }}
-                    type={showPassword ? "text" : "password"}
-                    InputProps={{
-                      startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}>
-                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    helperText={passhelper}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    error={!(ispasswordValid && isConfigPassValid)}
-                    variant="outlined"
-                    required
-                    fullWidth
-                    name="Rpassword"
-                    label="Confirm Password"
-                    id="Rpassword"
-                    autoComplete="current-password"
-                    value={configPass}
-                    onChange={event => { setConfigPass(event.target.value); checkConfigPass(event.target.value) }}
-                    type={showPassword ? "text" : "password"}
-                    InputProps={{
-                      startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>)
-                    }}
-                    helperText={configpasshelper}
-                  />
-                </Grid>
+                }
               </Grid>
-              <Box display="flex" justifyContent="space-between">
-                <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Sign up</Button>
-                {isLoading && <LoadingSpinner />}
-              </Box>
-              <Grid>
-                <Grid item>
-                  {!isdoctor && <Link class="link" onClick={changeToDoctor}>Are you a doctor? Sign up as a doctor</Link>}
-                  {isdoctor && <Link class="link" onClick={changeToPatient}>Are you a patient? Sign up as a patient</Link>}
-                </Grid>
-                <Grid item>
-                  <Link class="link" to="/login">Already have an account? Log in</Link>
-                </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  error={!isEmailValid}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  value={email}
+                  onChange={event => { setEmail(event.target.value); checkEmail(event.target.value); }}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>),
+                    endAdornment: (<InputAdornment position="end"></InputAdornment>)
+                  }}
+                  helperText={emailhelper}
+                />
               </Grid>
-            </div>
+              <Grid item xs={12}>
+                <TextField
+                  error={!isUsernameValid}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  value={username}
+                  onChange={event => { setUsername(event.target.value); checkUsername(event.target.value); }}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><AccountCircleIcon /></InputAdornment>),
+                    endAdornment: (<InputAdornment position="end"></InputAdornment>)
+                  }}
+                  helperText={userhelper}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  error={!(ispasswordValid && isConfigPassValid)}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={event => { setPassword(event.target.value); checkPassword(event.target.value); }}
+                  type={showPassword ? "text" : "password"}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}>
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                  helperText={passhelper}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  error={!(ispasswordValid && isConfigPassValid)}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="Rpassword"
+                  label="Confirm Password"
+                  id="Rpassword"
+                  autoComplete="current-password"
+                  value={configPass}
+                  onChange={event => { setConfigPass(event.target.value); checkConfigPass(event.target.value) }}
+                  type={showPassword ? "text" : "password"}
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>)
+                  }}
+                  helperText={configpasshelper}
+                />
+              </Grid>
+            </Grid>
+            <Box display="flex" justifyContent="space-between">
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '325px', marginBottom: '20px', marginTop: '20px' }}>Sign up</Button>
+            </Box>
+            <Grid>
+              {isLoading && <LoadingSpinner />}
+            </Grid>
+            <Grid>
+              {!isdoctor && <Link class="link" onClick={changeToDoctor}>Are you a doctor? Sign up as a doctor</Link>}
+            </Grid>
+            <Grid>
+              {isdoctor && <Link class="link" onClick={changeToPatient}>Are you a patient? Sign up as a patient</Link>}
+            </Grid>
+            <Grid>
+              <Link class="link" to="/login">Already have an account? Log in</Link>
+            </Grid>
           </div>
-          <Snackbar
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            open={openSnackBar}
-            autoHideDuration={6000}
-            onClose={handleClose}
-            resumeHideDuration={0}
-          >
-            <Paper style={{ backgroundColor: "#f9a099", borderRadius: "7px" }} elevation={3}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-                px={"1em"} py={"1em"}>
-                <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
-                <Box>
-                  {message && message.split("\n").map((item) =>
-                    <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
-                  )}
-                </Box>
-                <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
-                  <CloseIcon style={{ color: "#611a15" }} />
-                </IconButton>
+        </Grid>
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={handleClose}
+          resumeHideDuration={0}
+        >
+          <Paper style={{ backgroundColor: "#f9a099", borderRadius: "7px" }} elevation={3}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              px={"1em"} py={"1em"}>
+              <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+              <Box>
+                {message && message.split("\n").map((item) =>
+                  <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
+                )}
               </Box>
-            </Paper>
-          </Snackbar>
-          <Modal
-            open={openModal}
-            onClose={() => goToLogin()}
-          >
-            <div className={classes.paper} display="flex" color='#1e4620'>
-              <CheckCircleIcon />
-              <h2>SignUp was Successful!</h2>
-              <Button onClick={() => goToLogin()}>Dismiss</Button>
-            </div>
-          </Modal>
-        </Container>
-      </Box>
+              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
+                <CloseIcon style={{ color: "#611a15" }} />
+              </IconButton>
+            </Box>
+          </Paper>
+        </Snackbar>
+        <Modal
+          open={openModal}
+          onClose={() => goToLogin()}
+        >
+          <div className={classes.paper} display="flex" color='#1e4620'>
+            <CheckCircleIcon />
+            <h2>SignUp was Successful!</h2>
+            <Button onClick={() => goToLogin()}>Dismiss</Button>
+          </div>
+        </Modal>
+      </Grid>
     </React.Fragment>
   );
 }
