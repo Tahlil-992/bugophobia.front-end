@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, Container, IconButton, Link, makeStyles, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Container, IconButton, Link, makeStyles, Paper, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -376,6 +376,7 @@ export default function Profile () {
 
     const [profileImage, setProfileImage] = useState(isViewedDoctor ? DoctorImage : PatientImage);
 
+    const [doctorid, setDoctorid] = useState(0);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -388,12 +389,17 @@ export default function Profile () {
     const [experience, setExperience] = useState("");
     const [insurance, setInsurance] = useState("");
 
+    useEffect(() => {
+        callGetDetailRatingAPI();
+    }, [doctorid])
+
     const callGetAPI = async () => {
         try {
             const data = {username: viewedUsername};
             const response = await callProfileAPI(data, isViewedDoctor, isRemembered);
             if (response.status === 200) {
                 let payload = response.payload;
+                setDoctorid(nullCheck(payload.user.id))
                 setFirstName(nullCheck(payload.user.first_name));
                 setLastName(nullCheck(payload.user.last_name));
                 setEmail(nullCheck(payload.user.email));
@@ -474,10 +480,10 @@ export default function Profile () {
         }
     }
 
-    const callSubmitNewRateAPI = async (doctor_id = 4) => {
+    const callSubmitNewRateAPI = async () => {
         try {
-            const response = await newRateCallAPI({ doctor_id: doctor_id, amount: Number(newRateValue) }, isRemembered);
-            if (response.status == 200) {
+            const response = await newRateCallAPI({ doctor_id: doctorid, amount: Number(newRateValue) }, isRemembered);
+            if (response.status == 201) {
                 SetMessage({ type: Severity.SUCCESS, message: "Your given rating was successfully submitted!" });
                 setOnReloadRate(true);
             }
@@ -487,10 +493,10 @@ export default function Profile () {
         }
     }
 
-    const callGetDetailRatingAPI = async (doctor_id = 4) => {
+    const callGetDetailRatingAPI = async () => {
         try {
-            const response = await getRatingDetailCallAPI({ doctor_id: doctor_id });
-            console.log(response);
+            const response = await getRatingDetailCallAPI({ doctor_id: doctorid });
+            // console.log(response);
             if (response.status == 200) {
                 const payload = response.payload;
                 setRateCount(payload.number);
@@ -557,12 +563,15 @@ export default function Profile () {
                                             } 
                                             </Typography>
                                             <Typography variant="subtitle1">{specialization}</Typography>
-                                            <Box display="flex" alignItems="center" justifyContent="center">
-                                                <Tooltip title="Rate this doctor">
-                                                    <Button onClick={() => setOpenModal(true)}>
-                                                        <StarRating />
-                                                    </Button>
-                                                </Tooltip>
+                                            <Box display="flex" alignItems="center" justifyContent="flex-start">
+                                                <Paper style={{backgroundColor: "#E0E0E0"}}>
+                                                    <Tooltip title="Rate this doctor">
+                                                        <Button onClick={() => setOpenModal(true)} padding={0}>
+                                                            <StarRating val={rateAvg}/>
+                                                            <Typography>({rateCount})</Typography>
+                                                        </Button>
+                                                    </Tooltip>
+                                                </Paper>
                                             </Box>
                                         </Box>
                                     )
