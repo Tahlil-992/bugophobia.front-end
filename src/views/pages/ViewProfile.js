@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -30,7 +30,10 @@ import StarRating from "./RatingComponent/rating";
 import Modal from "@material-ui/core/Modal";
 import Tooltip from '@material-ui/core/Tooltip';
 
-
+export const Severity = {
+    SUCCESS: "SUCCESS",
+    ERROR: "ERROR"
+}
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
   
@@ -101,6 +104,36 @@ const callGetSaveProfileAPI = async (isRemembered) => {
     }
     catch (e) {
         throw e;
+    }
+}
+
+const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
+    try {
+      const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+      return response;
+    }
+    catch (e) {
+      throw e;
+    }
+}
+
+const getRateListCallAPI = (isRemembered) => {
+    try {
+      const response = callAPIHandler({ method: "GET", url: "/auth/rate-list/" }, true, isRemembered);
+      return response;
+    }
+    catch (e) {
+      throw e;
+    }
+}
+  
+const newRateCallAPI = ({ doctor_id, amount }, isRemembered) => {
+    try {
+      const response = callAPIHandler({ method: "POST", data: { amount: amount, doctor_id: doctor_id }, url: "/auth/rate-list/" }, true, isRemembered);
+      return response;
+    }
+    catch (e) {
+      throw e;
     }
 }
 
@@ -243,10 +276,30 @@ export default function Profile () {
 
     const [openModal, setOpenModal] = useState(false);
     const [onRateSubmit, setOnRateSubmit] = useState(false);
+    const [newRateValue, setNewRateValue] = useState(3);
+    const [onReloadRate, setOnReloadRate] = useState(true);
+    const [rateCount, setRateCount] = useState(0);
+    const [rateAvg, setRateAvg] = useState(0);
+    
+    const [message, SetMessage] = useState({ type: Severity.SUCCESS, message: "" });
+
+    useEffect(() => {
+        if (onRateSubmit) {
+            callSubmitNewRateAPI();
+        }
+        setOnRateSubmit(false);
+    }, [onRateSubmit])
+
+    useEffect(() => {
+        if (onReloadRate) {
+            callGetDetailRatingAPI();
+        }
+        setOnReloadRate(false);
+    }, [onReloadRate])
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        setOnRateSubmit(false);
+        // setOnRateSubmit(false);
     }
 
     const handleChange = (event, newValue) => {
@@ -421,6 +474,34 @@ export default function Profile () {
         }
     }
 
+    const callSubmitNewRateAPI = async (doctor_id = 4) => {
+        try {
+            const response = await newRateCallAPI({ doctor_id: doctor_id, amount: newRateValue }, isRemembered);
+            if (response.status == 200) {
+                SetMessage({ type: Severity.SUCCESS, message: "Your given rating was successfully submitted!" });
+                setOnReloadRate(true);
+            }
+        }
+        catch {
+            SetMessage({ type: Severity.ERROR, message: "Something went wrong while trying to submit your rating!" });
+        }
+    }
+
+    const callGetDetailRatingAPI = async (doctor_id = 4) => {
+        try {
+            const response = await getRatingDetailCallAPI({ doctor_id: doctor_id });
+            console.log(response);
+            if (response.status == 200) {
+                const payload = response.payload;
+                setRateCount(payload.number);
+                setRateAvg(payload.avg);
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }    
+
     const [disabled, setDisabled] = useState(-1);
 
     const fields = isViewedDoctor ?
@@ -586,9 +667,9 @@ export default function Profile () {
                 <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
                     <h4>{`Rate doctor ${username}.`}</h4>
                     <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
-                        <StarRating editAllowed={true} onSubmit={onRateSubmit}/>
+                        <StarRating editAllowed={true} onSubmit={onRateSubmit} setNewRate={(value) => setNewRateValue(value)}/>
                         <Box display="flex" marginTop="1.5em" justifyContent="space-between">
-                            <Button variant="contained" color="primary"  onClick={() => setOnRateSubmit(true)} style={{marginRight: "0.5em"}}>Submit</Button>
+                            <Button variant="contained" color="primary"  onClick={() => {setOnRateSubmit(true); handleCloseModal();}} style={{marginRight: "0.5em"}}>Submit</Button>
                             <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{marginLeft: "0.5em"}}>DISMISS</Button>
                         </Box>
                     </Box>
