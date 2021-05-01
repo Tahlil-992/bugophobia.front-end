@@ -476,7 +476,7 @@ export default function Profile () {
 
     const callSubmitNewRateAPI = async (doctor_id = 4) => {
         try {
-            const response = await newRateCallAPI({ doctor_id: doctor_id, amount: newRateValue }, isRemembered);
+            const response = await newRateCallAPI({ doctor_id: doctor_id, amount: Number(newRateValue) }, isRemembered);
             if (response.status == 200) {
                 SetMessage({ type: Severity.SUCCESS, message: "Your given rating was successfully submitted!" });
                 setOnReloadRate(true);
@@ -667,7 +667,7 @@ export default function Profile () {
                 <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
                     <h4>{`Rate doctor ${username}.`}</h4>
                     <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
-                        <StarRating editAllowed={true} onSubmit={onRateSubmit} setNewRate={(value) => setNewRateValue(value)}/>
+                        <StarRating editAllowed={true} setNewRate={(value) => setNewRateValue(value)}/>
                         <Box display="flex" marginTop="1.5em" justifyContent="space-between">
                             <Button variant="contained" color="primary"  onClick={() => {setOnRateSubmit(true); handleCloseModal();}} style={{marginRight: "0.5em"}}>Submit</Button>
                             <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{marginLeft: "0.5em"}}>DISMISS</Button>

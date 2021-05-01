@@ -31,7 +31,7 @@ export default function StarRating({ editAllowed = false, onSubmit = false, setN
         precision={editAllowed ? 1 : 0.1}
         readOnly={!editAllowed}
         value={editAllowed ? value : val}
-        onChange={(event) => setValue(event.target.value)} />
+        onChange={(event) => {setValue(event.target.value); setNewRate(event.target.value)}} />
     </div>
   );
 }
