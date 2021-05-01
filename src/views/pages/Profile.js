@@ -352,17 +352,17 @@ export default function Profile () {
                 setLastName(nullCheck(payload.user.last_name));
                 setEmail(nullCheck(payload.user.email));
                 setUsername(nullCheck(payload.user.username));
-                setGender(genderMap(payload.user.gender));
+                setGender((payload.user.gender));
                 setAge(nullCheck(payload.user.age));
                 setPhoneNumber(nullCheck(payload.user.phone_number));
                 setCity(nullCheck(payload.user.city));
                 if (isDoctor) {
                     setGmcNumber(nullCheck(payload.gmc_number));
-                    setSpecialization(specializationMap(payload.filed_of_specialization));
+                    setSpecialization((payload.filed_of_specialization));
                     setExperience(nullCheck(payload.work_experience));
                 }
                 else {
-                    setInsurance(insuranceMap(payload.insurance_type));
+                    setInsurance((payload.insurance_type));
                 }
             }
         }
