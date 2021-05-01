@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, ButtonBase, Container, IconButton, Link, makeStyles, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Container, IconButton, Link, makeStyles, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -109,16 +109,90 @@ const useStyles = makeStyles((theme) => ({
       },
     },
     large: {
-      width: theme.spacing(20),
-      height: theme.spacing(20),
-      margin: theme.spacing(0),
-    },
+        width: theme.spacing(16),
+        height: theme.spacing(16),
+        margin: theme.spacing(2),
+        "&:hover": {
+          width: theme.spacing(18),
+          height: theme.spacing(18),
+          margin: theme.spacing(1),
+        }
+      },
     tab: {
         width: 700,
     },
     grid: {
         marginTop: "2rem",
-    }
+    },
+    tab2: {
+        width: "75vmax",
+        //marginLeft: "10%",
+    },
+    onetab: {
+        backgroundColor: "#C0C0F0",
+        //border: "3px solid #16E",
+        borderTopRightRadius: "10px",
+        borderTopLeftRadius: "10px",
+        borderBottom: "3px solid #16E",
+        fontSize: 12,
+        iconSize: 30 ,
+        '&:hover': {
+            backgroundColor: "#D0D0F0",
+            fontSize: 14,
+        }
+    },
+    seltab: {
+        backgroundColor: "#F5F5F5",
+        //border: "3px solid #16E",
+        borderTopRightRadius: "10px",
+        borderTopLeftRadius: "10px",
+        borderTop: "3px solid #16E",
+        borderRight: "3px solid #16E",
+        borderLeft: "3px solid #16E", 
+    },
+    tabpanel: {
+        backgroundColor: "#F5F5F5",
+        borderRight: "3px solid #16E",
+        borderLeft: "3px solid #16E",
+        borderBottom: "3px solid #16E",
+        borderBottomRightRadius: "10px",
+        borderBottomLeftRadius: "10px",
+        marginBottom: "2rem",
+    },
+    textfield: {
+        width: "70%",
+        marginLeft: "15%",
+        backgroundColor: "#e5e5e5",
+        color: "#111",
+        '&:hover': {
+            backgroundColor: "#f0f0f0",
+            color: "#1ee",
+            width: "74%",
+            marginLeft: "13%",
+        },
+        '&$disabled': {
+            backgroundColor: "#f00000",
+        }
+    },
+    dis: {
+        '&:hover': {
+            color: "#05e",
+        },
+    },
+    button: {
+        backgroundColor: '#40bad5',
+        border: '0px solid #10217d',
+        padding: '1em 4em 1em 4em',
+        margin: '1em 0em 2em 0em',
+        textAlign: 'center',
+        fontSize: '16px',
+        borderRadius: '10px',
+        textTransform: 'none',
+        height:'45px',
+        '&:hover': {
+            backgroundColor: '#5f939a',
+        },
+    },
 }));
 
 const StyledBadge = withStyles((theme) => ({
@@ -361,81 +435,83 @@ export default function Profile () {
             </AppBar>
             <div >
                 <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
-                    <Grid item> { isViewedDoctor  && !isDoctor ?
-                        <StyledBadge 
-                            badgeContent={isSaved ? 
-                                <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
-                                    <FavoriteIcon color="secondary" fontSize="large" />
-                                </IconButton>
-                                :
-                                <IconButton onClick={saveButtonHandler} title="Add to Favorites">
-                                    <FavoriteBorderIcon color="secondary" fontSize="large" />
-                                </IconButton>
-                            } 
-                            >
-                            <Avatar className={classes.large} src={profileImage}></Avatar>
-                        </StyledBadge>
-                        :
-                        <Avatar className={classes.large} src={profileImage}></Avatar>
-                    }
-                    </Grid>
                     <Grid item>
-                            {isViewedDoctor ? (
-                                <center>
-                                    <h3>{"Doctor " + firstName + " " + lastName}</h3>
-                                    <h4>{specialization}</h4>
-                                    <h5>*****</h5>
-                                </center>
-                            )
-                            :
-                            (
-                                <center>
-                                    <h2>{firstName + " " + lastName}</h2>
-                                    <h3>{"User"}</h3>
-                                </center>
-                            )}
+                        <Box display="flex">
+                            <Avatar className={classes.large} src={profileImage}></Avatar>
+                                {isViewedDoctor ? (
+                                        <Box>
+                                            <br></br>
+                                            
+                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}
+                                            {isSaved ? 
+                                                <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
+                                                    <FavoriteIcon color="secondary" fontSize="large" />
+                                                </IconButton>
+                                                :
+                                                <IconButton onClick={saveButtonHandler} title="Add to Favorites">
+                                                    <FavoriteBorderIcon color="secondary" fontSize="large" />
+                                                </IconButton>
+                                            } 
+                                            </Typography>
+                                            <Typography variant="subtitle1">{specialization}</Typography>
+                                            <Typography variant="h5">*****</Typography>
+                                        </Box>
+                                    )
+                                    :
+                                    (
+                                        <Box>
+                                            <br></br><br></br>
+                                            <Typography variant="h6">{firstName + " " + lastName}</Typography>
+                                            <Typography variant="subtitle1">{"User"}</Typography>
+                                        </Box>
+                                    )}
+                                
+                        </Box>
                     </Grid>
                     <Grid item>
                         {isViewedDoctor ?
                             (
-                                <Button class="button" >Take a Visit Time</Button>
+                                <Button className={classes.button} >Take a Visit Time</Button>
                             )
                             :
                             <></>
                         }
                     </Grid>
-                    <Grid item>
+                    <Grid item container className={classes.tab2} direction="column">
+                    <Grid item style={{width: "inherit"}}>
                         {isViewedDoctor ? 
                             <Tabs
                                 value={tabValue}
                                 onChange={handleChange}
-                                indicatorColor="primary"
+                                indicatorColor="inherit"
                                 textColor="primary"
-                                className={classes.tab}
+                                
                                 variant="fullWidth"
                                 aria-label="full width tabs example"
                                 >
-                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} />
-                                    <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps(1)} />                                    
+                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />                                      
                             </Tabs>
                             :
                             <Tabs
                                 value={tabValue}
                                 onChange={handleChange}
-                                indicatorColor="primary"
+                                indicatorColor="inherit"
                                 textColor="primary"
-                                className={classes.tab}
+                                
                                 variant="fullWidth"
                                 aria-label="full width tabs example"
                                 >
-                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} />  
+                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />  
                             </Tabs>
                         }
-                        <TabPanel value={tabValue} index={0} className={classes.accordion}>
+                        </Grid>
+                        <Grid item className={classes.tabpanel}>
+                        <TabPanel value={tabValue} index={0}>
                                 <div>
-                                    <Container component="main" maxWidth="xs">                
+                                                   
                                         <Box display="flex" justifyContent="space-between" >
-                                            <Grid container spacing={2} alignItems="flex-start">
+                                            <Grid container spacing={3} alignItems="flex-start">
                                                     {fields.map((item, index) => {
                                                         return(
                                                             <Grid item xs={12} key={index.toString()}>
@@ -448,17 +524,21 @@ export default function Profile () {
                                                                     fullWidth 
                                                                     label={item[0]}
                                                                     value={item[1]}
+                                                                    className={classes.textfield}
                                                                     onChange={event => item[2](event.target.value)}
                                                                     InputProps={{
-                                                                        startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>)
-                                                                    }}
+                                                                        startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>),
+                                                                        classes: {root: classes.dis}
+                                                                        }
+                                                                        
+                                                                    }
                                                                     />
                                                             </Grid>
                                                             )
                                                         })}
                                             </Grid>
                                         </Box>
-                                    </Container>
+                                    
                                 </div>
                         </TabPanel>
                         <TabPanel value={tabValue} index={1}>
@@ -466,6 +546,7 @@ export default function Profile () {
                                 <CommentSection username={viewedUsername}/>
                             </Box>
                         </TabPanel>
+                        </Grid>
                     </Grid>
                 </Grid> 
             </div>
