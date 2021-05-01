@@ -193,6 +193,11 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
+    dis: {
+        '&:hover': {
+            color: "#05e",
+        },
+    },
 }));
 
 const StyledTextField = withStyles((theme) => ({
@@ -530,7 +535,8 @@ export default function Profile () {
                                                                         select={item[4]}
                                                                         onChange={event => item[2](event.target.value)}
                                                                         InputProps={{
-                                                                            startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>)
+                                                                            startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>),
+                                                                            classes: {root: classes.dis}
                                                                         }}
                                                                         >
                                                                         {item[4] ? 
@@ -560,11 +566,21 @@ export default function Profile () {
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={1} width="100%">
-                                Change Password
+                                {isDoctor ? 
+                                    <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                        <CommentSection username={username}/>
+                                    </Box>
+                                 :
+                                    <Typography>Change Password</Typography>
+                                }
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={2}>
-                                Saved Profiles
+                                {isDoctor ? 
+                                    <Typography>Change Password</Typography>
+                                :
+                                    <Typography>Saved Profiles</Typography>
+                                }
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={3}>
