@@ -36,40 +36,40 @@ export const Severity = {
 }
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
-  
+
     return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`full-width-tabpanel-${index}`}
-        aria-labelledby={`full-width-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box p={3}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`full-width-tabpanel-${index}`}
+            aria-labelledby={`full-width-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={3}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
     );
-  }
+}
 
 TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.any.isRequired,
     value: PropTypes.any.isRequired,
 };
-  
+
 function a11yProps(index) {
     return {
-      id: `full-width-tab-${index}`,
-      'aria-controls': `full-width-tabpanel-${index}`,
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
     };
 }
 
 const callProfileAPI = async (data, is_viewed_doctor, isRemembered) => {
     try {
-        const response = callAPIHandler({method:"POST", url: (is_viewed_doctor ? "/profile/doctor/public/" : "/profile/patient/public/"), data: data}, true, isRemembered);
+        const response = callAPIHandler({ method: "POST", url: (is_viewed_doctor ? "/profile/doctor/public/" : "/profile/patient/public/"), data: data }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -79,7 +79,7 @@ const callProfileAPI = async (data, is_viewed_doctor, isRemembered) => {
 
 const callSaveProfileAPI = async (data, isRemembered) => {
     try {
-        const response = callAPIHandler({method:"POST", url: "/profile/save/", data: data}, true, isRemembered);
+        const response = callAPIHandler({ method: "POST", url: "/profile/save/", data: data }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -89,7 +89,7 @@ const callSaveProfileAPI = async (data, isRemembered) => {
 
 const callRemoveSaveProfileAPI = async (id, isRemembered) => {
     try {
-        const response = callAPIHandler({method:"DELETE", url: `/profile/remove_save/${id}/`}, true, isRemembered);
+        const response = callAPIHandler({ method: "DELETE", url: `/profile/remove_save/${id}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -99,7 +99,7 @@ const callRemoveSaveProfileAPI = async (id, isRemembered) => {
 
 const callGetSaveProfileAPI = async (isRemembered) => {
     try {
-        const response = callAPIHandler({method:"GET", url: "/profile/save/"}, true, isRemembered);
+        const response = callAPIHandler({ method: "GET", url: "/profile/save/" }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -109,40 +109,40 @@ const callGetSaveProfileAPI = async (isRemembered) => {
 
 const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
     try {
-      const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
-      return response;
+        const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+        return response;
     }
     catch (e) {
-      throw e;
+        throw e;
     }
 }
 
 const getRateListCallAPI = (isRemembered) => {
     try {
-      const response = callAPIHandler({ method: "GET", url: "/auth/rate-list/" }, true, isRemembered);
-      return response;
+        const response = callAPIHandler({ method: "GET", url: "/auth/rate-list/" }, true, isRemembered);
+        return response;
     }
     catch (e) {
-      throw e;
+        throw e;
     }
 }
-  
+
 const newRateCallAPI = ({ doctor_id, amount }, isRemembered) => {
     try {
-      const response = callAPIHandler({ method: "POST", data: { amount: amount, doctor_id: doctor_id }, url: "/auth/rate-list/" }, true, isRemembered);
-      return response;
+        const response = callAPIHandler({ method: "POST", data: { amount: amount, doctor_id: doctor_id }, url: "/auth/rate-list/" }, true, isRemembered);
+        return response;
     }
     catch (e) {
-      throw e;
+        throw e;
     }
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
+        display: 'flex',
+        '& > *': {
+            margin: theme.spacing(1),
+        },
     },
     large: {
         width: theme.spacing(16),
@@ -153,7 +153,7 @@ const useStyles = makeStyles((theme) => ({
           height: theme.spacing(18),
           margin: theme.spacing(1),
         } */
-      },
+    },
     tab: {
         width: 700,
     },
@@ -171,7 +171,7 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
         fontSize: 12,
-        iconSize: 30 ,
+        iconSize: 30,
         '&:hover': {
             backgroundColor: "#D0D0F0",
             fontSize: 14,
@@ -184,7 +184,7 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: "10px",
         borderTop: "3px solid #16E",
         borderRight: "3px solid #16E",
-        borderLeft: "3px solid #16E", 
+        borderLeft: "3px solid #16E",
     },
     tabpanel: {
         backgroundColor: "#E0E0E0",
@@ -224,7 +224,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '16px',
         borderRadius: '10px',
         textTransform: 'none',
-        height:'45px',
+        height: '45px',
         '&:hover': {
             backgroundColor: '#5f939a',
         },
@@ -244,11 +244,11 @@ const useStyles = makeStyles((theme) => ({
 
 const StyledBadge = withStyles((theme) => ({
     badge: {
-      backgroundColor: "inherit",
+        backgroundColor: "inherit",
     },
-  }))(Badge);
+}))(Badge);
 
-export default function Profile () {
+export default function Profile() {
 
     const classes = useStyles();
 
@@ -280,7 +280,7 @@ export default function Profile () {
     const [onReloadRate, setOnReloadRate] = useState(true);
     const [rateCount, setRateCount] = useState(0);
     const [rateAvg, setRateAvg] = useState(0);
-    
+
     const [message, SetMessage] = useState({ type: Severity.SUCCESS, message: "" });
 
     useEffect(() => {
@@ -304,14 +304,14 @@ export default function Profile () {
 
     const handleChange = (event, newValue) => {
         setTabValue(newValue);
-      };
-    
-      const handleChangeIndex = (index) => {
+    };
+
+    const handleChangeIndex = (index) => {
         setTabValue(index);
-      };
+    };
 
     const specializationMap = (spec) => {
-        switch(spec) {
+        switch (spec) {
             case 'C':
                 return 'Cardiologist';
             case 'D':
@@ -342,7 +342,7 @@ export default function Profile () {
     }
 
     const insuranceMap = (insur) => {
-        switch(insur) {
+        switch (insur) {
             case 'O':
                 return 'Omr';
             case 'H':
@@ -355,7 +355,7 @@ export default function Profile () {
     }
 
     const genderMap = (gen) => {
-        switch(gen) {
+        switch (gen) {
             case 'M':
                 return 'Male';
             case 'F':
@@ -395,7 +395,7 @@ export default function Profile () {
 
     const callGetAPI = async () => {
         try {
-            const data = {username: viewedUsername};
+            const data = { username: viewedUsername };
             const response = await callProfileAPI(data, isViewedDoctor, isRemembered);
             if (response.status === 200) {
                 let payload = response.payload;
@@ -443,7 +443,7 @@ export default function Profile () {
     }
 
     const [sent, setSent] = useState(false);
-    if (!sent){
+    if (!sent) {
         callGetAPI();
         callGetSaveAPI();
         setSent(true);
@@ -451,7 +451,7 @@ export default function Profile () {
 
     const saveButtonHandler = async () => {
         try {
-            const data = {doctor: viewedUsername};
+            const data = { doctor: viewedUsername };
             const response = await callSaveProfileAPI(data, isRemembered);
             if (response.status === 201) {
                 setIsSaved(true);
@@ -506,36 +506,36 @@ export default function Profile () {
         catch (e) {
             console.log(e);
         }
-    }    
+    }
 
     const [disabled, setDisabled] = useState(-1);
 
     const fields = isViewedDoctor ?
-                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>],
-                    ['Email Address', email, setEmail, <EmailIcon/>],
-                    ['Username', username, setUsername, <AccountCircleIcon/>],
-                    ['Gender', gender, setGender, <WcIcon/>],
-                    ['Age', age, setAge, <AlarmIcon/>],
-                    ['City', city, setCity, <ApartmentIcon/>],
-                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>],
-                    ['Filed of Specialization', specialization, setSpecialization, <WorkIcon/>],
-                    ['Work Experiece', experience, setExperience, <BuildIcon/>]
-                    ]
+        [['First Name', firstName, setFirstName, <DoubleArrowIcon />],
+        ['Last Name', lastName, setLastName, <DoubleArrowIcon />],
+        ['Email Address', email, setEmail, <EmailIcon />],
+        ['Username', username, setUsername, <AccountCircleIcon />],
+        ['Gender', gender, setGender, <WcIcon />],
+        ['Age', age, setAge, <AlarmIcon />],
+        ['City', city, setCity, <ApartmentIcon />],
+        ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon />],
+        ['Filed of Specialization', specialization, setSpecialization, <WorkIcon />],
+        ['Work Experiece', experience, setExperience, <BuildIcon />]
+        ]
 
-                   :
+        :
 
-                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>],
-                    ['Email Address', email, setEmail, <EmailIcon/>],
-                    ['Username', username, setUsername, <AccountCircleIcon/>],
-                    ['Gender', gender, setGender, <WcIcon/>],
-                    ['Age', age, setAge, <AlarmIcon/>],
-                    ['City', city, setCity, <ApartmentIcon/>],
-                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>]
-                    ];
+        [['First Name', firstName, setFirstName, <DoubleArrowIcon />],
+        ['Last Name', lastName, setLastName, <DoubleArrowIcon />],
+        ['Email Address', email, setEmail, <EmailIcon />],
+        ['Username', username, setUsername, <AccountCircleIcon />],
+        ['Gender', gender, setGender, <WcIcon />],
+        ['Age', age, setAge, <AlarmIcon />],
+        ['City', city, setCity, <ApartmentIcon />],
+        ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />]
+        ];
     return (
-        <div style={{backgroundColor:'#8ab6d6'}}>
+        <div style={{ backgroundColor: '#8ab6d6' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -544,160 +544,153 @@ export default function Profile () {
             </AppBar>
             <div >
                 <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
-                    <Grid item>
-                        <Box display="flex" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
-                            
-                            <Avatar className={classes.large} src={profileImage}></Avatar>
+                    <Grid item direction="row">
+                        <Box style={{ backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: '0.5rem' }}>
+                            <Grid style={{ display: 'flex' }}>
+                                <Avatar className={classes.large} src={profileImage}></Avatar>
                                 {isViewedDoctor ? (
-                                        <Box >
-                                            
-                                            <br/>
-                                            {isDoctor ?  <br/> : <></>}
-                                            
-                                            
-                                            {!isDoctor ? 
-                                                <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}
-                                                    {isSaved ? 
-                                                        <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
-                                                            <FavoriteIcon color="secondary" fontSize="large" />
-                                                        </IconButton>
-                                                        :
-                                                        <IconButton onClick={saveButtonHandler} title="Add to Favorites">
-                                                            <FavoriteBorderIcon color="secondary" fontSize="large" />
-                                                        </IconButton>
-                                                    }
-                                                </Typography>
-                                                :
-                                                <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
-                                            }
-                                            
-                                            <Typography variant="subtitle1">{specialization}</Typography>
-                                            <Box display="flex" alignItems="center" justifyContent="flex-start">
-                                                <Paper style={{backgroundColor: "#E0E0E0"}}>
-                                                    <Tooltip title="Rate this doctor">
-                                                        <Button onClick={() => setOpenModal(true)} padding={0}>
-                                                            <StarRating val={rateAvg}/>
-                                                            <Typography>({rateCount})</Typography>
-                                                        </Button>
-                                                    </Tooltip>
-                                                </Paper>
-                                            </Box>
+                                    <Box >
+                                        <br />
+                                        {isDoctor ? <br /> : <></>}
+                                        {!isDoctor ?
+                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}
+                                                {isSaved ?
+                                                    <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
+                                                        <FavoriteIcon color="secondary" fontSize="large" />
+                                                    </IconButton>
+                                                    :
+                                                    <IconButton onClick={saveButtonHandler} title="Add to Favorites">
+                                                        <FavoriteBorderIcon color="secondary" fontSize="large" />
+                                                    </IconButton>
+                                                }
+                                            </Typography>
+                                            :
+                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
+                                        }
+                                        <Typography variant="subtitle1">{specialization}</Typography>
+                                        <Box display="flex" alignItems="center" justifyContent="flex-start">
+                                            <Paper style={{ backgroundColor: "#E0E0E0" }}>
+                                                <Tooltip title="Rate this doctor">
+                                                    <Button onClick={() => setOpenModal(true)} padding={0}>
+                                                        <StarRating val={rateAvg} />
+                                                        <Typography>({rateCount})</Typography>
+                                                    </Button>
+                                                </Tooltip>
+                                            </Paper>
                                         </Box>
-                                    )
+                                    </Box>
+                                )
                                     :
                                     (
                                         <Box>
-                                            
+
                                             <br></br><br></br>
                                             <Typography variant="h6">{firstName + " " + lastName}</Typography>
                                             <Typography variant="subtitle1">{"User"}</Typography>
                                         </Box>
-                                        
+
                                     )}
-                                    
-                                    
-                    
-                                
-                        </Box>
-                    </Grid>
-                    <Grid item>
-                        {isViewedDoctor ?
-                            (
-                              <Button className={classes.button} >Take a Visit Time</Button>
+                            </Grid>
+                            <Grid style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginBottom: '1rem', paddingLeft: '0.5rem' }}>
+                                {isViewedDoctor ?
+                                    (
+                                        <Button className={classes.button} >Take a Visit Time</Button>
                                     )
                                     :
                                     <></>
                                 }
+                            </Grid>
+                        </Box>
                     </Grid>
                     <Grid item container className={classes.tab2} direction="column">
-                    <Grid item style={{width: "inherit"}}>
-                        {isViewedDoctor ? 
-                            <Tabs
-                                value={tabValue}
-                                onChange={handleChange}
-                                indicatorColor="inherit"
-                                textColor="primary"
-                                
-                                variant="fullWidth"
-                                aria-label="full width tabs example"
+                        <Grid item style={{ width: "inherit" }}>
+                            {isViewedDoctor ?
+                                <Tabs
+                                    value={tabValue}
+                                    onChange={handleChange}
+                                    indicatorColor="inherit"
+                                    textColor="primary"
+
+                                    variant="fullWidth"
+                                    aria-label="full width tabs example"
                                 >
-                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
-                                    <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />                                      
-                            </Tabs>
-                            :
-                            <Tabs
-                                value={tabValue}
-                                onChange={handleChange}
-                                indicatorColor="inherit"
-                                textColor="primary"
-                                
-                                variant="fullWidth"
-                                aria-label="full width tabs example"
+                                    <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Comments" icon={<CommentIcon />} {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />
+                                </Tabs>
+                                :
+                                <Tabs
+                                    value={tabValue}
+                                    onChange={handleChange}
+                                    indicatorColor="inherit"
+                                    textColor="primary"
+
+                                    variant="fullWidth"
+                                    aria-label="full width tabs example"
                                 >
-                                    <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />  
-                            </Tabs>
-                        }
+                                    <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                </Tabs>
+                            }
                         </Grid>
                         <Grid item className={classes.tabpanel}>
-                        <TabPanel value={tabValue} index={0}>
+                            <TabPanel value={tabValue} index={0}>
                                 <div>
-                                                   
-                                        <Box display="flex" justifyContent="space-between" >
-                                            <Grid container spacing={3} alignItems="flex-start">
-                                                    {fields.map((item, index) => {
-                                                        return(
-                                                            <Grid item xs={12} key={index.toString()}>
-                                                                <TextField 
-                                                                    key={index.toString()}
-                                                                    onMouseEnter={() => setDisabled(index)}
-                                                                    onMouseLeave={() => setDisabled(-1)}
-                                                                    disabled={(disabled === index)}
-                                                                    variant="outlined"
-                                                                    fullWidth 
-                                                                    label={item[0]}
-                                                                    value={item[1]}
-                                                                    className={classes.textfield}
-                                                                    onChange={event => item[2](event.target.value)}
-                                                                    InputProps={{
-                                                                        startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>),
-                                                                        classes: {root: classes.dis}
-                                                                        }
-                                                                        
-                                                                    }
-                                                                    />
-                                                            </Grid>
-                                                            )
-                                                        })}
-                                            </Grid>
-                                        </Box>
-                                    
+
+                                    <Box display="flex" justifyContent="space-between" >
+                                        <Grid container spacing={3} alignItems="flex-start">
+                                            {fields.map((item, index) => {
+                                                return (
+                                                    <Grid item xs={12} key={index.toString()}>
+                                                        <TextField
+                                                            key={index.toString()}
+                                                            onMouseEnter={() => setDisabled(index)}
+                                                            onMouseLeave={() => setDisabled(-1)}
+                                                            disabled={(disabled === index)}
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            label={item[0]}
+                                                            value={item[1]}
+                                                            className={classes.textfield}
+                                                            onChange={event => item[2](event.target.value)}
+                                                            InputProps={{
+                                                                startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>),
+                                                                classes: { root: classes.dis }
+                                                            }
+
+                                                            }
+                                                        />
+                                                    </Grid>
+                                                )
+                                            })}
+                                        </Grid>
+                                    </Box>
+
                                 </div>
-                        </TabPanel>
-                        <TabPanel value={tabValue} index={1}>
-                            <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
-                                <CommentSection username={viewedUsername}/>
-                            </Box>
-                        </TabPanel>
+                            </TabPanel>
+                            <TabPanel value={tabValue} index={1}>
+                                <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                    <CommentSection username={viewedUsername} />
+                                </Box>
+                            </TabPanel>
                         </Grid>
                     </Grid>
-                </Grid> 
+                </Grid>
             </div>
-            {!isDoctor && 
-            <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-            >
-                <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
-                    <h4>{`Rate doctor ${username}.`}</h4>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
-                        <StarRating editAllowed={true} setNewRate={(value) => setNewRateValue(value)}/>
-                        <Box display="flex" marginTop="1.5em" justifyContent="space-between">
-                            <Button variant="contained" color="primary"  onClick={() => {setOnRateSubmit(true); handleCloseModal();}} style={{marginRight: "0.5em"}}>Submit</Button>
-                            <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{marginLeft: "0.5em"}}>DISMISS</Button>
+            {!isDoctor &&
+                <Modal
+                    open={openModal}
+                    onClose={handleCloseModal}
+                >
+                    <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
+                        <h4>{`Rate doctor ${username}.`}</h4>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
+                            <StarRating editAllowed={true} setNewRate={(value) => setNewRateValue(value)} />
+                            <Box display="flex" marginTop="1.5em" justifyContent="space-between">
+                                <Button variant="contained" color="primary" onClick={() => { setOnRateSubmit(true); handleCloseModal(); }} style={{ marginRight: "0.5em" }}>Submit</Button>
+                                <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{ marginLeft: "0.5em" }}>DISMISS</Button>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
-            </Modal>}
+                </Modal>}
         </div>
     );
 }
