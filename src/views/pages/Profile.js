@@ -170,16 +170,18 @@ const useStyles = makeStyles((theme) => ({
         //marginLeft: "10%",
     },
     onetab: {
-        backgroundColor: "#C0C0F0",
-        //border: "3px solid #16E",
+        backgroundColor: "#C0C5E5",
+        //border: "1px solid #C5CAEA",
+        color: "#111",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
         fontSize: 12,
         iconSize: 30 ,
         '&:hover': {
-            backgroundColor: "#D0D0F0",
+            backgroundColor: "#D0D5F0",
             fontSize: 14,
+            color: "#000",
         }
     },
     seltab: {
@@ -189,7 +191,8 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: "10px",
         borderTop: "3px solid #16E",
         borderRight: "3px solid #16E",
-        borderLeft: "3px solid #16E", 
+        borderLeft: "3px solid #16E",
+        color: "#31C", 
     },
     tabpanel: {
         backgroundColor: "#e0e0e0",
@@ -219,7 +222,7 @@ const useStyles = makeStyles((theme) => ({
     },
     dis: {
         '&:hover': {
-            //color: "#05e",
+           color: "#31c",
         },
     },
 }));
@@ -464,7 +467,7 @@ export default function Profile () {
     }
 
     const onFileChange = event => {
-        if (event.target.files !== []) {
+        if (event.target.files) {
             setProfileImage(URL.createObjectURL(event.target.files[0]));
         }
     }
@@ -548,7 +551,7 @@ export default function Profile () {
                                     value={tabValue2}
                                     onChange={handleChange2}
                                     indicatorColor="inherit"
-                                    textColor="primary"
+                                    
                                     style={{width: "inherit"}}
                                     variant="fullWidth"
                                     aria-label="full width tabs example"
@@ -565,17 +568,17 @@ export default function Profile () {
                                     value={tabValue2}
                                     onChange={handleChange2}
                                     indicatorColor="inherit"
-                                    textColor="primary"
+                                    
                                     style={{width: "inherit"}}
                                     variant="fullWidth"
                                     aria-label="full width tabs example"
                                     >
                                         <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
                                         <Tab label="Change Password" icon={<VpnKeyIcon/>} {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Saved Profiles" icon={<FavoriteIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Notifications" icon={<NotificationsIcon/>} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />   
+                                        {/*<Tab label="Saved Profiles" icon={<FavoriteIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />*/}
+                                        <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Notifications" icon={<NotificationsIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />   
                                 </Tabs>
                             }
                         </Grid>
@@ -645,16 +648,24 @@ export default function Profile () {
                                 {isDoctor ? 
                                     <Typography>Change Password</Typography>
                                 :
-                                    <Typography>Saved Profiles</Typography>
+                                    <Typography>Calendar</Typography>
                                 }
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={3}>
-                                Calendar
+                                {isDoctor ? 
+                                    <Typography>Calendar</Typography>
+                                :
+                                    <Typography>Notifications</Typography>
+                                }
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={4}>
-                                Notifications
+                                {isDoctor ? 
+                                    <Typography>Notifications</Typography>
+                                :
+                                    <Typography>Privacy Policy</Typography>
+                                }
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={5}>
