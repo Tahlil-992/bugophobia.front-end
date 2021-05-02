@@ -29,6 +29,15 @@ import CommentSection from './commentSection';
 import StarRating from "./RatingComponent/rating";
 import Modal from "@material-ui/core/Modal";
 import Tooltip from '@material-ui/core/Tooltip';
+import Snackbar from "@material-ui/core/Snackbar";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import CloseIcon from "@material-ui/icons/Close";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+
+const SUCCESS_COLOR = "#1e4620";
+const SUCCESS_BACKGROUND = "#c2fcc2";
+const ERROR_COLOR = "#611a15";
+const ERROR_BACKGROUND = "#f9a099";
 
 export const Severity = {
     SUCCESS: "SUCCESS",
@@ -280,8 +289,8 @@ export default function Profile() {
     const [onReloadRate, setOnReloadRate] = useState(true);
     const [rateCount, setRateCount] = useState(0);
     const [rateAvg, setRateAvg] = useState(0);
-
-    const [message, SetMessage] = useState({ type: Severity.SUCCESS, message: "" });
+    const [openSnackBar, setOpenSnackBar] = useState(false);  
+    const [message, setMessage] = useState({type: "", text: ""});
 
     useEffect(() => {
         if (onRateSubmit) {
@@ -483,13 +492,13 @@ export default function Profile() {
     const callSubmitNewRateAPI = async () => {
         try {
             const response = await newRateCallAPI({ doctor_id: doctorid, amount: Number(newRateValue) }, isRemembered);
-            if (response.status == 201) {
-                SetMessage({ type: Severity.SUCCESS, message: "Your given rating was successfully submitted!" });
+            if (response.status === 201) {
+                setMessage({ type: Severity.SUCCESS, text: "Your given score was successfully submitted!" });
                 setOnReloadRate(true);
             }
         }
         catch {
-            SetMessage({ type: Severity.ERROR, message: "Something went wrong while trying to submit your rating!" });
+            setMessage({ type: Severity.ERROR, text: "Something went wrong while trying to submit your score!" });
         }
     }
 
@@ -507,6 +516,24 @@ export default function Profile() {
             console.log(e);
         }
     }
+
+    useEffect(() => {
+        if (message.type !== "") {
+            setOpenSnackBar(true);
+        }
+    }, [message])
+
+    const handleCloseSnackbar = () => {
+        // console.log("MESSAGE = " + message.text);
+        // console.log("TYPE = " + message.type);
+        setOpenSnackBar(false);
+    }
+
+    useEffect(() => {
+        if(!openSnackBar) {
+            setMessage({type: "", text: ""});
+        }
+    }, [openSnackBar])
 
     const [disabled, setDisabled] = useState(-1);
 
@@ -690,7 +717,37 @@ export default function Profile() {
                             </Box>
                         </Box>
                     </Box>
-                </Modal>}
+            </Modal>}
+            {openSnackBar && <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={openSnackBar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                resumeHideDuration={0}
+            >
+                <Paper style={{
+                    backgroundColor: message.type === Severity.SUCCESS ? SUCCESS_BACKGROUND : ERROR_BACKGROUND
+                    , borderRadius: "7px"
+                }} elevation={3}>
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        px={"1em"} py={"1em"}>
+                        {message.type === Severity.ERROR && <ErrorOutlineIcon style={{
+                            color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR
+                            , marginRight: "0.5em"
+                        }} />}
+                        {message.type === Severity.SUCCESS && <CheckCircleIcon />}
+                        <Box>
+                            <Typography style={{ color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR }} display="block">{message.text}</Typography>
+                        </Box>
+                        <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleCloseSnackbar}>
+                            <CloseIcon style={{ color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR }} />
+                        </IconButton>
+                    </Box>
+                </Paper>
+            </Snackbar>}
         </div>
     );
 }

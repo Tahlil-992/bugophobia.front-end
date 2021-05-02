@@ -50,6 +50,7 @@ const CommentSection = ({ remember_me, username }) => {
     }, [username])
 
     useEffect(() => {
+        console.log("[MESSAGE] => " + message.text)
         if (message.text !== "") {
             setOpenSnackBar(true);
         }
@@ -77,8 +78,8 @@ const CommentSection = ({ remember_me, username }) => {
     }
 
     const handleClose = () => {
-        console.log("MESSAGE = " + message.text);
-        console.log("TYPE = " + message.type);
+        // console.log("MESSAGE = " + message.text);
+        // console.log("TYPE = " + message.type);
         setOpenSnackBar(false);
     }
 
