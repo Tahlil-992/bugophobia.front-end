@@ -148,17 +148,17 @@ const useStyles = makeStyles((theme) => ({
         width: theme.spacing(16),
         height: theme.spacing(16),
         margin: theme.spacing(2),
-        "&:hover": {
+        /* "&:hover": {
           width: theme.spacing(18),
           height: theme.spacing(18),
           margin: theme.spacing(1),
-        }
+        } */
       },
     tab: {
         width: 700,
     },
     grid: {
-        marginTop: "2rem",
+        marginTop: "1rem",
     },
     tab2: {
         width: "75vmax",
@@ -178,7 +178,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     seltab: {
-        backgroundColor: "#F5F5F5",
+        backgroundColor: "#E0E0E0",
         //border: "3px solid #16E",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
@@ -187,7 +187,7 @@ const useStyles = makeStyles((theme) => ({
         borderLeft: "3px solid #16E", 
     },
     tabpanel: {
-        backgroundColor: "#F5F5F5",
+        backgroundColor: "#E0E0E0",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
         borderBottom: "3px solid #16E",
@@ -212,14 +212,14 @@ const useStyles = makeStyles((theme) => ({
     },
     dis: {
         '&:hover': {
-            color: "#05e",
+            color: "#000",
         },
     },
     button: {
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
         padding: '1em 4em 1em 4em',
-        margin: '1em 0em 2em 0em',
+        margin: '1em 0em 1em 0em',
         textAlign: 'center',
         fontSize: '16px',
         borderRadius: '10px',
@@ -535,7 +535,7 @@ export default function Profile () {
                     ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>]
                     ];
     return (
-        <div style={{backgroundColor:'#E0E0E0'}}>
+        <div style={{backgroundColor:'#8ab6d6'}}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -545,23 +545,32 @@ export default function Profile () {
             <div >
                 <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
                     <Grid item>
-                        <Box display="flex">
+                        <Box display="flex" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
+                            
                             <Avatar className={classes.large} src={profileImage}></Avatar>
                                 {isViewedDoctor ? (
-                                        <Box>
-                                            <br></br>
+                                        <Box >
                                             
-                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}
-                                            {isSaved ? 
-                                                <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
-                                                    <FavoriteIcon color="secondary" fontSize="large" />
-                                                </IconButton>
+                                            <br/>
+                                            {isDoctor ?  <br/> : <></>}
+                                            
+                                            
+                                            {!isDoctor ? 
+                                                <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}
+                                                    {isSaved ? 
+                                                        <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
+                                                            <FavoriteIcon color="secondary" fontSize="large" />
+                                                        </IconButton>
+                                                        :
+                                                        <IconButton onClick={saveButtonHandler} title="Add to Favorites">
+                                                            <FavoriteBorderIcon color="secondary" fontSize="large" />
+                                                        </IconButton>
+                                                    }
+                                                </Typography>
                                                 :
-                                                <IconButton onClick={saveButtonHandler} title="Add to Favorites">
-                                                    <FavoriteBorderIcon color="secondary" fontSize="large" />
-                                                </IconButton>
-                                            } 
-                                            </Typography>
+                                                <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
+                                            }
+                                            
                                             <Typography variant="subtitle1">{specialization}</Typography>
                                             <Box display="flex" alignItems="center" justifyContent="flex-start">
                                                 <Paper style={{backgroundColor: "#E0E0E0"}}>
@@ -578,22 +587,27 @@ export default function Profile () {
                                     :
                                     (
                                         <Box>
+                                            
                                             <br></br><br></br>
                                             <Typography variant="h6">{firstName + " " + lastName}</Typography>
                                             <Typography variant="subtitle1">{"User"}</Typography>
                                         </Box>
+                                        
                                     )}
+                                    
+                                    
+                    
                                 
                         </Box>
                     </Grid>
                     <Grid item>
                         {isViewedDoctor ?
                             (
-                                <Button className={classes.button} >Take a Visit Time</Button>
-                            )
-                            :
-                            <></>
-                        }
+                              <Button className={classes.button} >Take a Visit Time</Button>
+                                    )
+                                    :
+                                    <></>
+                                }
                     </Grid>
                     <Grid item container className={classes.tab2} direction="column">
                     <Grid item style={{width: "inherit"}}>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Button, Container, Icon, IconButton, Input, Link, makeStyles, MenuItem, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Container, Icon, IconButton, Input, Link, makeStyles, MenuItem, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -23,6 +23,8 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import SecurityIcon from '@material-ui/icons/Security';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import CommentIcon from '@material-ui/icons/Comment';
+import CameraAltIcon from '@material-ui/icons/CameraAlt';
+import CreateIcon from '@material-ui/icons/Create';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
@@ -138,11 +140,20 @@ const useStyles = makeStyles((theme) => ({
       width: theme.spacing(16),
       height: theme.spacing(16),
       margin: theme.spacing(2),
-      "&:hover": {
+      /* "&:hover": {
         width: theme.spacing(18),
         height: theme.spacing(18),
         margin: theme.spacing(1),
-      }
+      } */
+    },
+    camera: {
+        width: theme.spacing(3),
+        height: theme.spacing(3),
+        color: "#226",
+        "&:hover": {
+            width: theme.spacing(4),
+            height: theme.spacing(4),
+        }
     },
     tabs: {
         borderRight: `1px solid ${theme.palette.divider}`,
@@ -172,7 +183,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     seltab: {
-        backgroundColor: "#F5F5F5",
+        backgroundColor: "#e0e0e0",
         //border: "3px solid #16E",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
@@ -181,7 +192,7 @@ const useStyles = makeStyles((theme) => ({
         borderLeft: "3px solid #16E", 
     },
     tabpanel: {
-        backgroundColor: "#F5F5F5",
+        backgroundColor: "#e0e0e0",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
         borderBottom: "3px solid #16E",
@@ -208,7 +219,7 @@ const useStyles = makeStyles((theme) => ({
     },
     dis: {
         '&:hover': {
-            color: "#05e",
+            //color: "#05e",
         },
     },
 }));
@@ -453,11 +464,13 @@ export default function Profile () {
     }
 
     const onFileChange = event => {
-        setProfileImage(URL.createObjectURL(event.target.files[0]));
+        if (event.target.files !== []) {
+            setProfileImage(URL.createObjectURL(event.target.files[0]));
+        }
     }
 
     return (
-        <div style={{backgroundColor:'#E0E0E0'}}>
+        <div style={{backgroundColor:'#8ab6d6'}}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -488,14 +501,32 @@ export default function Profile () {
                     <TabPanel value={tabValue} index={0}  >
                         <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
                         <Grid item> 
-                            <Box display="flex">
-                                    <Avatar className={classes.large} src={profileImage}></Avatar>
+                            <Box display="flex" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
+                                    <Badge overlap="circle" anchorOrigin={{vertical: 'bottom',horizontal: 'left',}} badgeContent={
+                                            <Box>
+                                                <label htmlFor="myInput"> <CameraAltIcon className={classes.camera} /> </label>
+                                                <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{marginBottom: "1em", display:'none'}} />
+                                            </Box>
+                                        }
+                                        >
+                                        <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage}>
+                                            
+                                        </Avatar>
+                                    </Badge>
+                                    
                                     {isDoctor ? (
-                                        <Box>
+                                        <Box >
                                             <br></br><br></br>
-                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
+                                            <Typography variant="h6"  >{"Doctor " + firstName + " " + lastName}</Typography>
                                             <Typography variant="subtitle1">{specializationMap(specialization)}</Typography>
-                                            <Typography variant="h5">*****</Typography>
+                                            <Box display="flex" >
+                                                <Paper style={{backgroundColor: "#E0E0E0"}}>
+                                                    <Button>
+                                                        <StarRating val={rateAvg}/>
+                                                        <Typography>({rateCount})</Typography>
+                                                    </Button>
+                                                </Paper>
+                                            </Box>
                                         </Box>
                                     )
                                     :
@@ -509,30 +540,7 @@ export default function Profile () {
                                 
                             </Box>
                         </Grid>
-                        <Grid item>
-                            <Input type="file" onChange={onFileChange} style={{marginBottom: "1em"}}></Input>
-                                {isDoctor ? (
-                                    <center>
-                                        <h3>{"Doctor " + firstName + " " + lastName}</h3>
-                                        <h4>{specialization}</h4>
-                                        <Box display="flex" alignItems="center" justifyContent="center">
-                                            <Paper style={{backgroundColor: "#E0E0E0"}}>
-                                                <Button>
-                                                    <StarRating val={rateAvg}/>
-                                                    <Typography>({rateCount})</Typography>
-                                                </Button>
-                                            </Paper>
-                                        </Box>
-                                    </center>
-                                )
-                                :
-                                (
-                                    <center>
-                                        <h2>{firstName + " " + lastName}</h2>
-                                        <h3>{"User"}</h3>
-                                    </center>
-                                )}
-                        </Grid>
+                        
                         <Grid item container className={classes.tab2} direction="column" style={{marginTop: "1em"}}>
                             <Grid item style={{width: "inherit"}}>
                             {isDoctor ? 
@@ -548,7 +556,7 @@ export default function Profile () {
                                         <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
                                         <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
                                         <Tab label="Change Password" icon={<VpnKeyIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Calender" icon={<CalendarTodayIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
                                         <Tab label="Notifications" icon={<NotificationsIcon />} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
                                         <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />                                        
                                 </Tabs>
@@ -565,7 +573,7 @@ export default function Profile () {
                                         <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
                                         <Tab label="Change Password" icon={<VpnKeyIcon/>} {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
                                         <Tab label="Saved Profiles" icon={<FavoriteIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Calender" icon={<CalendarTodayIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
                                         <Tab label="Notifications" icon={<NotificationsIcon/>} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
                                         <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />   
                                 </Tabs>
@@ -642,7 +650,7 @@ export default function Profile () {
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={3}>
-                                Calender
+                                Calendar
                             </TabPanel2>
                         
                             <TabPanel2 value={tabValue2} index={4}>
