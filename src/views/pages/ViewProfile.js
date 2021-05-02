@@ -535,6 +535,24 @@ export default function Profile() {
         }
     }, [openSnackBar])
 
+    useEffect(() => {
+        if (message.type !== "") {
+            setOpenSnackBar(true);
+        }
+    }, [message])
+
+    const handleCloseSnackbar = () => {
+        // console.log("MESSAGE = " + message.text);
+        // console.log("TYPE = " + message.type);
+        setOpenSnackBar(false);
+    }
+
+    useEffect(() => {
+        if(!openSnackBar) {
+            setMessage({type: "", text: ""});
+        }
+    }, [openSnackBar])
+
     const [disabled, setDisabled] = useState(-1);
 
     const fields = isViewedDoctor ?
