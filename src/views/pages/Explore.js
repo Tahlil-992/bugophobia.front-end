@@ -147,7 +147,7 @@ const useStyles = makeStyles((theme) => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        backgroundColor: '#719fb0',
+        backgroundColor: '#8ab6d6',
     },
     drawerPaperClose: {
         overflowX: 'hidden',
@@ -159,7 +159,7 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('sm')]: {
             width: theme.spacing(9),
         },
-        backgroundColor: '#719fb0',
+        backgroundColor: '#8ab6d6',
     },
     appBarSpacer: theme.mixins.toolbar,
     content: {
@@ -187,11 +187,11 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#e7e7e7',
         transition: "transform 0.15s ease-in-out",
         "&:hover": {
             transform: "scale3d(1.1, 1.1, 1)",
-            backgroundColor: '#D3D3D3',
+            backgroundColor: '#f3f3f3',
         },
     },
     cardGrid: {
@@ -366,12 +366,12 @@ function Explore({ signOut }) {
                                     <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '20px' }} gutterBottom>
                                         Top Doctors
                                     </Typography>
-                                    <Container className={classes.cardGrid}>
-                                        <Grid container spacing={4}>
+                                    <Container style={{backgroundColor:'#E0E0E0'}} className={classes.cardGrid}>
+                                        <Grid container style={{background:'#E0E0E0'}} spacing={4}>
                                             {cards.map((card) => (
                                                 <Grid item key={card} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
                                                     <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
-                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row' }}>
                                                                 <CardMedia
                                                                     className={classes.cardMedia}

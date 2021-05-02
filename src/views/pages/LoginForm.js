@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar';
 import { Link, useHistory } from "react-router-dom";
 import CloseIcon from '@material-ui/icons/Close';
@@ -26,6 +27,13 @@ import { callAPIHandler } from "../../core/modules/refreshToken";
 import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import h1 from "../../assets/images/login-signup/h1.jpg";
+import h2 from "../../assets/images/login-signup/h2.jpg";
+import h3 from "../../assets/images/login-signup/h3.jpg";
+import h4 from "../../assets/images/login-signup/h4.jpg";
+import h5 from "../../assets/images/login-signup/h5.jpg";
+import h6 from "../../assets/images/login-signup/h6.jpg";
+import h7 from "../../assets/images/login-signup/h7.jpg";
 
 const callLoginAPI = async ({ email, password }, isRemembered) => {
     try {
@@ -37,9 +45,52 @@ const callLoginAPI = async ({ email, password }, isRemembered) => {
     }
 }
 
+const useStyles = makeStyles((theme) => ({
+    root: {
+        height: '100vh',
+    },
+    image: {
+        backgroundImage: 'url(../../assets/images/OnlineDoctor.jpg);',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor:
+            theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+    },
+    paper: {
+        margin: theme.spacing(8, 5),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+    Btn: {
+        backgroundColor: '#40bad5',
+        textAlign: 'center',
+        fontSize: '16px',
+        borderRadius: '10px',
+        textTransform: 'none',
+        height: '45px',
+        '&:hover': {
+            backgroundColor: '#5f939a',
+        },
+    },
+}));
+
 function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
 
     const history = useHistory();
+
+    const images = [h1, h2, h3, h4, h5, h6, h7];
+    const [index, setindex] = useState(0);
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setindex(index => index === 6 ? 0 : index + 1);
+      }, 3000);
+      return () => clearInterval(interval);
+    }, []);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -125,6 +176,8 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
+    const classes = useStyles();
+
     return (
         <React.Fragment >
             <AppBar position="relative">
@@ -133,97 +186,96 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                     <Typography variant="h6" color="inherit" noWrap>Login Page</Typography>
                 </Toolbar>
             </AppBar>
-            <Box style={{ display: 'flex', backgroundColor: '#E0E0E0', height: '690px', alignItems: 'center' }}>
-                <Container component="main" maxWidth="xs">
-                    <div class="paper">
-                        <div className="form">
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        error={isEmailEmpty}
-                                        variant="outlined"
-                                        required
-                                        fullWidth
-                                        id="email"
-                                        label="Email Address"
-                                        name="email"
-                                        value={email}
-                                        onChange={event => { setEmail(event.target.value); setIsEmailEmpty(false); }}
-                                        InputProps={{
-                                            startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>)
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}><br />
-                                    <TextField
-                                        error={isPasswordEmpty}
-                                        variant="outlined"
-                                        required
-                                        fullWidth
-                                        name="password"
-                                        label="Password"
-                                        id="password"
-                                        autoComplete="current-password"
-                                        value={password}
-                                        onChange={event => { setPassword(event.target.value); setIsPasswordEmpty(false); }}
-                                        type={showPassword ? "text" : "password"}
-                                        InputProps={{
-                                            startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton
-                                                        aria-label="toggle password visibility"
-                                                        onClick={handleClickShowPassword}
-                                                        onMouseDown={handleMouseDownPassword}>
-                                                        {showPassword ? <Visibility /> : <VisibilityOff />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <FormControlLabel
-                                        control={<Checkbox value="remember" />}
-                                        label="Remember me"
-                                        onChange={(event) => setChecked(event.target.checked)} />
-                                </Grid>
+            <Grid container component="main" className={classes.root} style={{ paddingTop: '50px', paddingBottom: '50px', paddingRight: '350px', paddingLeft: '350px', height: '690px', backgroundColor: '#8ab6d6' }}>
+                <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
+                <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
+                    <div className={classes.paper}>
+                        <Grid container spacing={2} style={{ padding: '10px' }}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    error={isEmailEmpty}
+                                    variant="outlined"
+                                    required
+                                    fullWidth
+                                    id="email"
+                                    label="Email Address"
+                                    name="email"
+                                    value={email}
+                                    onChange={event => { setEmail(event.target.value); setIsEmailEmpty(false); }}
+                                    InputProps={{
+                                        startAdornment: (<InputAdornment position="start"><EmailIcon /></InputAdornment>)
+                                    }}
+                                />
                             </Grid>
-                            <Box display="flex" justifyContent="space-between">
-                                <Button type="submit" variant="contained" class="button" onClick={() => handleSubmit()}>Log in</Button>
-                                {isLoading && <LoadingSpinner />}
-                            </Box>
-                            <Grid>
-                                <Link class="link" to="/forget-password">Forget password?</Link>
+                            <Grid item xs={12}><br />
+                                <TextField
+                                    error={isPasswordEmpty}
+                                    variant="outlined"
+                                    required
+                                    fullWidth
+                                    name="password"
+                                    label="Password"
+                                    id="password"
+                                    autoComplete="current-password"
+                                    value={password}
+                                    onChange={event => { setPassword(event.target.value); setIsPasswordEmpty(false); }}
+                                    type={showPassword ? "text" : "password"}
+                                    InputProps={{
+                                        startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}>
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
                             </Grid>
-                            <Grid>
-                                <Link class="link" to="/sign-up">Don't have an account? Sign Up</Link>
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={<Checkbox value="remember" />}
+                                    label="Remember me"
+                                    onChange={(event) => setChecked(event.target.checked)} />
                             </Grid>
-                        </div>
+                        </Grid>
+                        <Box display="flex" justifyContent="space-between">
+                            <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{width:'315px', marginBottom: '20px'}}>Log in</Button>
+                        </Box>
+                        <Grid>
+                            {isLoading && <LoadingSpinner />}
+                        </Grid>
+                        <Grid>
+                            <Link class="link" to="/forget-password">Forget password?</Link>
+                        </Grid>
+                        <Grid>
+                            <Link class="link" to="/sign-up">Don't have an account? Sign Up</Link>
+                        </Grid>
+                        <Snackbar
+                            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                            open={openSnackBar}
+                            message={
+                                <Box display="flex" alignItems="center">
+                                    <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+                                    <Typography style={{ color: "#611a15" }}>{message}</Typography>
+                                    <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                                        <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
+                                    </IconButton>
+                                </Box>}
+                            ContentProps={{ style: { backgroundColor: "#f9a099" } }}
+                            autoHideDuration={6000}
+                            onClose={handleClose}
+                            resumeHideDuration={0}>
+                        </Snackbar>
                     </div>
-                    <Snackbar
-                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                        open={openSnackBar}
-                        message={
-                            <Box display="flex" alignItems="center">
-                                <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
-                                <Typography style={{ color: "#611a15" }}>{message}</Typography>
-                                <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                                    <CloseIcon onClick={handleClose} style={{ color: "#611a15" }} />
-                                </IconButton>
-                            </Box>}
-                        ContentProps={{ style: { backgroundColor: "#f9a099" } }}
-                        autoHideDuration={6000}
-                        onClose={handleClose}
-                        resumeHideDuration={0}
-                    >
-                    </Snackbar>
-                </Container>
-            </Box>
+                </Grid>
+            </Grid>
         </React.Fragment>
     );
 }
-
 export default connect(
     state => ({ isdoctor: state.authReducer.isdoctor }),
     dispatch => ({

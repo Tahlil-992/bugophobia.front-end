@@ -34,11 +34,11 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#e7e7e7',
         transition: "transform 0.15s ease-in-out",
         "&:hover": {
             transform: "scale3d(1.1, 1.1, 1)",
-            backgroundColor: '#D3D3D3',
+            backgroundColor: '#f3f3f3',
         },
     },
     cardGrid: {
@@ -120,7 +120,7 @@ export default function SavedAccounts() {
                                         {SavedAccounts.map((account) => (
                                             <Grid item key={account} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
                                                 <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(account.doctor.user.username)} size="small" color="primary">
-                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', border: '1px solid #10217d', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                         <Grid style={{display:'flex', flexDirection:'row'}}>
                                                             <CardMedia
                                                                 className={classes.cardMedia}
