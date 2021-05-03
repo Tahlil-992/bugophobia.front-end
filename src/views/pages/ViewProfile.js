@@ -28,11 +28,14 @@ import PropTypes from 'prop-types';
 import CommentSection from './commentSection';
 import StarRating from "./RatingComponent/rating";
 import Modal from "@material-ui/core/Modal";
-import Tooltip from '@material-ui/core/Tooltip';
+// import Tooltip from '@material-ui/core/Tooltip';
 import Snackbar from "@material-ui/core/Snackbar";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import CloseIcon from "@material-ui/icons/Close";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import Rating from '@material-ui/lab/Rating';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -238,6 +241,27 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
+    rateButton: {
+        textTransform: "none",
+        backgroundColor: "#F6AE28",
+        "&:hover": {
+            backgroundColor: "#D08A08",
+        },
+    },
+    submitButton: {
+        textTransform: "none",
+        backgroundColor: "#2aac3d",
+        "&:hover": {
+            backgroundColor: "#139122",
+        },
+    },
+    cancelButton: {
+        textTransform: "none",
+        backgroundColor: "#bdc1c5",
+        "&:hover": {
+            backgroundColor: "#9099A1",
+        },
+    },
     modal: {
         position: 'absolute',
         width: 'auto',
@@ -283,7 +307,6 @@ export default function Profile() {
 
     const [tabValue, setTabValue] = useState(0);
 
-    const [openModal, setOpenModal] = useState(false);
     const [onRateSubmit, setOnRateSubmit] = useState(false);
     const [newRateValue, setNewRateValue] = useState(3);
     const [onReloadRate, setOnReloadRate] = useState(true);
@@ -291,6 +314,7 @@ export default function Profile() {
     const [rateAvg, setRateAvg] = useState(0);
     const [openSnackBar, setOpenSnackBar] = useState(false);  
     const [message, setMessage] = useState({type: "", text: ""});
+    const [onVote, setOnVote] = useState(false);
 
     useEffect(() => {
         if (onRateSubmit) {
@@ -305,11 +329,6 @@ export default function Profile() {
         }
         setOnReloadRate(false);
     }, [onReloadRate])
-
-    const handleCloseModal = () => {
-        setOpenModal(false);
-        // setOnRateSubmit(false);
-    }
 
     const handleChange = (event, newValue) => {
         setTabValue(newValue);
@@ -494,11 +513,13 @@ export default function Profile() {
             const response = await newRateCallAPI({ doctor_id: doctorid, amount: Number(newRateValue) }, isRemembered);
             if (response.status === 201) {
                 setMessage({ type: Severity.SUCCESS, text: "Your given score was successfully submitted!" });
+                setOnVote(false);
                 setOnReloadRate(true);
             }
         }
         catch {
             setMessage({ type: Severity.ERROR, text: "Something went wrong while trying to submit your score!" });
+            setOnVote(false);
         }
     }
 
@@ -595,15 +616,48 @@ export default function Profile() {
                                             <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
                                         }
                                         <Typography variant="subtitle1">{specialization}</Typography>
-                                        <Box display="flex" alignItems="center" justifyContent="flex-start">
-                                            <Paper style={{ backgroundColor: "#E0E0E0" }}>
-                                                <Tooltip title="Rate this doctor">
-                                                    <Button onClick={() => setOpenModal(true)} padding={0}>
-                                                        <StarRating val={rateAvg} />
-                                                        <Typography>({rateCount})</Typography>
-                                                    </Button>
-                                                </Tooltip>
-                                            </Paper>
+                                        <Box 
+                                            style={{marginTop: "0.5em"}} 
+                                            display="flex" 
+                                            alignItems="center" 
+                                            justifyContent="flex-start">
+                                            {!onVote &&
+                                            <Rating
+                                                name="rating-star"
+                                                defaultValue={0}
+                                                precision={0.1}
+                                                readOnly={true}
+                                                value={rateAvg}/>}
+                                            {onVote && 
+                                            <Rating
+                                                name="rating-star"
+                                                defaultValue={0}
+                                                precision={1}
+                                                readOnly={false}
+                                                value={newRateValue}
+                                                emptyIcon={<StarBorderIcon/>}
+                                                onChange={(event) => setNewRateValue(event.target.value)}/>}
+                                            <VisibilityIcon style={{fontSize: "1.25em", color: "gray"}}/>
+                                            <Typography style={{fontSize: "1em", marginLeft: "0.1em"}}>{rateCount}</Typography>
+                                        </Box>
+                                        <Box marginTop="1em">
+                                            {!onVote && 
+                                            <Button className={classes.rateButton} style={{width: "100%"}} onClick={() => setOnVote(true)}>
+                                                Rate This Doctor
+                                            </Button>}
+                                            {onVote && 
+                                            <Box  display="flex" alignItems="center" justifyContent="space-between">
+                                                <Box>
+                                                    <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
+                                                        Submit    
+                                                    </Button>                                                
+                                                </Box>
+                                                <Box>
+                                                    <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
+                                                        Cancel    
+                                                    </Button>                                                   
+                                                </Box>
+                                            </Box>}
                                         </Box>
                                     </Box>
                                 )
@@ -702,22 +756,6 @@ export default function Profile() {
                     </Grid>
                 </Grid>
             </div>
-            {!isDoctor &&
-                <Modal
-                    open={openModal}
-                    onClose={handleCloseModal}
-                >
-                    <Box className={classes.modal} display="flex" color='#1e4620' flexDirection="column" alignItems="center">
-                        <h4>{`Rate doctor ${username}.`}</h4>
-                        <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="column">
-                            <StarRating editAllowed={true} setNewRate={(value) => setNewRateValue(value)} />
-                            <Box display="flex" marginTop="1.5em" justifyContent="space-between">
-                                <Button variant="contained" color="primary" onClick={() => { setOnRateSubmit(true); handleCloseModal(); }} style={{ marginRight: "0.5em" }}>Submit</Button>
-                                <Button variant="contained" alignSelf="flex-end" onClick={() => handleCloseModal()} style={{ marginLeft: "0.5em" }}>DISMISS</Button>
-                            </Box>
-                        </Box>
-                    </Box>
-            </Modal>}
             {openSnackBar && <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={openSnackBar}
