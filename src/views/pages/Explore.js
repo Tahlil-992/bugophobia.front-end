@@ -147,7 +147,7 @@ const useStyles = makeStyles((theme) => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        backgroundColor: '#8ab6d6',
+        backgroundColor: 'rgba(138, 182, 214, 0.57)',
     },
     drawerPaperClose: {
         overflowX: 'hidden',
@@ -159,18 +159,17 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('sm')]: {
             width: theme.spacing(9),
         },
-        backgroundColor: '#8ab6d6',
+        backgroundColor: 'rgba(138, 182, 214, 0.57)',
     },
     appBarSpacer: theme.mixins.toolbar,
     content: {
         flexGrow: 1,
         height: '100vh',
         overflow: 'auto',
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#8ab6d6',
     },
     container: {
         paddingTop: theme.spacing(4),
-        paddingBottom: theme.spacing(4),
     },
     paper: {
         padding: theme.spacing(2),
@@ -359,15 +358,15 @@ function Explore({ signOut }) {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Container maxWidth="lg" className={classes.container}>
-                    <Grid container spacing={3}>
+                    <Grid container>
                         <Grid item xs={12}>
-                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0' }}>
+                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px' }}>
                                 <React.Fragment>
                                     <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '20px' }} gutterBottom>
                                         Top Doctors
                                     </Typography>
-                                    <Container style={{backgroundColor:'#E0E0E0'}} className={classes.cardGrid}>
-                                        <Grid container style={{background:'#E0E0E0'}} spacing={4}>
+                                    <Container style={{ backgroundColor: '#E0E0E0', minHeight: '587px' }} className={classes.cardGrid}>
+                                        <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card) => (
                                                 <Grid item key={card} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
                                                     <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
