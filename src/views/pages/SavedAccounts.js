@@ -28,7 +28,6 @@ const callSavedProfilesAPI = async () => {
 const useStyles = makeStyles((theme) => ({
     container: {
         paddingTop: theme.spacing(4),
-        paddingBottom: theme.spacing(4),
     },
     card: {
         height: '100%',
@@ -103,7 +102,7 @@ export default function SavedAccounts() {
         setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
     }
     return (
-        <div style={{ backgroundColor: '#E0E0E0', height: '100vh' }}>
+        <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -111,16 +110,16 @@ export default function SavedAccounts() {
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" className={classes.container}>
-                <Grid container spacing={3}>
+                <Grid container spacing={0}>
                     <Grid item xs={12}>
-                        <div className={classes.paper} style={{ backgroundColor: '#E0E0E0' }}>
+                        <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px', padding:'2em'}}>
                             <React.Fragment>
-                                <Container className={classes.cardGrid}>
+                                <Container style={{ backgroundColor: '#E0E0E0', minHeight: '43em' }} className={classes.cardGrid}>
                                     <Grid container spacing={4}>
                                         {SavedAccounts.map((account) => (
-                                            <Grid item key={account} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
+                                            <Grid item key={account} xs={12} sm={6} md={4}>
                                                 <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(account.doctor.user.username)} size="small" color="primary">
-                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', width: '320px' }}>
                                                         <Grid style={{display:'flex', flexDirection:'row'}}>
                                                             <CardMedia
                                                                 className={classes.cardMedia}

@@ -365,7 +365,7 @@ function Explore({ signOut }) {
                                     <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '20px' }} gutterBottom>
                                         Top Doctors
                                     </Typography>
-                                    <Container style={{ backgroundColor: '#E0E0E0', minHeight: '587px' }} className={classes.cardGrid}>
+                                    <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card) => (
                                                 <Grid item key={card} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
