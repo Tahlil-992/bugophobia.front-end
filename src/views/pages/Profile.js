@@ -99,7 +99,7 @@ TabPanel2.propTypes = {
 const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
         const urlAddress = is_doctor ? "doctor" : "patient";
-        const response = callAPIHandler({method:"GET", url: `/auth/detail/${urlAddress}/`}, true, isRemembered);
+        const response = callAPIHandler({method:"GET", url: `/profile/${urlAddress}/`}, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -166,7 +166,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#719fb0',
     },
     tab2: {
-        width: "90vmax",
+        width: "100vmin",
         //marginLeft: "10%",
     },
     onetab: {
@@ -176,11 +176,12 @@ const useStyles = makeStyles((theme) => ({
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
-        fontSize: 12,
+        fontSize: 9,
         iconSize: 30 ,
+        minWidth: 0,
         '&:hover': {
             backgroundColor: "#D0D5F0",
-            fontSize: 14,
+            fontSize: 10,
             color: "#000",
         }
     },
@@ -193,6 +194,8 @@ const useStyles = makeStyles((theme) => ({
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
         color: "#31C", 
+        minWidth: 0,
+        fontSize: 10,
     },
     tabpanel: {
         backgroundColor: "#e0e0e0",
@@ -473,14 +476,14 @@ export default function Profile () {
     }
 
     return (
-        <div style={{backgroundColor:'#8ab6d6'}}>
+        <div style={{backgroundColor:'#8ab6d6', padding: '0rem'}}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
                     <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid container>
+            <Grid container style={{margin: "0rem", backgroundColor: "#E0E0E0", maxWidth: "100vmax"}}>
                 <Grid item >
                 <Tabs
                     orientation="vertical"
@@ -502,8 +505,8 @@ export default function Profile () {
                 </Grid>
                 <Grid item xs>
                     <TabPanel value={tabValue} index={0}  >
-                        <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
-                        <Grid item> 
+                        <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
+                        <Grid item style={{/*maxWidth: "40vmax"*/}} > 
                             <Box display="flex" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
                                     <Badge overlap="circle" anchorOrigin={{vertical: 'bottom',horizontal: 'left',}} badgeContent={
                                             <Box>
@@ -544,7 +547,7 @@ export default function Profile () {
                             </Box>
                         </Grid>
                         
-                        <Grid item container className={classes.tab2} direction="column" style={{marginTop: "1em"}}>
+                        <Grid item container className={classes.tab2} direction="column"   style={{marginTop: "1em"}}>
                             <Grid item style={{width: "inherit"}}>
                             {isDoctor ? 
                                 <Tabs
@@ -556,12 +559,12 @@ export default function Profile () {
                                     variant="fullWidth"
                                     aria-label="full width tabs example"
                                     >
-                                        <Tab label="About" icon={<AccountCircleIcon/>} {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Comments" icon={<CommentIcon/>} {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Change Password" icon={<VpnKeyIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Notifications" icon={<NotificationsIcon />} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />                                        
+                                        <Tab label="About"  {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Calendar"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Privacy Policy"  {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />                                        
                                 </Tabs>
                                 :
                                 <Tabs
@@ -646,7 +649,73 @@ export default function Profile () {
                         
                             <TabPanel2 value={tabValue2} index={2}>
                                 {isDoctor ? 
-                                    <Typography>Change Password</Typography>
+                                    <Grid container spacing={3} alignItems="center" >
+                                    <Grid item xs={12}  >
+                                        
+                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                        <StyledTextField 
+                                            
+                                            variant="outlined"
+                                            fullWidth
+                                            className={classes.textfield}
+                                            label="Enter Old Password"
+                                            type="password"
+                                            
+                                            
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start" ></InputAdornment>),
+                                                classes: {root: classes.dis}
+                                            }}
+                                            >
+                                        
+                                            </StyledTextField>
+                                        
+                                    </Grid>
+                                    <Grid item xs={12}  >
+                                        
+                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                        <StyledTextField 
+                                            
+                                            variant="outlined"
+                                            fullWidth
+                                            className={classes.textfield}
+                                            label="Enter New Password"
+                                            type="password"
+                                            
+                                            
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start" ></InputAdornment>),
+                                                classes: {root: classes.dis}
+                                            }}
+                                            >
+                                        
+                                            </StyledTextField>
+                                        
+                                    </Grid>
+                                    <Grid item xs={12}  >
+                                        
+                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                        <StyledTextField 
+                                            
+                                            variant="outlined"
+                                            fullWidth
+                                            className={classes.textfield}
+                                            label="Confirm New Password"
+                                            type="password"
+                                            
+                                            
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start" ></InputAdornment>),
+                                                classes: {root: classes.dis}
+                                            }}
+                                            >
+                                        
+                                            </StyledTextField>
+                                        
+                                    </Grid>
+                                    
+                                
+                        </Grid>
                                 :
                                     <Typography>Calendar</Typography>
                                 }
