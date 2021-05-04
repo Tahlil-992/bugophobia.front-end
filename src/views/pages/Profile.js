@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, Container, Icon, IconButton, Input, Link, makeStyles, MenuItem, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Chip, Link, makeStyles, MenuItem, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -21,8 +21,6 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import SecurityIcon from '@material-ui/icons/Security';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import CommentIcon from '@material-ui/icons/Comment';
 import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import CreateIcon from '@material-ui/icons/Create';
 import { callAPIHandler } from "../../core/modules/refreshToken";
@@ -33,30 +31,9 @@ import PropTypes from 'prop-types';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StarRating from "./RatingComponent/rating";
-import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 
-function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-  
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`vertical-tabpanel-${index}`}
-        aria-labelledby={`vertical-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <div width="100%">
-            <Typography>{children}</Typography>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  function TabPanel2(props) {
+function TabPanel2(props) {
     const { children, value, index, ...other } = props;
   
     return (
@@ -82,14 +59,7 @@ TabPanel2.propTypes = {
     value: PropTypes.any.isRequired,
 };
   
-  function a11yProps(index) {
-    return {
-      id: `vertical-tab-${index}`,
-      'aria-controls': `vertical-tabpanel-${index}`,
-    };
-  }
-
-  function a11yProps2(index) {
+function a11yProps2(index) {
     return {
       id: `full-width-tab-${index}`,
       'aria-controls': `full-width-tabpanel-${index}`,
@@ -124,18 +94,6 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
       },
     },
-    accordion:{
-        backgroundColor: '#E0E0E0',
-        borderWidth: "3px",
-        borderColor: "#10217d",
-        
-    },
-    content: {
-        padding: "8px",
-        '& > *': {
-            margin: theme.spacing(2),
-          },
-    },
     large: {
       width: theme.spacing(16),
       height: theme.spacing(16),
@@ -145,25 +103,6 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(18),
         margin: theme.spacing(1),
       } */
-    },
-    camera: {
-        width: theme.spacing(3),
-        height: theme.spacing(3),
-        color: "#226",
-        "&:hover": {
-            width: theme.spacing(4),
-            height: theme.spacing(4),
-        }
-    },
-    tabs: {
-        borderRight: `1px solid ${theme.palette.divider}`,
-        //backgroundColor: '#719fb0',
-    },
-    seletedTab: {
-        backgroundColor: '#E0E0E0',
-    },
-    unseletedTab: {
-        backgroundColor: '#719fb0',
     },
     tab2: {
         width: "100vmin",
@@ -483,269 +422,211 @@ export default function Profile () {
                     <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid container style={{margin: "0rem", backgroundColor: "#E0E0E0", maxWidth: "100vmax"}}>
-                <Grid item >
-                <Tabs
-                    orientation="vertical"
-                    variant="fullWidth"
-                    value={tabValue}
-                    onChange={handleChange}
-                    aria-label="Vertical tabs example"
-                    className={classes.tabs}
-                    >
-                        {/*
-                        <Tab label="About you" {...a11yProps(0)} />
-                        <Tab label="Comments" {...a11yProps(1)} />
-                        <Tab label="Change Password" {...a11yProps(2)} />
-                        <Tab label="Payment" {...a11yProps(3)} />
-                        <Tab label="Notifications" {...a11yProps(4)} />
-                        <Tab label="About us" {...a11yProps(5)} />
-                        */}
-                </Tabs>
-                </Grid>
-                <Grid item xs>
-                    <TabPanel value={tabValue} index={0}  >
-                        <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
-                        <Grid item style={{/*maxWidth: "40vmax"*/}} > 
-                            <Box display="flex" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
-                                    <Badge overlap="circle" anchorOrigin={{vertical: 'bottom',horizontal: 'left',}} badgeContent={
-                                            <Box>
-                                                <label htmlFor="myInput"> <CameraAltIcon className={classes.camera} /> </label>
-                                                <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{marginBottom: "1em", display:'none'}} />
-                                            </Box>
-                                        }
-                                        >
-                                        <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage}>
-                                            
-                                        </Avatar>
-                                    </Badge>
-                                    
-                                    {isDoctor ? (
-                                        <Box >
-                                            <br></br><br></br>
-                                            <Typography variant="h6"  >{"Doctor " + firstName + " " + lastName}</Typography>
-                                            <Typography variant="subtitle1">{specializationMap(specialization)}</Typography>
-                                            <Box display="flex" >
-                                                <Paper style={{backgroundColor: "#E0E0E0"}}>
-                                                    <Button>
-                                                        <StarRating val={rateAvg}/>
-                                                        <Typography>({rateCount})</Typography>
-                                                    </Button>
-                                                </Paper>
-                                            </Box>
-                                        </Box>
-                                    )
-                                    :
-                                    (
-                                        <Box>
-                                            <br></br><br></br>
-                                            <Typography variant="h6">{firstName + " " + lastName}</Typography>
-                                            <Typography variant="subtitle1">{"User"}</Typography>
-                                        </Box>
-                                    )}
-                                
-                            </Box>
-                        </Grid>
-                        
-                        <Grid item container className={classes.tab2} direction="column"   style={{marginTop: "1em"}}>
-                            <Grid item style={{width: "inherit"}}>
-                            {isDoctor ? 
-                                <Tabs
-                                    value={tabValue2}
-                                    onChange={handleChange2}
-                                    indicatorColor="inherit"
-                                    
-                                    style={{width: "inherit"}}
-                                    variant="fullWidth"
-                                    aria-label="full width tabs example"
-                                    >
-                                        <Tab label="About"  {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Calendar"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Privacy Policy"  {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />                                        
-                                </Tabs>
-                                :
-                                <Tabs
-                                    value={tabValue2}
-                                    onChange={handleChange2}
-                                    indicatorColor="inherit"
-                                    
-                                    style={{width: "inherit"}}
-                                    variant="fullWidth"
-                                    aria-label="full width tabs example"
-                                    >
-                                        <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Change Password" icon={<VpnKeyIcon/>} {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
-                                        {/*<Tab label="Saved Profiles" icon={<FavoriteIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />*/}
-                                        <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Notifications" icon={<NotificationsIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />   
-                                </Tabs>
+            <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
+                <Grid item style={{/*maxWidth: "40vmax"*/}} > 
+                    <Box display="flex" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
+                        <Badge 
+                            overlap="circle" 
+                            anchorOrigin={{vertical: 'bottom',horizontal: 'right',}} 
+                            badgeContent={
+                                <Box> 
+                                    <label htmlFor="myInput"><Chip icon={<CreateIcon />} clickable size="small" color="secondary" label="Edit" variant="default" />  </label>
+                                    <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{marginBottom: "1em", display:'none'}} />
+                                </Box>
                             }
-                        </Grid>
-                        <Grid item className={classes.tabpanel}>
-                            <TabPanel2 value={tabValue2} index={0} >
-                                    <Grid container alignItems="center" direction="column">
-                                        <Grid item >
-                                                       
-                                            <Box display="flex" justifyContent="space-between" >
-                                                <Grid container spacing={3} alignItems="center" >
-                                                        {fields.map((item, index) => {
-                                                            return(
-                                                                <Grid item xs={12} key={index.toString()} >
-                                                                    
-                                                                    {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                                    <StyledTextField 
-                                                                        key={index.toString()}
-                                                                        variant="outlined"
-                                                                        fullWidth
-                                                                        className={classes.textfield}
-                                                                        label={item[0]}
-                                                                        value={item[1]}
-                                                                        select={item[4]}
-                                                                        onChange={event => item[2](event.target.value)}
-                                                                        InputProps={{
-                                                                            startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>),
-                                                                            classes: {root: classes.dis}
-                                                                        }}
-                                                                        >
-                                                                        {item[4] ? 
-                                                                            (
-                                                                            item[5].map((option) => (
-                                                                                <MenuItem key={option.value} value={option.value}>
-                                                                                    {option.label}
-                                                                                </MenuItem>
-                                                                            )))
-                                                                            :
-                                                                            (<></>)
-                                                                        }
-                                                                        </StyledTextField>
-                                                                    
-                                                                </Grid>
-                                                                )
-                                                            })}
-                                                </Grid>
-                                            </Box>
-                                            
-                                        
+                            >
+                                <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage} />
+                        </Badge>    
+                        {isDoctor ? (
+                            <Box >
+                                <br></br><br></br>
+                                <Typography variant="h6"  >{"Doctor " + firstName + " " + lastName}</Typography>
+                                <Typography variant="subtitle1">{specializationMap(specialization)}</Typography>
+                                <Box display="flex" >
+                                    <Paper style={{backgroundColor: "#E0E0E0"}}>
+                                        <Button>
+                                            <StarRating val={rateAvg}/>
+                                            <Typography>({rateCount})</Typography>
+                                        </Button>
+                                    </Paper>
+                                </Box>
+                            </Box>
+                        )
+                        :
+                        (
+                            <Box>
+                                <br></br><br></br>
+                                <Typography variant="h6">{firstName + " " + lastName}</Typography>
+                                <Typography variant="subtitle1">{"User"}</Typography>
+                            </Box>
+                        )}
+                                
+                    </Box>
+                </Grid> 
+                <Grid item container className={classes.tab2} direction="column"   style={{marginTop: "1em"}}>
+                    <Grid item style={{width: "inherit"}}>
+                        {isDoctor ? 
+                            <Tabs
+                                value={tabValue2}
+                                onChange={handleChange2}
+                                indicatorColor="inherit"
+                                style={{width: "inherit"}}
+                                variant="fullWidth"
+                                aria-label="full width tabs example"
+                                >
+                                    <Tab label="About"  {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Calendar"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Privacy Policy"  {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />                                        
+                            </Tabs>
+                            :
+                            <Tabs
+                                value={tabValue2}
+                                onChange={handleChange2}
+                                indicatorColor="inherit"
+                                style={{width: "inherit"}}
+                                variant="fullWidth"
+                                aria-label="full width tabs example"
+                                >
+                                    <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Change Password" icon={<VpnKeyIcon/>} {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
+                                    {/*<Tab label="Saved Profiles" icon={<FavoriteIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />*/}
+                                    <Tab label="Calendar" icon={<CalendarTodayIcon/>} {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Notifications" icon={<NotificationsIcon/>} {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                    <Tab label="Privacy Policy" icon={<SecurityIcon/>} {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />   
+                            </Tabs>
+                        }
+                    </Grid>
+                    <Grid item className={classes.tabpanel}>
+                        <TabPanel2 value={tabValue2} index={0} >
+                            <Grid container alignItems="center" direction="column">
+                                <Grid item >        
+                                    <Box display="flex" justifyContent="space-between" >
+                                        <Grid container spacing={3} alignItems="center" >
+                                            {fields.map((item, index) => {
+                                                return(
+                                                    <Grid item xs={12} key={index.toString()} >
+                                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                                        <StyledTextField 
+                                                            key={index.toString()}
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            className={classes.textfield}
+                                                            label={item[0]}
+                                                            value={item[1]}
+                                                            select={item[4]}
+                                                            onChange={event => item[2](event.target.value)}
+                                                            InputProps={{
+                                                                startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>),
+                                                                classes: {root: classes.dis}
+                                                            }}
+                                                            >
+                                                            {item[4] ? 
+                                                                (
+                                                                item[5].map((option) => (
+                                                                    <MenuItem key={option.value} value={option.value}>
+                                                                        {option.label}
+                                                                    </MenuItem>
+                                                                )))
+                                                                :
+                                                                (<></>)
+                                                            }
+                                                            </StyledTextField>
+                                                    </Grid>
+                                                    )
+                                            })}
                                         </Grid>
-                                        <Grid item>
-                                            <Button className={classes.button} >Update Your Profile</Button>
-                                        </Grid>
-                                    </Grid>
-                            </TabPanel2>
-                        
-                            <TabPanel2 value={tabValue2} index={1} width="100%">
-                                {isDoctor ? 
-                                    <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
-                                        <CommentSection username={username}/>
                                     </Box>
-                                 :
-                                    <Typography>Change Password</Typography>
-                                }
-                            </TabPanel2>
-                        
-                            <TabPanel2 value={tabValue2} index={2}>
-                                {isDoctor ? 
-                                    <Grid container spacing={3} alignItems="center" >
+                                </Grid>
+                                <Grid item>
+                                    <Button className={classes.button} >Update Your Profile</Button>
+                                </Grid>
+                            </Grid>
+                        </TabPanel2>
+                        <TabPanel2 value={tabValue2} index={1} width="100%">
+                            {isDoctor ? 
+                                <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                    <CommentSection username={username}/>
+                                </Box>
+                                :
+                                <Typography>Change Password</Typography>
+                            }
+                        </TabPanel2>
+                        <TabPanel2 value={tabValue2} index={2}>
+                            {isDoctor ? 
+                                <Grid container spacing={3} alignItems="center" >
                                     <Grid item xs={12}  >
-                                        
                                         {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
                                         <StyledTextField 
-                                            
                                             variant="outlined"
                                             fullWidth
                                             className={classes.textfield}
                                             label="Enter Old Password"
                                             type="password"
-                                            
-                                            
                                             InputProps={{
                                                 startAdornment: (<InputAdornment position="start" ></InputAdornment>),
                                                 classes: {root: classes.dis}
                                             }}
                                             >
-                                        
-                                            </StyledTextField>
-                                        
+                                        </StyledTextField>
                                     </Grid>
-                                    <Grid item xs={12}  >
-                                        
+                                    <Grid item xs={12} >
                                         {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
                                         <StyledTextField 
-                                            
                                             variant="outlined"
                                             fullWidth
                                             className={classes.textfield}
                                             label="Enter New Password"
                                             type="password"
-                                            
-                                            
                                             InputProps={{
                                                 startAdornment: (<InputAdornment position="start" ></InputAdornment>),
                                                 classes: {root: classes.dis}
                                             }}
                                             >
-                                        
-                                            </StyledTextField>
-                                        
+                                        </StyledTextField>
                                     </Grid>
                                     <Grid item xs={12}  >
-                                        
                                         {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
                                         <StyledTextField 
-                                            
                                             variant="outlined"
                                             fullWidth
                                             className={classes.textfield}
                                             label="Confirm New Password"
                                             type="password"
-                                            
-                                            
                                             InputProps={{
                                                 startAdornment: (<InputAdornment position="start" ></InputAdornment>),
                                                 classes: {root: classes.dis}
                                             }}
                                             >
-                                        
-                                            </StyledTextField>
-                                        
+                                        </StyledTextField>
                                     </Grid>
-                                    
-                                
-                        </Grid>
-                                :
-                                    <Typography>Calendar</Typography>
-                                }
-                            </TabPanel2>
-                        
-                            <TabPanel2 value={tabValue2} index={3}>
-                                {isDoctor ? 
-                                    <Typography>Calendar</Typography>
-                                :
-                                    <Typography>Notifications</Typography>
-                                }
-                            </TabPanel2>
-                        
-                            <TabPanel2 value={tabValue2} index={4}>
-                                {isDoctor ? 
-                                    <Typography>Notifications</Typography>
-                                :
-                                    <Typography>Privacy Policy</Typography>
-                                }
-                            </TabPanel2>
-                        
-                            <TabPanel2 value={tabValue2} index={5}>
-                                Privacy Policy
-                            </TabPanel2>
-                        </Grid>
-                        </Grid>
-                        </Grid>
-                    </TabPanel>
-                </Grid>             
-            </Grid>
+                                </Grid>
+                            :
+                                <Typography>Calendar</Typography>
+                            }
+                        </TabPanel2>
+                        <TabPanel2 value={tabValue2} index={3}>
+                            {isDoctor ? 
+                                <Typography>Calendar</Typography>
+                            :
+                                <Typography>Notifications</Typography>
+                            }
+                        </TabPanel2>
+                        <TabPanel2 value={tabValue2} index={4}>
+                            {isDoctor ? 
+                                <Typography>Notifications</Typography>
+                            :
+                                <Typography>Privacy Policy</Typography>
+                            }
+                        </TabPanel2>
+                        <TabPanel2 value={tabValue2} index={5}>
+                            Privacy Policy
+                        </TabPanel2>
+                    </Grid>
+                </Grid>
+            </Grid>       
         </div>
     );
 }
