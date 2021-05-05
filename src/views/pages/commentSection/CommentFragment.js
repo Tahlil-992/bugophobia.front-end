@@ -35,14 +35,20 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
     // }, [direction]);
 
     return (
-        <Paper minWidth="100%" borderRadius="7px 7px 0 0" maxWidth="100%" elevation={3} style={{backgroundColor: "#F0F0F0"}}>
+        <>
+        <Paper minWidth="100%" borderRadius="7px 7px 0 0" maxWidth="100%" elevation={0} style={{backgroundColor: "inherit", zIndex: 1}}>
+            {!isdoctor &&
+            <Box position="sticky" left="0%" top="0%" zIndex={2}>
+                <AddComment doctor_username={username} setMessage={(msg) => {setMessage(msg); setMsgType(msg.type)}} reload={() => reload(page)} />
+            </Box>}
+            <Box style={{marginTop: "1em", marginBottom: "1em"}}>
             {show && comments.map((comment, index) => {
                 return (
-                    <Box key={"Box-comment-" + comment.id} padding={index == 0 ? "1em 0 0 0" : "0}"}>
+                    <Box key={"Box-comment-" + comment.id}>
                     {/* <Slide key={"slide-A-" + comment.id} direction={direction === "left" ? "left" : "right"} in={onSlide} exit={!onSlide} mountOnEnter unmountOnExit timeout={{enter: 1000, exit: 10000}}> */}
                     <Card 
                         key={"card-" + comment.id} 
-                        style={{ minWidth: "95%", maxWidth: "95%" , marginRight: "1em", marginLeft: "1em", borderRadius: (index == 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
+                        style={{wordBreak: "break-word", minWidth: "95%", maxWidth: "95%" , marginRight: "1em", marginLeft: "1em", borderRadius: (index == 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
                         (index == comments.length - 1 ? "0 0 7px 7px" : "0")) }}
                         >
                         <>
@@ -73,6 +79,7 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
                     </Box>
                 )
             })}
+            </Box>
             {/* {show && curComments.map(comment => {
                 return (
                     <Slide direction={direction} in={!onSlide} exit={onSlide} mountOnEnter unmountOnExit timeout={{enter: 6000, exit: 10000}}>
@@ -87,13 +94,12 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
             {!show && <LoadingSpinner />}
             {count === 0 && msgType !== Severity.ERROR &&
                 <Typography
-                    style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "#F0F0F0", marginRight: "1em", marginLeft: "1em" }}>
+                    style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "inherit", marginRight: "1em", marginLeft: "1em" }}>
                     Be the first to comment
                 </Typography>}
-            <Box 
-                style={{ minWidth: "100%", maxWidth: "100%", position: "sticky", bottom: "0%", left: "0%", backgroundColor: "rgb(224,224,224, 0.4)" }}>
-            {!isdoctor && 
-            <AddComment doctor_username={username} setMessage={(msg) => {setMessage(msg); setMsgType(msg.type)}} reload={() => reload(page)} />}
+        </Paper>
+        <Box 
+                style={{ minWidth: "100%", maxWidth: "100%", padding: "1em 0", position: "sticky", bottom: "0%", left: "0%", zIndex: 0 }}>
             <Pagination
                 pageCount={pageCount}
                 page={page}
@@ -101,8 +107,8 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
                 onForwardPage={() => {setDirection("right"); setOnSlide(true);reload(page + 1);}}
                 onForwardLastPage={() => {setDirection("right"); setOnSlide(true); reload(pageCount);}}
                 onBackwardFirstPage={() => {setDirection("left"); setOnSlide(true); reload(1);}} />
-            </Box>
-        </Paper>
+        </Box>
+        </>
     );
 }
 

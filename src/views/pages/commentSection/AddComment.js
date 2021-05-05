@@ -66,7 +66,7 @@ const AddComment = ({ doctor_username, remember_me, reload, setMessage }) => {
     }, [onSubmit])
 
     return (
-        <Card raised style={{border: "1px solid #E0E0E0", minWidth: "95%", maxWidth: "95%", marginTop: "1em", marginLeft:"1em", marginRight: "1em" }}>
+        <Card raised style={{border: "1px solid #E0E0E0", minWidth: "95%", maxWidth: "95%", marginLeft:"1em", marginRight: "1em" }}>
             <CardContent>
                 <Grid container>
                     <Grid item xs={2}>
