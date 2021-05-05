@@ -238,7 +238,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
         padding: '1em 4em 1em 4em',
-        margin: '1em 0em 1em 0em',
+        margin: '1em 0em 0em 0em',
         textAlign: 'center',
         fontSize: '0.9em',
         borderRadius: '10px',
