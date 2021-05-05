@@ -748,7 +748,7 @@ export default function Profile() {
                                 </div>
                             </TabPanel>
                             <TabPanel value={tabValue} index={1}>
-                                <Box display="flex" flex={1} position="relative" maxHeight="75vh" className="column__cards">
+                                <Box display="flex" flex={1} position="relative">
                                     <CommentSection username={viewedUsername} />
                                 </Box>
                             </TabPanel>

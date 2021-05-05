@@ -190,7 +190,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
                 </Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
                     <Box style={{wordWrap: "break-word"}} display="flex" flex={1}>
-                    {!onEdit && <Typography variant={"body2"} color={"textPrimary"}>
+                    {!onEdit && <Typography variant={"body2"} color={"textPrimary"} style={{whiteSpace: "pre-line"}}>
                         {commentProps.comment_text}
                     </Typography>}
                     {onEdit && commentProps.patient.user.email === email &&
@@ -202,6 +202,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
                             name="EditComment"
                             label="Edit your comment"
                             id="EditComment"
+                            multiline
                             value={editedContent}
                             style={{backgroundColor: "#eeeeee"}}
                             onChange={event => setEditedContent(event.target.value)}
