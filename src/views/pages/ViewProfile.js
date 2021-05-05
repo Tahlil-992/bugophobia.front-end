@@ -36,6 +36,9 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Rating from '@material-ui/lab/Rating';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, } from '@material-ui/pickers';
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -231,7 +234,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
         padding: '1em 4em 1em 4em',
-        margin: '1em 0em 1em 0em',
+        margin: '1em 0em 0em 0em',
         textAlign: 'center',
         fontSize: '16px',
         borderRadius: '10px',
@@ -312,8 +315,8 @@ export default function Profile() {
     const [onReloadRate, setOnReloadRate] = useState(true);
     const [rateCount, setRateCount] = useState(0);
     const [rateAvg, setRateAvg] = useState(0);
-    const [openSnackBar, setOpenSnackBar] = useState(false);  
-    const [message, setMessage] = useState({type: "", text: ""});
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
     const [onVote, setOnVote] = useState(false);
 
     useEffect(() => {
@@ -551,8 +554,8 @@ export default function Profile() {
     }
 
     useEffect(() => {
-        if(!openSnackBar) {
-            setMessage({type: "", text: ""});
+        if (!openSnackBar) {
+            setMessage({ type: "", text: "" });
         }
     }, [openSnackBar])
 
@@ -582,6 +585,12 @@ export default function Profile() {
         ['City', city, setCity, <ApartmentIcon />],
         ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />]
         ];
+
+    const [selectedDate, setSelectedDate] = useState(new Date('2014-08-18T21:11:54'));
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
+    const [VisitTimeClick, setVisitTimeClick] = useState(false);
     return (
         <div style={{ backgroundColor: '#8ab6d6' }}>
             <AppBar position="relative">
@@ -616,48 +625,48 @@ export default function Profile() {
                                             <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
                                         }
                                         <Typography variant="subtitle1">{specialization}</Typography>
-                                        <Box 
-                                            style={{marginTop: "0.5em"}} 
-                                            display="flex" 
-                                            alignItems="center" 
+                                        <Box
+                                            style={{ marginTop: "0.5em" }}
+                                            display="flex"
+                                            alignItems="center"
                                             justifyContent="flex-start">
                                             {!onVote &&
-                                            <Rating
-                                                name="rating-star"
-                                                defaultValue={0}
-                                                precision={0.1}
-                                                readOnly={true}
-                                                value={rateAvg}/>}
-                                            {onVote && 
-                                            <Rating
-                                                name="rating-star"
-                                                defaultValue={0}
-                                                precision={1}
-                                                readOnly={false}
-                                                value={newRateValue}
-                                                emptyIcon={<StarBorderIcon/>}
-                                                onChange={(event) => setNewRateValue(event.target.value)}/>}
-                                            <VisibilityIcon style={{fontSize: "1.25em", color: "gray"}}/>
-                                            <Typography style={{fontSize: "1em", marginLeft: "0.1em"}}>{rateCount}</Typography>
+                                                <Rating
+                                                    name="rating-star"
+                                                    defaultValue={0}
+                                                    precision={0.1}
+                                                    readOnly={true}
+                                                    value={rateAvg} />}
+                                            {onVote &&
+                                                <Rating
+                                                    name="rating-star"
+                                                    defaultValue={0}
+                                                    precision={1}
+                                                    readOnly={false}
+                                                    value={newRateValue}
+                                                    emptyIcon={<StarBorderIcon />}
+                                                    onChange={(event) => setNewRateValue(event.target.value)} />}
+                                            <VisibilityIcon style={{ fontSize: "1.25em", color: "gray" }} />
+                                            <Typography style={{ fontSize: "1em", marginLeft: "0.1em" }}>{rateCount}</Typography>
                                         </Box>
                                         <Box marginTop="1em">
-                                            {!onVote && 
-                                            <Button className={classes.rateButton} style={{width: "100%"}} onClick={() => setOnVote(true)}>
-                                                Rate This Doctor
+                                            {!onVote &&
+                                                <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
+                                                    Rate This Doctor
                                             </Button>}
-                                            {onVote && 
-                                            <Box  display="flex" alignItems="center" justifyContent="space-between">
-                                                <Box>
-                                                    <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
-                                                        Submit    
-                                                    </Button>                                                
-                                                </Box>
-                                                <Box>
-                                                    <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
-                                                        Cancel    
-                                                    </Button>                                                   
-                                                </Box>
-                                            </Box>}
+                                            {onVote &&
+                                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                                    <Box>
+                                                        <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
+                                                            Submit
+                                                    </Button>
+                                                    </Box>
+                                                    <Box>
+                                                        <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
+                                                            Cancel
+                                                    </Button>
+                                                    </Box>
+                                                </Box>}
                                         </Box>
                                     </Box>
                                 )
@@ -675,12 +684,41 @@ export default function Profile() {
                             <Grid style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginBottom: '1rem', paddingLeft: '0.5rem' }}>
                                 {isViewedDoctor ?
                                     (
-                                        <Button className={classes.button} >Take a Visit Time</Button>
+                                        <Button onClick={() => setVisitTimeClick(true)} className={classes.button} >Take a Visit Time</Button>
                                     )
                                     :
                                     <></>
                                 }
+                                {VisitTimeClick &&
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                        <Grid container justify="space-around">
+                                            <KeyboardDatePicker
+                                                style={{ width: '9em' }}
+                                                margin="normal"
+                                                id="date-picker-dialog"
+                                                label="Date"
+                                                format="MM/dd/yyyy"
+                                                value={selectedDate}
+                                                onChange={handleDateChange}
+                                                KeyboardButtonProps={{
+                                                    'aria-label': 'change date',
+                                                }}
+                                            />
+                                            <KeyboardTimePicker
+                                                style={{ width: '8em' }}
+                                                margin="normal"
+                                                id="time-picker"
+                                                label="Time"
+                                                value={selectedDate}
+                                                onChange={handleDateChange}
+                                                KeyboardButtonProps={{
+                                                    'aria-label': 'change time',
+                                                }}
+                                            />
+                                        </Grid>
+                                    </MuiPickersUtilsProvider>}
                             </Grid>
+                            <Grid><br /></Grid>
                         </Box>
                     </Grid>
                     <Grid item container className={classes.tab2} direction="column">
