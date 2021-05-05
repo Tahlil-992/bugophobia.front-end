@@ -35,6 +35,9 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Rating from '@material-ui/lab/Rating';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -185,7 +188,7 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
         fontSize: 9,
-        iconSize: 30 ,
+        iconSize: 30,
         minWidth: 0,
         '&:hover': {
             backgroundColor: 'rgba(138, 182, 214, 0.77)',
@@ -201,7 +204,7 @@ const useStyles = makeStyles((theme) => ({
         borderTop: "3px solid #16E",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
-        color: "#31C", 
+        color: "#31C",
         minWidth: 0,
         fontSize: 10,
     },
@@ -237,13 +240,13 @@ const useStyles = makeStyles((theme) => ({
     button: {
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
-        padding: '1em 4em 1em 4em',
+        padding: '1em 5em 1em 5em',
         margin: '1em 0em 0em 0em',
         textAlign: 'center',
         fontSize: '0.9em',
-        borderRadius: '10px',
+        borderRadius: '5px',
         textTransform: 'none',
-        height:'45px',
+        height: '2.5em',
         '&:hover': {
             backgroundColor: '#5f939a',
         },
@@ -333,8 +336,8 @@ export default function Profile() {
     const [onReloadRate, setOnReloadRate] = useState(true);
     const [rateCount, setRateCount] = useState(0);
     const [rateAvg, setRateAvg] = useState(0);
-    const [openSnackBar, setOpenSnackBar] = useState(false);  
-    const [message, setMessage] = useState({type: "", text: ""});
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
     const [onVote, setOnVote] = useState(false);
 
     useEffect(() => {
@@ -369,7 +372,7 @@ export default function Profile() {
             case 'P': return 'Pediatrician';
             case 'PS': return 'Psychiatrist';
             case 'U': return 'Urologist';
-            default : return '';
+            default: return '';
         }
     }
 
@@ -548,12 +551,18 @@ export default function Profile() {
     }
 
     useEffect(() => {
-        if(!openSnackBar) {
-            setMessage({type: "", text: ""});
+        if (!openSnackBar) {
+            setMessage({ type: "", text: "" });
         }
     }, [openSnackBar])
 
     const [disabled, setDisabled] = useState(-1);
+
+    const [VisitTimeClick, setVisitTimeClick] = useState(false);
+    const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    }
 
     const fields = isViewedDoctor ?
         [['First Name', firstName, setFirstName, <DoubleArrowIcon />],
@@ -589,113 +598,143 @@ export default function Profile() {
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" className={classes.container}>
-                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px', minHeight: 'inherit' }}>
+                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                     <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
-                        <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/}} > 
+                        <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/ }} >
                             <Grid item container justify='center' direction="row" style={{ backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: '0.5rem' }}>
-                                <Grid item container xs justify='center' alignItems='center' direction='column' style={{marginBottom: '1em'}}>
+                                <Grid item container xs justify='center' alignItems='center' direction='column' style={{ marginBottom: '1em' }}>
                                     <Grid item xs>
                                         <Avatar className={classes.large} src={profileImage}></Avatar>
                                     </Grid>
                                     {isViewedDoctor ?
                                         <Grid item xs>
-                                            {isSaved ?    
-                                                <Chip 
-                                                    icon={<BookmarkIcon />} 
-                                                    size="small" 
-                                                    color="secondary" 
-                                                    label={"Saved"} 
-                                                    variant={"default"} 
+                                            {isSaved ?
+                                                <Chip
+                                                    icon={<BookmarkIcon />}
+                                                    size="small"
+                                                    color="secondary"
+                                                    label={"Saved"}
+                                                    variant={"default"}
                                                     onDelete={deleteButtonHandler}
-                                                    />
+                                                />
                                                 :
-                                                <Chip 
-                                                    icon={<BookmarkBorderIcon/>} 
+                                                <Chip
+                                                    icon={<BookmarkBorderIcon />}
                                                     clickable
-                                                    size="small" 
-                                                    color="secondary" 
-                                                    label={"Save This Account"} 
-                                                    variant={"outlined"} 
+                                                    size="small"
+                                                    color="secondary"
+                                                    label={"Save This Account"}
+                                                    variant={"outlined"}
                                                     onClick={saveButtonHandler}
-                                                    />
+                                                />
                                             }
-                                            
+
                                         </Grid>
                                         :
                                         <></>
                                     }
                                     {isViewedDoctor ?
                                         <Grid item xs>
-                                            <Button className={classes.button} >Take a Visit Time</Button>
+                                            <Button onClick={() => setVisitTimeClick(true)} className={classes.button} >Take a Visit Time</Button>
                                         </Grid>
                                         :
                                         <></>
+                                    }
+                                    {VisitTimeClick &&
+                                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                            <Grid container style={{justifyContent:'center', alignItems:'center', textAlign:'center'}}>
+                                                <KeyboardDatePicker
+                                                    style={{ width: '9em' }}
+                                                    margin="normal"
+                                                    id="date-picker-dialog"
+                                                    label="Date"
+                                                    format="MM/dd/yyyy"
+                                                    value={selectedDate}
+                                                    onChange={handleDateChange}
+                                                    KeyboardButtonProps={{
+                                                        'aria-label': 'change date',
+                                                    }}
+                                                />
+                                                <KeyboardTimePicker
+                                                    style={{ width: '7em' }}
+                                                    margin="normal"
+                                                    id="time-picker"
+                                                    label="Time"
+                                                    ampm={false}
+                                                    value={selectedDate}
+                                                    onChange={handleDateChange}
+                                                    KeyboardButtonProps={{
+                                                        'aria-label': 'change time',
+                                                    }}
+                                                />
+                                            </Grid>
+                                        </MuiPickersUtilsProvider>
                                     }
                                 </Grid>
                                 <Grid item xs={8} >
                                     {isViewedDoctor ? (
                                         <Box >
-                                            <hr/>
+                                            <hr />
                                             <Typography className={classes.subtext} >{"Name:"}</Typography>
                                             <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
-                                            <hr/>
+                                            <hr />
                                             <Typography className={classes.subtext} >{"Specialization:"}</Typography>
                                             <Typography className={classes.text}  >{(specialization)}</Typography>
-                                            <hr/>
+                                            <hr />
                                             <Typography className={classes.subtext} >{"Rating:"}</Typography>
-                                            <Box 
-                                                style={{marginTop: "0.5em"}} 
-                                                display="flex" 
-                                                alignItems="center" 
+                                            <Box
+                                                style={{ marginTop: "0.5em" }}
+                                                display="flex"
+                                                alignItems="center"
                                                 justifyContent="flex-start">
                                                 {!onVote &&
-                                                <Rating
-                                                    name="rating-star"
-                                                    defaultValue={0}
-                                                    precision={0.1}
-                                                    readOnly={true}
-                                                    value={rateAvg}/>}
-                                                {onVote && 
-                                                <Rating
-                                                    name="rating-star"
-                                                    defaultValue={0}
-                                                    precision={1}
-                                                    readOnly={false}
-                                                    value={newRateValue}
-                                                    emptyIcon={<StarBorderIcon/>}
-                                                    onChange={(event) => setNewRateValue(event.target.value)}/>}
-                                                <VisibilityIcon style={{fontSize: "1.25em", color: "gray"}}/>
-                                                <Typography style={{fontSize: "1em", marginLeft: "0.1em"}}>{rateCount}</Typography>
+                                                    <Rating
+                                                        name="rating-star"
+                                                        defaultValue={0}
+                                                        precision={0.1}
+                                                        readOnly={true}
+                                                        value={rateAvg} />}
+                                                {onVote &&
+                                                    <Rating
+                                                        name="rating-star"
+                                                        defaultValue={0}
+                                                        precision={1}
+                                                        readOnly={false}
+                                                        value={newRateValue}
+                                                        emptyIcon={<StarBorderIcon />}
+                                                        onChange={(event) => setNewRateValue(event.target.value)} />}
+                                                <VisibilityIcon style={{ fontSize: "1.25em", color: "gray" }} />
+                                                <Typography style={{ fontSize: "1em", marginLeft: "0.1em" }}>{rateCount}</Typography>
                                             </Box>
                                             <Box marginTop="1em">
-                                                {!onVote && 
-                                                <Button className={classes.rateButton} style={{width: "100%"}} onClick={() => setOnVote(true)}>
-                                                    Rate This Doctor
+                                                {!onVote &&
+                                                    <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
+                                                        Rate This Doctor
                                                 </Button>}
-                                                {onVote && 
-                                                <Box  display="flex" alignItems="center" justifyContent="space-between">
-                                                    <Box>
-                                                        <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
-                                                            Submit    
-                                                        </Button>                                                
-                                                    </Box>
-                                                    <Box>
-                                                        <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
-                                                            Cancel    
-                                                        </Button>                                                   
-                                                    </Box>
-                                                </Box>}
+                                                {onVote &&
+                                                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                                                        <Box>
+                                                            <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
+                                                                Submit
+                                                        </Button>
+                                                        </Box>
+                                                        <Box>
+                                                            <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
+                                                                Cancel
+                                                        </Button>
+                                                        </Box>
+                                                    </Box>}
                                             </Box>
-                                            <hr/>
+                                            <hr />
                                         </Box>
-                                        )
+                                    )
                                         :
                                         (
                                             <Box>
-                                                <hr/>
+                                                <hr />
                                                 <Typography className={classes.subtext} >{"Name:"}</Typography>
                                                 <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
-                                                <hr/>
+                                                <hr />
                                             </Box>
 
                                         )
@@ -703,30 +742,30 @@ export default function Profile() {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs container className={classes.tab2} direction="column" style={{marginTop: "1em"}} >
+                        <Grid item xs container className={classes.tab2} direction="column" style={{ marginTop: "1em" }} >
                             <Grid item style={{ width: "inherit" }}>
                                 {isViewedDoctor ?
                                     <Tabs
                                         value={tabValue}
                                         onChange={handleChange}
                                         indicatorColor="inherit"
-                                        style={{width: "inherit"}}
+                                        style={{ width: "inherit" }}
                                         variant="fullWidth"
                                         aria-label="full width tabs example"
-                                        >
-                                            <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Comments" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />
+                                    >
+                                        <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Comments" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                     :
                                     <Tabs
                                         value={tabValue}
                                         onChange={handleChange}
                                         indicatorColor="inherit"
-                                        style={{width: "inherit"}}
+                                        style={{ width: "inherit" }}
                                         variant="fullWidth"
                                         aria-label="full width tabs example"
-                                        >
-                                            <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                    >
+                                        <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                 }
                             </Grid>
@@ -754,7 +793,8 @@ export default function Profile() {
                                                             }}
                                                         />
                                                     </Grid>
-                                                )})
+                                                )
+                                            })
                                             }
                                         </Grid>
                                     </Box>
