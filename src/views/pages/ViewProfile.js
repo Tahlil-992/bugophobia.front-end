@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, IconButton, Link, makeStyles, Paper, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Chip, Container, IconButton, Link, makeStyles, Paper, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -16,9 +16,8 @@ import WorkIcon from '@material-ui/icons/Work';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
-import CommentIcon from '@material-ui/icons/Comment';
+import BookmarkIcon from '@material-ui/icons/Bookmark';
+import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
@@ -159,7 +158,9 @@ const useStyles = makeStyles((theme) => ({
     large: {
         width: theme.spacing(16),
         height: theme.spacing(16),
-        margin: theme.spacing(2),
+        marginRight: theme.spacing(1),
+        marginLeft: theme.spacing(1),
+        marginBottom: theme.spacing(1),
         /* "&:hover": {
           width: theme.spacing(18),
           height: theme.spacing(18),
@@ -167,39 +168,45 @@ const useStyles = makeStyles((theme) => ({
         } */
     },
     tab: {
-        width: 700,
+        //width: 700,
     },
     grid: {
-        marginTop: "1rem",
+        marginTop: "0rem",
     },
     tab2: {
-        width: "75vmax",
+        //width: "75vmax",
         //marginLeft: "10%",
     },
     onetab: {
-        backgroundColor: "#C0C0F0",
-        //border: "3px solid #16E",
+        backgroundColor: 'rgba(138, 182, 214, 0.57)',
+        //border: "1px solid #C5CAEA",
+        color: "#111",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
-        fontSize: 12,
-        iconSize: 30,
+        fontSize: 9,
+        iconSize: 30 ,
+        minWidth: 0,
         '&:hover': {
-            backgroundColor: "#D0D0F0",
-            fontSize: 14,
+            backgroundColor: 'rgba(138, 182, 214, 0.77)',
+            fontSize: 10,
+            color: "#000",
         }
     },
     seltab: {
-        backgroundColor: "#E0E0E0",
+        backgroundColor: "#ebebeb",
         //border: "3px solid #16E",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderTop: "3px solid #16E",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
+        color: "#31C", 
+        minWidth: 0,
+        fontSize: 10,
     },
     tabpanel: {
-        backgroundColor: "#E0E0E0",
+        backgroundColor: "#ebebeb",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
         borderBottom: "3px solid #16E",
@@ -210,10 +217,10 @@ const useStyles = makeStyles((theme) => ({
     textfield: {
         width: "70%",
         marginLeft: "15%",
-        backgroundColor: "#e5e5e5",
+        backgroundColor: "#f0f0f0",
         color: "#111",
         '&:hover': {
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f3f3f3",
             color: "#1ee",
             width: "74%",
             marginLeft: "13%",
@@ -233,10 +240,10 @@ const useStyles = makeStyles((theme) => ({
         padding: '1em 4em 1em 4em',
         margin: '1em 0em 1em 0em',
         textAlign: 'center',
-        fontSize: '16px',
+        fontSize: '0.9em',
         borderRadius: '10px',
         textTransform: 'none',
-        height: '45px',
+        height:'45px',
         '&:hover': {
             backgroundColor: '#5f939a',
         },
@@ -273,13 +280,27 @@ const useStyles = makeStyles((theme) => ({
         left: "50%",
         transform: "translate(-50%, -50%)",
     },
-}));
-
-const StyledBadge = withStyles((theme) => ({
-    badge: {
-        backgroundColor: "inherit",
+    subtext: {
+        fontSize: 11,
+        color: "#222",
     },
-}))(Badge);
+    text: {
+        fontSize: 15,
+        color: "#000",
+    },
+    container: {
+        padding: theme.spacing(4),
+        paddingBottom: 0,
+        minHeight: "100vh",
+    },
+    paper: {
+        padding: theme.spacing(2),
+        display: 'flex',
+        overflow: 'auto',
+        flexDirection: 'column',
+        marginBottom: 0,
+    },
+}));
 
 export default function Profile() {
 
@@ -334,62 +355,38 @@ export default function Profile() {
         setTabValue(newValue);
     };
 
-    const handleChangeIndex = (index) => {
-        setTabValue(index);
-    };
-
     const specializationMap = (spec) => {
         switch (spec) {
-            case 'C':
-                return 'Cardiologist';
-            case 'D':
-                return 'Dermatologist';
-            case 'G':
-                return 'General Practitioner';
-            case 'GY':
-                return 'Gynecologist';
-            case 'I':
-                return 'Internist';
-            case 'N':
-                return 'Neurologist';
-            case 'O':
-                return 'Obstetrician';
-            case 'OP':
-                return 'Ophthalmologist';
-            case 'OT':
-                return 'Otolaryngologist';
-            case 'P':
-                return 'Pediatrician';
-            case 'PS':
-                return 'Psychiatrist';
-            case 'U':
-                return 'Urologist';
-            default:
-                return '';
+            case 'C': return 'Cardiologist';
+            case 'D': return 'Dermatologist';
+            case 'G': return 'General Practitioner';
+            case 'GY': return 'Gynecologist';
+            case 'I': return 'Internist';
+            case 'N': return 'Neurologist';
+            case 'O': return 'Obstetrician';
+            case 'OP': return 'Ophthalmologist';
+            case 'OT': return 'Otolaryngologist';
+            case 'P': return 'Pediatrician';
+            case 'PS': return 'Psychiatrist';
+            case 'U': return 'Urologist';
+            default : return '';
         }
     }
 
     const insuranceMap = (insur) => {
         switch (insur) {
-            case 'O':
-                return 'Omr';
-            case 'H':
-                return 'Havades';
-            case 'T':
-                return 'Takmili';
-            default:
-                return '';
+            case 'O': return 'Omr';
+            case 'H': return 'Havades';
+            case 'T': return 'Takmili';
+            default: return '';
         }
     }
 
     const genderMap = (gen) => {
         switch (gen) {
-            case 'M':
-                return 'Male';
-            case 'F':
-                return 'Female';
-            default:
-                return '';
+            case 'M': return 'Male';
+            case 'F': return 'Female';
+            default: return '';
         }
     }
 
@@ -582,6 +579,7 @@ export default function Profile() {
         ['City', city, setCity, <ApartmentIcon />],
         ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />]
         ];
+
     return (
         <div style={{ backgroundColor: '#8ab6d6' }}>
             <AppBar position="relative">
@@ -590,132 +588,150 @@ export default function Profile() {
                     <Typography variant="h6" color="inherit" noWrap>View Profile</Typography>
                 </Toolbar>
             </AppBar>
-            <div >
-                <Grid container className={classes.grid} direction="column" spacing={0} alignItems="center" justify="center" margin="1rem">
-                    <Grid item direction="row">
-                        <Box style={{ backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: '0.5rem' }}>
-                            <Grid style={{ display: 'flex' }}>
-                                <Avatar className={classes.large} src={profileImage}></Avatar>
-                                {isViewedDoctor ? (
-                                    <Box >
-                                        <br />
-                                        {isDoctor ? <br /> : <></>}
-                                        {!isDoctor ?
-                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}
-                                                {isSaved ?
-                                                    <IconButton onClick={deleteButtonHandler} title="Remove from Favorites">
-                                                        <FavoriteIcon color="secondary" fontSize="large" />
-                                                    </IconButton>
-                                                    :
-                                                    <IconButton onClick={saveButtonHandler} title="Add to Favorites">
-                                                        <FavoriteBorderIcon color="secondary" fontSize="large" />
-                                                    </IconButton>
-                                                }
-                                            </Typography>
-                                            :
-                                            <Typography variant="h6" >{"Doctor " + firstName + " " + lastName}</Typography>
-                                        }
-                                        <Typography variant="subtitle1">{specialization}</Typography>
-                                        <Box 
-                                            style={{marginTop: "0.5em"}} 
-                                            display="flex" 
-                                            alignItems="center" 
-                                            justifyContent="flex-start">
-                                            {!onVote &&
-                                            <Rating
-                                                name="rating-star"
-                                                defaultValue={0}
-                                                precision={0.1}
-                                                readOnly={true}
-                                                value={rateAvg}/>}
-                                            {onVote && 
-                                            <Rating
-                                                name="rating-star"
-                                                defaultValue={0}
-                                                precision={1}
-                                                readOnly={false}
-                                                value={newRateValue}
-                                                emptyIcon={<StarBorderIcon/>}
-                                                onChange={(event) => setNewRateValue(event.target.value)}/>}
-                                            <VisibilityIcon style={{fontSize: "1.25em", color: "gray"}}/>
-                                            <Typography style={{fontSize: "1em", marginLeft: "0.1em"}}>{rateCount}</Typography>
+            <Container maxWidth="lg" className={classes.container}>
+                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px', minHeight: 'inherit' }}>
+                    <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
+                        <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/}} > 
+                            <Grid item container justify='center' direction="row" style={{ backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: '0.5rem' }}>
+                                <Grid item container xs justify='center' alignItems='center' direction='column' style={{marginBottom: '1em'}}>
+                                    <Grid item xs>
+                                        <Avatar className={classes.large} src={profileImage}></Avatar>
+                                    </Grid>
+                                    {isViewedDoctor ?
+                                        <Grid item xs>
+                                            {isSaved ?    
+                                                <Chip 
+                                                    icon={<BookmarkIcon />} 
+                                                    size="small" 
+                                                    color="secondary" 
+                                                    label={"Saved"} 
+                                                    variant={"default"} 
+                                                    onDelete={deleteButtonHandler}
+                                                    />
+                                                :
+                                                <Chip 
+                                                    icon={<BookmarkBorderIcon/>} 
+                                                    clickable
+                                                    size="small" 
+                                                    color="secondary" 
+                                                    label={"Save This Account"} 
+                                                    variant={"outlined"} 
+                                                    onClick={saveButtonHandler}
+                                                    />
+                                            }
+                                            
+                                        </Grid>
+                                        :
+                                        <></>
+                                    }
+                                    {isViewedDoctor ?
+                                        <Grid item xs>
+                                            <Button className={classes.button} >Take a Visit Time</Button>
+                                        </Grid>
+                                        :
+                                        <></>
+                                    }
+                                </Grid>
+                                <Grid item xs={8} >
+                                    {isViewedDoctor ? (
+                                        <Box >
+                                            <hr/>
+                                            <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                            <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                            <hr/>
+                                            <Typography className={classes.subtext} >{"Specialization:"}</Typography>
+                                            <Typography className={classes.text}  >{(specialization)}</Typography>
+                                            <hr/>
+                                            <Typography className={classes.subtext} >{"Rating:"}</Typography>
+                                            <Box 
+                                                style={{marginTop: "0.5em"}} 
+                                                display="flex" 
+                                                alignItems="center" 
+                                                justifyContent="flex-start">
+                                                {!onVote &&
+                                                <Rating
+                                                    name="rating-star"
+                                                    defaultValue={0}
+                                                    precision={0.1}
+                                                    readOnly={true}
+                                                    value={rateAvg}/>}
+                                                {onVote && 
+                                                <Rating
+                                                    name="rating-star"
+                                                    defaultValue={0}
+                                                    precision={1}
+                                                    readOnly={false}
+                                                    value={newRateValue}
+                                                    emptyIcon={<StarBorderIcon/>}
+                                                    onChange={(event) => setNewRateValue(event.target.value)}/>}
+                                                <VisibilityIcon style={{fontSize: "1.25em", color: "gray"}}/>
+                                                <Typography style={{fontSize: "1em", marginLeft: "0.1em"}}>{rateCount}</Typography>
+                                            </Box>
+                                            <Box marginTop="1em">
+                                                {!onVote && 
+                                                <Button className={classes.rateButton} style={{width: "100%"}} onClick={() => setOnVote(true)}>
+                                                    Rate This Doctor
+                                                </Button>}
+                                                {onVote && 
+                                                <Box  display="flex" alignItems="center" justifyContent="space-between">
+                                                    <Box>
+                                                        <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
+                                                            Submit    
+                                                        </Button>                                                
+                                                    </Box>
+                                                    <Box>
+                                                        <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
+                                                            Cancel    
+                                                        </Button>                                                   
+                                                    </Box>
+                                                </Box>}
+                                            </Box>
+                                            <hr/>
                                         </Box>
-                                        <Box marginTop="1em">
-                                            {!onVote && 
-                                            <Button className={classes.rateButton} style={{width: "100%"}} onClick={() => setOnVote(true)}>
-                                                Rate This Doctor
-                                            </Button>}
-                                            {onVote && 
-                                            <Box  display="flex" alignItems="center" justifyContent="space-between">
-                                                <Box>
-                                                    <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
-                                                        Submit    
-                                                    </Button>                                                
-                                                </Box>
-                                                <Box>
-                                                    <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
-                                                        Cancel    
-                                                    </Button>                                                   
-                                                </Box>
-                                            </Box>}
-                                        </Box>
-                                    </Box>
-                                )
-                                    :
-                                    (
-                                        <Box>
+                                        )
+                                        :
+                                        (
+                                            <Box>
+                                                <hr/>
+                                                <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                                <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                <hr/>
+                                            </Box>
 
-                                            <br></br><br></br>
-                                            <Typography variant="h6">{firstName + " " + lastName}</Typography>
-                                            <Typography variant="subtitle1">{"User"}</Typography>
-                                        </Box>
-
-                                    )}
+                                        )
+                                    }
+                                </Grid>
                             </Grid>
-                            <Grid style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginBottom: '1rem', paddingLeft: '0.5rem' }}>
+                        </Grid>
+                        <Grid item xs container className={classes.tab2} direction="column" style={{marginTop: "1em"}} >
+                            <Grid item style={{ width: "inherit" }}>
                                 {isViewedDoctor ?
-                                    (
-                                        <Button className={classes.button} >Take a Visit Time</Button>
-                                    )
+                                    <Tabs
+                                        value={tabValue}
+                                        onChange={handleChange}
+                                        indicatorColor="inherit"
+                                        style={{width: "inherit"}}
+                                        variant="fullWidth"
+                                        aria-label="full width tabs example"
+                                        >
+                                            <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                            <Tab label="Comments" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />
+                                    </Tabs>
                                     :
-                                    <></>
+                                    <Tabs
+                                        value={tabValue}
+                                        onChange={handleChange}
+                                        indicatorColor="inherit"
+                                        style={{width: "inherit"}}
+                                        variant="fullWidth"
+                                        aria-label="full width tabs example"
+                                        >
+                                            <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
+                                    </Tabs>
                                 }
                             </Grid>
-                        </Box>
-                    </Grid>
-                    <Grid item container className={classes.tab2} direction="column">
-                        <Grid item style={{ width: "inherit" }}>
-                            {isViewedDoctor ?
-                                <Tabs
-                                    value={tabValue}
-                                    onChange={handleChange}
-                                    indicatorColor="inherit"
-                                    textColor="primary"
-
-                                    variant="fullWidth"
-                                    aria-label="full width tabs example"
-                                >
-                                    <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
-                                    <Tab label="Comments" icon={<CommentIcon />} {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />
-                                </Tabs>
-                                :
-                                <Tabs
-                                    value={tabValue}
-                                    onChange={handleChange}
-                                    indicatorColor="inherit"
-                                    textColor="primary"
-
-                                    variant="fullWidth"
-                                    aria-label="full width tabs example"
-                                >
-                                    <Tab label="About" icon={<AccountCircleIcon />} {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
-                                </Tabs>
-                            }
-                        </Grid>
-                        <Grid item className={classes.tabpanel}>
-                            <TabPanel value={tabValue} index={0}>
-                                <div>
-
+                            <Grid item className={classes.tabpanel}>
+                                <TabPanel value={tabValue} index={0}>
                                     <Box display="flex" justifyContent="space-between" >
                                         <Grid container spacing={3} alignItems="flex-start">
                                             {fields.map((item, index) => {
@@ -735,27 +751,24 @@ export default function Profile() {
                                                             InputProps={{
                                                                 startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>),
                                                                 classes: { root: classes.dis }
-                                                            }
-
-                                                            }
+                                                            }}
                                                         />
                                                     </Grid>
-                                                )
-                                            })}
+                                                )})
+                                            }
                                         </Grid>
                                     </Box>
-
-                                </div>
-                            </TabPanel>
-                            <TabPanel value={tabValue} index={1}>
-                                <Box display="flex" flex={1} position="relative">
-                                    <CommentSection username={viewedUsername} />
-                                </Box>
-                            </TabPanel>
+                                </TabPanel>
+                                <TabPanel value={tabValue} index={1}>
+                                    <Box display="flex" flex={1} position="relative">
+                                        <CommentSection username={viewedUsername} />
+                                    </Box>
+                                </TabPanel>
+                            </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
-            </div>
+                </div>
+            </Container>
             {openSnackBar && <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={openSnackBar}
