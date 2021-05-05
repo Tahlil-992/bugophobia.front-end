@@ -653,7 +653,7 @@ export default function Profile() {
                                             {!onVote &&
                                                 <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
                                                     Rate This Doctor
-                                            </Button>}
+                                                </Button>}
                                             {onVote &&
                                                 <Box display="flex" alignItems="center" justifyContent="space-between">
                                                     <Box>
