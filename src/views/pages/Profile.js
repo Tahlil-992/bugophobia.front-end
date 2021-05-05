@@ -551,7 +551,53 @@ export default function Profile () {
                                     <CommentSection username={username}/>
                                 </Box>
                                 :
-                                <Typography>Change Password</Typography>
+                                <Grid container spacing={3} alignItems="center" >
+                                    <Grid item xs={12}  >
+                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                        <StyledTextField 
+                                            variant="outlined"
+                                            fullWidth
+                                            className={classes.textfield}
+                                            label="Enter Old Password"
+                                            type="password"
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start" ></InputAdornment>),
+                                                classes: {root: classes.dis}
+                                            }}
+                                            >
+                                        </StyledTextField>
+                                    </Grid>
+                                    <Grid item xs={12} >
+                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                        <StyledTextField 
+                                            variant="outlined"
+                                            fullWidth
+                                            className={classes.textfield}
+                                            label="Enter New Password"
+                                            type="password"
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start" ></InputAdornment>),
+                                                classes: {root: classes.dis}
+                                            }}
+                                            >
+                                        </StyledTextField>
+                                    </Grid>
+                                    <Grid item xs={12}  >
+                                        {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
+                                        <StyledTextField 
+                                            variant="outlined"
+                                            fullWidth
+                                            className={classes.textfield}
+                                            label="Confirm New Password"
+                                            type="password"
+                                            InputProps={{
+                                                startAdornment: (<InputAdornment position="start" ></InputAdornment>),
+                                                classes: {root: classes.dis}
+                                            }}
+                                            >
+                                        </StyledTextField>
+                                    </Grid>
+                                </Grid>
                             }
                         </TabPanel2>
                         <TabPanel2 value={tabValue2} index={2}>
@@ -622,7 +668,11 @@ export default function Profile () {
                             }
                         </TabPanel2>
                         <TabPanel2 value={tabValue2} index={5}>
-                            Privacy Policy
+                            {isDoctor ?
+                               <Typography>Privacy Policy</Typography>
+                            :
+                                <></>
+                            }
                         </TabPanel2>
                     </Grid>
                 </Grid>
