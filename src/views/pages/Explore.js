@@ -38,8 +38,13 @@ import { signOut } from '../../core/Authentication/action/authActions';
 import { Link } from "react-router-dom";
 import { SearchFiltersFragment } from "./searchFilterComponents/SearchFilters";
 import Menu from '@material-ui/core/Menu';
-import MenuI from "@material-ui/core/MenuItem";
 import MenuItem from '@material-ui/core/MenuItem';
+import Box from "@material-ui/core/Box";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import { MenuList } from '@material-ui/core';
+import Popper from '@material-ui/core/Popper';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -218,6 +223,15 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#f3f3f3',
         },
     },
+    limitedCard: {
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#e7e7e7',
+        "&:hover": {
+            backgroundColor: '#f3f3f3',
+        },
+    },
     cardGrid: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
@@ -244,25 +258,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 function Explore({ signOut }) {
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const searchRef = useRef(null);
-    const resultItemRef = useRef(null)
-
-    useEffect(() => {
-        if (searchRef && resultItemRef) {
-            const rect = searchRef.current.getBoundingClientRect();
-            setAnchorEl({top: rect.bottom, left: rect.left});
-            console.log(anchorEl);
-        }
-    }, [searchRef, resultItemRef])
+    const [showLimitedMenu, setShowLimitedMenu] = useState(false);
+    const anchorRef = useRef(null);
 
     const handleMenuItemClick = (event, index) => {
-        setAnchorEl(null);
+        // setShowLimitedMenu(false);
     };
 
     const handleClickListItem = (event) => {
-        setAnchorEl(event.currentTarget);
+        setShowLimitedMenu(true);
     };
+
+    const handleCloseLimitedPopper = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+          return;
+        }
+    
+        setShowLimitedMenu(false);
+    };
+
+    function handleListKeyDown(event) {
+        if (event.key === 'Tab') {
+          event.preventDefault();
+          setShowLimitedMenu(false);
+        }
+    }
 
     const handleSignOut = () => {
         resetLocalStorage();
@@ -375,7 +395,7 @@ function Explore({ signOut }) {
                             <SearchIcon />
                         </div>
                         <div>
-                            <div>
+                            <div ref={anchorRef}>
                                 <InputBase
                                     placeholder="Search…"
                                     classes={{
@@ -384,40 +404,45 @@ function Explore({ signOut }) {
                                     }}
                                     inputProps={{ 'aria-label': 'search' }}
                                     onClick={handleClickListItem}
-                                    ref={searchRef}/>
-                            {/* </div>
-                            <div> */}
-                            <Menu
-                                ref={resultItemRef}
-                                keepMounted
-                                open={true}
-                                anchorEl={anchorEl}
-                                open={Boolean(anchorEl)}
-                                onClose={() => setAnchorEl(null)}
-                                style={{padding: "0"}}>
-                                <MenuItem style={{padding: "0"}}>
-                                <Button style={{ textTransform: 'none', textAlign: 'center' }} size="small" color="primary">
-                                <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
-                                    <Grid style={{ display: 'flex', flexDirection: 'row' }}>
-                                        <CardMedia
-                                            className={classes.cardMedia}
-                                            image={DoctorImage}
-                                            title="Image title" />
-                                        <CardContent className={classes.cardContent}>
-                                            <Typography gutterBottom variant="h5" component="h2">
-                                                {/* {card.user.username} */}
-                                                Username
-                                            </Typography>
-                                            <Typography>
-                                                {/* {specializationMap(card.filed_of_specialization)} */}
-                                                General Practitioner
-                                            </Typography>
-                                        </CardContent>
-                                    </Grid>
-                                </Card>
-                                </Button>
-                                </MenuItem>
-                            </Menu>
+                                    />
+                            </div>
+                            <div>
+                            {<Popper open={showLimitedMenu} anchorEl={anchorRef !== null ? anchorRef.current : null} role={undefined} transition disablePortal>
+                            {({ TransitionProps, placement }) => (
+                                <Grow
+                                {...TransitionProps}
+                                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                                >
+                                <Paper>
+                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper}>
+                                    <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
+                                        <MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
+                                            <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%',width: "auto", maxWidth: '320px' }}>
+                                                <Grid style={{ display: 'flex', flexDirection: 'row' }}>
+                                                    <CardMedia
+                                                        className={classes.cardMedia}
+                                                        image={DoctorImage}
+                                                        title="Image title"
+                                                        style={{paddingBottom: 0}} />
+                                                    <CardContent className={classes.cardContent} style={{paddingBottom: 0}}>
+                                                        <Typography variant="h6">
+                                                            {/* {card.user.username} */}
+                                                            Username
+                                                        </Typography>
+                                                        <Typography>
+                                                            {/* {specializationMap(card.filed_of_specialization)} */}
+                                                            General Practitioner
+                                                        </Typography>
+                                                    </CardContent>
+                                                </Grid>
+                                            </Card>
+                                        </MenuItem>
+                                    </MenuList>
+                                    </ClickAwayListener>
+                                </Paper>
+                                </Grow>
+                            )}
+                            </Popper>}
                             </div>
                         </div>
                     </div>
