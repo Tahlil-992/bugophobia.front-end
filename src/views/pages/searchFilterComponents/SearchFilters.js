@@ -16,6 +16,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Box from "@material-ui/core/Box";
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -35,17 +36,33 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1),
         backgroundColor: "#FFFFFF",
     },
+    submitButton: {
+        textTransform: "none",
+        color: "white",
+        backgroundColor: "#2aac3d",
+        "&:hover": {
+            backgroundColor: "#139122",
+        },
+    },
+    resetButton: {
+        textTransform: "none",
+    },
 }))
 
 export const SearchFiltersFragment = () => {
     const classes = useStyles();
     const [onExpand, setOnExpand] = useState(false);
+    const [usernameSearchValue, setUsernameSearchValue] = useState("");
+    const [genderSearchValue, setGenderSearchValue] = useState("");
+    const [citySearchValue, setCitySearchValue] = useState("");
+    const [specialtySearchValue, setSpecialtySearchValue] = useState("");
 
     return (
         <>
         <Container maxWidth="lg" className={classes.container}>
             <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderRadius: "50px" }}>
                 <Grid container>
+                    <Grid item xs={12}>
                     <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
                         <Box display="flex" marginLeft="1.5em" alignItems="center">
                             <SearchIcon color="primary"/>
@@ -60,26 +77,28 @@ export const SearchFiltersFragment = () => {
                             </IconButton>
                         </Box>
                     </Box>
-                    <Box display="flex" justifyContent="center">
+                    </Grid>
+                    <Grid item xs={12}>
                     <Collapse in={onExpand} timeout="auto" unmountOnExit>
                     <Container>
                         <Grid container>
+                        <Grid container item xs={9}>
                             <Grid item xs={6} md={3}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="username-search-input-label">Username</FormLabel>
-                                    <OutlinedInput id="username-search-input" value={"value"} variant={"standard"} className={classes.inputEmpty}/>
+                                    <OutlinedInput id="username-search-input" value={usernameSearchValue} onChange={(event) => setUsernameSearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={6} md={3}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="specialty-search-input-label">Specialty</FormLabel>
-                                    <OutlinedInput id="specialty-search-input" value={"value"} variant={"standard"} className={classes.inputEmpty}/>
+                                    <OutlinedInput id="specialty-search-input" value={specialtySearchValue} onChange={(event) => setSpecialtySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={6} md={3}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="city-search-input-label">City</FormLabel>
-                                    <OutlinedInput id="city-search-input" value={"value"} variant={"standard"} className={classes.inputEmpty}/>
+                                    <OutlinedInput id="city-search-input" value={citySearchValue} onChange={(event) => setCitySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                 </FormControl>
                             </Grid>    
                             <Grid item xs={6} md={3}>
@@ -88,7 +107,8 @@ export const SearchFiltersFragment = () => {
                                     <Select
                                         labelId="gender-search-select-label"
                                         id="gender-search-select"
-                                        value={"10"}
+                                        value={genderSearchValue}
+                                        onChange={(event) => setGenderSearchValue(event.target.value)}
                                         className={classes.inputEmpty}
                                         native
                                         defaultValue={""}
@@ -100,9 +120,25 @@ export const SearchFiltersFragment = () => {
                                 </FormControl>
                             </Grid>                                                    
                         </Grid>
+                        <Grid container item xs={3}>
+                            <Grid container alignItems="center" justifyContent="space-between">
+                                <Box>
+                                    <Button className={classes.submitButton} variant="text">
+                                        Search    
+                                    </Button>                                                
+                                </Box>
+                                <Box>
+                                    <Button className={classes.resetButton} variant="contained" color="primary" disableElevation>
+                                        Reset    
+                                    </Button>                                                   
+                                </Box>
+                            </Grid>
+                        </Grid>
+                        </Grid>
                     </Container>
                     </Collapse>
-                    </Box>
+                    </Grid>
+
                 </Grid>
             </div>
         </Container>
