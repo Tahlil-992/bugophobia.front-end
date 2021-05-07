@@ -259,11 +259,28 @@ const useStyles = makeStyles((theme) => ({
 function Explore({ signOut }) {
 
     const [showLimitedMenu, setShowLimitedMenu] = useState(false);
+    const [limitedSearchInput, setLimitedSearchInput] = useState("");
+    const [limitedSearchResults, setLimitedSearchResults] = useState(null);
     const anchorRef = useRef(null);
 
-    const handleMenuItemClick = (event, index) => {
-        // setShowLimitedMenu(false);
-    };
+    useEffect(() => {
+        if (limitedSearchInput)
+        {
+            if (limitedSearchInput !== "" && limitedSearchInput !== null)
+                callSearchLimitedAPI();
+            else {
+                setLimitedSearchResults(null);
+            }
+        }
+    }, [limitedSearchInput])
+
+    // const handleMenuItemClick = (event, index) => {
+    //     // setShowLimitedMenu(false);
+    // };
+
+    const handleOnLimitedSearchInputChange = (event) => {
+        setLimitedSearchInput(event.target.value);
+    }
 
     const handleClickListItem = (event) => {
         setShowLimitedMenu(true);
@@ -345,8 +362,11 @@ function Explore({ signOut }) {
 
     const callSearchLimitedAPI = async () => {        
         try {
-            const response = await getLimitedSearchCallAPI("doc", isRemembered);
-            console.log(response);
+            const response = await getLimitedSearchCallAPI(limitedSearchInput, isRemembered);
+            if (response.status === 200)
+            {
+                setLimitedSearchResults(response.payload);
+            }
         }
         catch {
             console.log("LIMITED SEARCH ERROR");
@@ -404,6 +424,8 @@ function Explore({ signOut }) {
                                     }}
                                     inputProps={{ 'aria-label': 'search' }}
                                     onClick={handleClickListItem}
+                                    value={limitedSearchInput}
+                                    onChange={handleOnLimitedSearchInputChange}
                                     />
                             </div>
                             <div>
@@ -414,29 +436,39 @@ function Explore({ signOut }) {
                                 style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
                                 >
                                 <Paper>
-                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper}>
+                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
                                     <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
-                                        <MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
-                                            <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%',width: "auto", maxWidth: '320px' }}>
+                                        {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
+                                            <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0 }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
+                                            <Card 
+                                                className={classes.limitedCard} 
+                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: index === 0 ? '10px 10px 0 0' : (index === limitedSearchResults.length - 1 ? '0 0 10px 10px' : '0'), height: '100%',width: "auto", maxWidth: '320px' }}>
                                                 <Grid style={{ display: 'flex', flexDirection: 'row' }}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
                                                         image={DoctorImage}
                                                         title="Image title"
-                                                        style={{paddingBottom: 0}} />
+                                                        style={{paddingBottom: 0, height: "3em", width: "3em"}} />
                                                     <CardContent className={classes.cardContent} style={{paddingBottom: 0}}>
                                                         <Typography variant="h6">
-                                                            {/* {card.user.username} */}
-                                                            Username
+                                                            {list.user.username}
                                                         </Typography>
                                                         <Typography>
-                                                            {/* {specializationMap(card.filed_of_specialization)} */}
-                                                            General Practitioner
+                                                            {specializationMap(list.filed_of_specialization)}
                                                         </Typography>
                                                     </CardContent>
                                                 </Grid>
                                             </Card>
+                                            </Button>
                                         </MenuItem>
+                                        ))}
+                                        {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "10px"}}>
+                                        <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: '320px' }}>
+                                            <Typography style={{color: "#611a15"}}>
+                                                Record Not found
+                                            </Typography>
+                                        </Card>
+                                        </Box>}
                                     </MenuList>
                                     </ClickAwayListener>
                                 </Paper>
