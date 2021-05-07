@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -36,6 +36,10 @@ import { connect } from "react-redux";
 import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { signOut } from '../../core/Authentication/action/authActions';
 import { Link } from "react-router-dom";
+import { SearchFiltersFragment } from "./searchFilterComponents/SearchFilters";
+import Menu from '@material-ui/core/Menu';
+import MenuI from "@material-ui/core/MenuItem";
+import MenuItem from '@material-ui/core/MenuItem';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -56,6 +60,27 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
         throw e;
     }
 }
+
+const getAllSearchCallAPI = async (params, isRemembered) => {
+    try {
+        const response = await callAPIHandler({ method: "GET", url: "/search/all/", params: params }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const getLimitedSearchCallAPI = async (username, isRemembered) => {
+    try {
+        const response = await callAPIHandler({ method: "GET", url: "/search/limited/", params: { q: username } }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -218,6 +243,27 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 function Explore({ signOut }) {
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const searchRef = useRef(null);
+    const resultItemRef = useRef(null)
+
+    useEffect(() => {
+        if (searchRef && resultItemRef) {
+            const rect = searchRef.current.getBoundingClientRect();
+            setAnchorEl({top: rect.bottom, left: rect.left});
+            console.log(anchorEl);
+        }
+    }, [searchRef, resultItemRef])
+
+    const handleMenuItemClick = (event, index) => {
+        setAnchorEl(null);
+    };
+
+    const handleClickListItem = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
     const handleSignOut = () => {
         resetLocalStorage();
         resetSessionStorage();
@@ -266,6 +312,32 @@ function Explore({ signOut }) {
     const handleDrawerOpen = () => {
         setOpen(true);
     };
+
+    const callSearchAllAPI = async () => {        
+        try {
+            const response = await getAllSearchCallAPI({ q: "doc" }, isRemembered);
+            console.log(response);
+        }
+        catch {
+            console.log("All SEARCH ERROR");
+        }
+    }
+
+    const callSearchLimitedAPI = async () => {        
+        try {
+            const response = await getLimitedSearchCallAPI("doc", isRemembered);
+            console.log(response);
+        }
+        catch {
+            console.log("LIMITED SEARCH ERROR");
+        }
+    }
+
+    useEffect(() => {
+        callSearchAllAPI();
+        callSearchLimitedAPI();
+    }, [])
+
     const handleDrawerClose = () => {
         setOpen(false);
     };
@@ -302,13 +374,52 @@ function Explore({ signOut }) {
                         <div className={classes.searchIcon}>
                             <SearchIcon />
                         </div>
-                        <InputBase
-                            placeholder="Search…"
-                            classes={{
-                                root: classes.inputRoot,
-                                input: classes.inputInput,
-                            }}
-                            inputProps={{ 'aria-label': 'search' }} />
+                        <div>
+                            <div>
+                                <InputBase
+                                    placeholder="Search…"
+                                    classes={{
+                                        root: classes.inputRoot,
+                                        input: classes.inputInput,
+                                    }}
+                                    inputProps={{ 'aria-label': 'search' }}
+                                    onClick={handleClickListItem}
+                                    ref={searchRef}/>
+                            {/* </div>
+                            <div> */}
+                            <Menu
+                                ref={resultItemRef}
+                                keepMounted
+                                open={true}
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={() => setAnchorEl(null)}
+                                style={{padding: "0"}}>
+                                <MenuItem style={{padding: "0"}}>
+                                <Button style={{ textTransform: 'none', textAlign: 'center' }} size="small" color="primary">
+                                <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                    <Grid style={{ display: 'flex', flexDirection: 'row' }}>
+                                        <CardMedia
+                                            className={classes.cardMedia}
+                                            image={DoctorImage}
+                                            title="Image title" />
+                                        <CardContent className={classes.cardContent}>
+                                            <Typography gutterBottom variant="h5" component="h2">
+                                                {/* {card.user.username} */}
+                                                Username
+                                            </Typography>
+                                            <Typography>
+                                                {/* {specializationMap(card.filed_of_specialization)} */}
+                                                General Practitioner
+                                            </Typography>
+                                        </CardContent>
+                                    </Grid>
+                                </Card>
+                                </Button>
+                                </MenuItem>
+                            </Menu>
+                            </div>
+                        </div>
                     </div>
                     <IconButton color="inherit">
                         <Badge badgeContent={1} color="secondary">
@@ -357,18 +468,19 @@ function Explore({ signOut }) {
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
+                <SearchFiltersFragment/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container>
                         <Grid item xs={12}>
                             <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px' }}>
                                 <React.Fragment>
-                                    <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '20px' }} gutterBottom>
+                                    <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
                                         Top Doctors
                                     </Typography>
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
-                                            {cards.map((card) => (
-                                                <Grid item key={card} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
+                                            {cards.map((card, index) => (
+                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
                                                     <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
                                                         <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row' }}>
