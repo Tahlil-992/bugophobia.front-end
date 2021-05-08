@@ -263,6 +263,12 @@ function Explore({ signOut }) {
     const [limitedSearchResults, setLimitedSearchResults] = useState(null);
     const anchorRef = useRef(null);
 
+    const [allSearchParams, setAllSearchParams] = useState(null);
+    const [searchPage, setSearchPage] = useState(1);
+    const [searchPageCount, setSearchPageCount] = useState(1);
+
+    const [title, setTitle] = useState("Top Doctors");
+
     useEffect(() => {
         if (limitedSearchInput)
         {
@@ -274,9 +280,16 @@ function Explore({ signOut }) {
         }
     }, [limitedSearchInput])
 
-    // const handleMenuItemClick = (event, index) => {
-    //     // setShowLimitedMenu(false);
-    // };
+    useEffect(() => {
+        if (allSearchParams !== null) {
+            callSearchAllAPI();
+        }
+        else
+        {
+            setTitle("Top Doctors");
+            setSent(false);
+        }
+    }, [allSearchParams])
 
     const handleOnLimitedSearchInputChange = (event) => {
         setLimitedSearchInput(event.target.value);
@@ -352,8 +365,14 @@ function Explore({ signOut }) {
 
     const callSearchAllAPI = async () => {        
         try {
-            const response = await getAllSearchCallAPI({ q: "doc" }, isRemembered);
-            console.log(response);
+            const response = await getAllSearchCallAPI({ ...allSearchParams }, isRemembered);
+            if (response.status === 200)
+            {
+                setcards(response.payload.results);
+                setSearchPage(allSearchParams.page ? allSearchParams.page : 1);
+                setSearchPageCount(Math.ceil(response.payload.count !== 0 ? response.payload.count / 10 : 1));
+                setTitle(response.payload.count !== 0 ? "Search Results" : "Search Results: Not Found!");
+            }
         }
         catch {
             console.log("All SEARCH ERROR");
@@ -372,11 +391,6 @@ function Explore({ signOut }) {
             console.log("LIMITED SEARCH ERROR");
         }
     }
-
-    useEffect(() => {
-        callSearchAllAPI();
-        callSearchLimitedAPI();
-    }, [])
 
     const handleDrawerClose = () => {
         setOpen(false);
@@ -525,14 +539,14 @@ function Explore({ signOut }) {
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                <SearchFiltersFragment/>
+                <SearchFiltersFragment setOnFilters={(value) => {setAllSearchParams(value);}} page={searchPage} pageCount={searchPageCount}/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container>
                         <Grid item xs={12}>
                             <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px' }}>
                                 <React.Fragment>
                                     <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
-                                        Top Doctors
+                                        {title}
                                     </Typography>
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton, makeStyles } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
@@ -17,6 +17,7 @@ import Box from "@material-ui/core/Box";
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Button from "@material-ui/core/Button";
+import { Pagination } from "../../../core/modules/pagination";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -49,13 +50,64 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-export const SearchFiltersFragment = () => {
+export const SearchFiltersFragment = ({ setOnFilters, page, pageCount }) => {
     const classes = useStyles();
     const [onExpand, setOnExpand] = useState(false);
+
     const [usernameSearchValue, setUsernameSearchValue] = useState("");
     const [genderSearchValue, setGenderSearchValue] = useState("");
     const [citySearchValue, setCitySearchValue] = useState("");
     const [specialtySearchValue, setSpecialtySearchValue] = useState("");
+    
+    const [filterParams, setFilterParams] = useState(null);
+
+    useEffect(() => {
+        if (filterParams !== null) {
+            setOnFilters(filterParams);
+        }
+        else {
+            setOnFilters(null);
+        }
+    }, [filterParams])
+
+    const specializationMap = (spec) => {
+        switch (spec) {
+            case 'Cardiologist': return 'C';
+            case 'Dermatologist': return 'D';
+            case 'General Practitioner': return 'G';
+            case 'Gynecologist': return 'GY';
+            case 'Internist': return 'I';
+            case 'Neurologist': return 'N';
+            case 'Obstetrician': return 'O';
+            case 'Ophthalmologist': return 'OP';
+            case 'Otolaryngologist': return 'OT';
+            case 'Pediatrician': return 'P';
+            case 'Psychiatrist': return 'PS';
+            case 'Urologist': return 'U';
+            default : return '';
+        }
+    }
+
+    const handleSearchButton = () => {
+        let filters = {};
+        if (usernameSearchValue !== "")
+            filters = {...filters, q: usernameSearchValue};
+        if (genderSearchValue !== "")
+            filters = {...filters, gender: genderSearchValue};
+        if (citySearchValue !== "")
+            filters = {...filters, city: citySearchValue};
+        if (specialtySearchValue !== "")
+            filters = {...filters, specialization: specializationMap(specialtySearchValue)};
+        setFilterParams(filters)
+    }
+
+    const handleResetButton = () => {
+        setUsernameSearchValue("");
+        setGenderSearchValue("");
+        setCitySearchValue("");
+        setSpecialtySearchValue("");
+        setFilterParams(null);
+    }
 
     return (
         <>
@@ -82,26 +134,26 @@ export const SearchFiltersFragment = () => {
                     <Collapse in={onExpand} timeout="auto" unmountOnExit>
                     <Container>
                         <Grid container>
-                        <Grid container item xs={9}>
-                            <Grid item xs={6} md={3}>
+                        <Grid container item xs={12}>
+                            <Grid item xs={6} md={2}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="username-search-input-label">Username</FormLabel>
                                     <OutlinedInput id="username-search-input" value={usernameSearchValue} onChange={(event) => setUsernameSearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={6} md={3}>
+                            <Grid item xs={6} md={2}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="specialty-search-input-label">Specialty</FormLabel>
                                     <OutlinedInput id="specialty-search-input" value={specialtySearchValue} onChange={(event) => setSpecialtySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={6} md={3}>
+                            <Grid item xs={6} md={2}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="city-search-input-label">City</FormLabel>
                                     <OutlinedInput id="city-search-input" value={citySearchValue} onChange={(event) => setCitySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                 </FormControl>
                             </Grid>    
-                            <Grid item xs={6} md={3}>
+                            <Grid item xs={6} md={2}>
                                 <FormControl variant={"outlined"} className={classes.formControl}>
                                     <FormLabel variant="standard" id="gender-search-select-label">Gender</FormLabel>
                                     <Select
@@ -111,27 +163,35 @@ export const SearchFiltersFragment = () => {
                                         onChange={(event) => setGenderSearchValue(event.target.value)}
                                         className={classes.inputEmpty}
                                         native
-                                        defaultValue={""}
                                         >
                                         <option value="">{""}</option>
                                         <option value="M">Male</option>
                                         <option value="F">Female</option>
                                     </Select>
                                 </FormControl>
-                            </Grid>                                                    
-                        </Grid>
-                        <Grid container item xs={3}>
-                            <Grid container alignItems="center" justifyContent="space-between">
-                                <Box>
-                                    <Button className={classes.submitButton} variant="text">
-                                        Search    
-                                    </Button>                                                
-                                </Box>
-                                <Box>
-                                    <Button className={classes.resetButton} variant="contained" color="primary" disableElevation>
-                                        Reset    
-                                    </Button>                                                   
-                                </Box>
+                            </Grid>   
+                            <Grid item xs={6} md={2}>
+                                {filterParams !== null && <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="center" paddingTop="2em" paddingBottom="1em">
+                                    <Pagination
+                                        page={page}
+                                        pageCount={pageCount}
+                                        onBackwardFirstPage={() => setFilterParams({...filterParams, page: 1})}
+                                        onBackwardPage={() => setFilterParams({...filterParams, page: page - 1})}
+                                        onForwardLastPage={() => setFilterParams({...filterParams, page: pageCount})}
+                                        onForwardPage={() => setFilterParams({...filterParams, page: page + 1})}/>                                    
+                                </Box>}
+                            </Grid>
+                            <Grid item xs={6} md={2}>
+                                <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="space-evenly" paddingTop="2em" paddingBottom="1em">
+                                <Button className={classes.submitButton} variant="text" onClick={handleSearchButton}>
+                                    Search    
+                                </Button>
+                                {/* </Box>
+                                <Box>   */}
+                                <Button className={classes.resetButton} variant="contained" onClick={handleResetButton} color="primary" disableElevation>
+                                    Reset    
+                                </Button>
+                                </Box>   
                             </Grid>
                         </Grid>
                         </Grid>
