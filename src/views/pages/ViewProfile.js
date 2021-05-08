@@ -254,16 +254,16 @@ const useStyles = makeStyles((theme) => ({
     },
     rateButton: {
         textTransform: "none",
-        backgroundColor: "#F6AE28",
+        backgroundColor: 'rgba(246, 174, 40, 0.9)',
         "&:hover": {
-            backgroundColor: "#D08A08",
+            backgroundColor: 'rgba(208, 138, 8, 0.9)',
         },
     },
     submitButton: {
         textTransform: "none",
-        backgroundColor: "#2aac3d",
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
         "&:hover": {
-            backgroundColor: "#139122",
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
         },
     },
     cancelButton: {
@@ -607,7 +607,7 @@ export default function Profile() {
             <Container maxWidth="lg" className={classes.container}>
                 <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                     <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
-                        <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/ }} >
+                        <Grid item md={4} xs style={{ marginTop: '1em' }} >
                             <Grid item container justify='center' direction="row" style={{ backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: '0.5rem' }}>
                                 <Grid item container xs={9} justify='center' alignItems='center' direction='column' style={{ marginBottom: '1em' }}>
                                     <Grid item xs>
@@ -640,7 +640,7 @@ export default function Profile() {
                                         :
                                         <></>
                                     }
-                                    <TextField style={{ width: '100%', marginBottom: '0.5em', marginTop:'1em' }}
+                                    <TextField style={{ width: '100%', marginBottom: '0.5em', marginTop: '1em' }}
                                         className={classes.margin}
                                         id="input-with-icon-textfield"
                                         value={"  " + VisitTimeDuration}
@@ -674,7 +674,7 @@ export default function Profile() {
                                             <Grid container style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
                                                 <ThemeProvider theme={defaultMaterialTheme}>
                                                     <KeyboardDatePicker
-                                                        style={{ width: '10em', headerColor: 'red' }}
+                                                        style={{ width: '55%', headerColor: 'red' }}
                                                         margin="normal"
                                                         id="date-picker-dialog"
                                                         label="Date"
@@ -687,7 +687,7 @@ export default function Profile() {
                                                         }}
                                                     />
                                                     <KeyboardTimePicker
-                                                        style={{ width: '8em' }}
+                                                        style={{ width: '45%' }}
                                                         margin="normal"
                                                         id="time-picker"
                                                         label="Time"
@@ -699,11 +699,12 @@ export default function Profile() {
                                                             'aria-label': 'change time',
                                                         }}
                                                         minutesStep={5}
-                                                        minTime={new Date(0, 0, 0, 8)}
-                                                        maxTime={new Date(0, 0, 0, 18, 45)}
                                                     />
                                                 </ThemeProvider>
-                                                <Button onClick={() => setVisitTimeClick(false)} className={classes.button} style={{ width: '100%', margin: '0em' }}>Cancel</Button>
+                                                <Grid display="flex" alignItems="center" justifyContent="space-between" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                    <Button onClick={() => setVisitTimeClick(false)} className={classes.button} className={classes.submitButton} style={{ width: '49%', marginRight: '1%' }}>Submit</Button>
+                                                    <Button onClick={() => setVisitTimeClick(false)} className={classes.button} className={classes.cancelButton} style={{ width: '49%', marginLeft: '1%' }}>Cancel</Button>
+                                                </Grid>
                                             </Grid>
                                         </MuiPickersUtilsProvider>
                                     }
@@ -740,28 +741,26 @@ export default function Profile() {
                                                         value={newRateValue}
                                                         emptyIcon={<StarBorderIcon />}
                                                         onChange={(event) => setNewRateValue(event.target.value)} />}
-                                                <VisibilityIcon style={{ fontSize: "1.25em", color: "gray" }} />
-                                                <Typography style={{ fontSize: "1em", marginLeft: "0.1em" }}>{rateCount}</Typography>
+                                                <VisibilityIcon style={{ fontSize: "1.25em", color: "gray", marginLeft: '0.5em' }} />
+                                                <Typography style={{ fontSize: "1em", marginLeft: "0.2em" }}>{rateCount}</Typography>
                                             </Box>
-                                            <Box marginTop="1em">
-                                                {!onVote &&
-                                                    <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
-                                                        Rate This Doctor
-                                                </Button>}
-                                                {onVote &&
-                                                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                                                        <Box>
-                                                            <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)}>
+                                            { !isDoctor &&
+                                                <Box marginTop="1em">
+                                                    {!onVote &&
+                                                        <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
+                                                            Rate This Doctor
+                                                    </Button>}
+                                                    {onVote &&
+                                                        <Grid display="flex" alignItems="center" justifyContent="space-between" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                            <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)} style={{ width: '49%', marginRight: '1%' }}>
                                                                 Submit
                                                         </Button>
-                                                        </Box>
-                                                        <Box>
-                                                            <Button className={classes.cancelButton} onClick={() => setOnVote(false)}>
+                                                            <Button className={classes.cancelButton} onClick={() => setOnVote(false)} style={{ width: '49%', marginLeft: '1%' }}>
                                                                 Cancel
                                                         </Button>
-                                                        </Box>
-                                                    </Box>}
-                                            </Box>
+                                                        </Grid>}
+                                                </Box>
+                                            }
                                             <hr />
                                         </Box>
                                     )
@@ -779,7 +778,7 @@ export default function Profile() {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs container className={classes.tab2} direction="column" style={{ marginTop: '1em', marginRight:'2em' }} >
+                        <Grid item xs container className={classes.tab2} direction="column" style={{ marginTop: '2em', marginRight: '2em' }} >
                             <Grid item style={{ width: "inherit" }}>
                                 {isViewedDoctor ?
                                     <Tabs
@@ -846,36 +845,38 @@ export default function Profile() {
                     </Grid>
                 </div>
             </Container>
-            {openSnackBar && <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={openSnackBar}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-                resumeHideDuration={0}
-            >
-                <Paper style={{
-                    backgroundColor: message.type === Severity.SUCCESS ? SUCCESS_BACKGROUND : ERROR_BACKGROUND
-                    , borderRadius: "7px"
-                }} elevation={3}>
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        px={"1em"} py={"1em"}>
-                        {message.type === Severity.ERROR && <ErrorOutlineIcon style={{
-                            color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR
-                            , marginRight: "0.5em"
-                        }} />}
-                        {message.type === Severity.SUCCESS && <CheckCircleIcon />}
-                        <Box>
-                            <Typography style={{ color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR }} display="block">{message.text}</Typography>
+            {
+                openSnackBar && <Snackbar
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    open={openSnackBar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                    resumeHideDuration={0}
+                >
+                    <Paper style={{
+                        backgroundColor: message.type === Severity.SUCCESS ? SUCCESS_BACKGROUND : ERROR_BACKGROUND
+                        , borderRadius: "7px"
+                    }} elevation={3}>
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            px={"1em"} py={"1em"}>
+                            {message.type === Severity.ERROR && <ErrorOutlineIcon style={{
+                                color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR
+                                , marginRight: "0.5em"
+                            }} />}
+                            {message.type === Severity.SUCCESS && <CheckCircleIcon />}
+                            <Box>
+                                <Typography style={{ color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR }} display="block">{message.text}</Typography>
+                            </Box>
+                            <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleCloseSnackbar}>
+                                <CloseIcon style={{ color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR }} />
+                            </IconButton>
                         </Box>
-                        <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleCloseSnackbar}>
-                            <CloseIcon style={{ color: message.type === Severity.SUCCESS ? SUCCESS_COLOR : ERROR_COLOR }} />
-                        </IconButton>
-                    </Box>
-                </Paper>
-            </Snackbar>}
-        </div>
+                    </Paper>
+                </Snackbar>
+            }
+        </div >
     );
 }
