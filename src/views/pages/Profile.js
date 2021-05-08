@@ -35,44 +35,54 @@ import Tab from '@material-ui/core/Tab';
 import StarRating from "./RatingComponent/rating";
 import Paper from '@material-ui/core/Paper';
 import { HorizontalSplit } from '@material-ui/icons';
+import Rating from '@material-ui/lab/Rating';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import Select from '@material-ui/core/Select';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import MailIcon from '@material-ui/icons/Mail';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 
 function TabPanel2(props) {
     const { children, value, index, ...other } = props;
-  
+
     return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`full-width-tabpanel-${index}`}
-        aria-labelledby={`full-width-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box p={3}>
-            {children}
-          </Box>
-        )}
-      </div>
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`full-width-tabpanel-${index}`}
+            aria-labelledby={`full-width-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={3}>
+                    {children}
+                </Box>
+            )}
+        </div>
     );
-  }
+}
 
 TabPanel2.propTypes = {
     children: PropTypes.node,
     index: PropTypes.any.isRequired,
     value: PropTypes.any.isRequired,
 };
-  
+
 function a11yProps2(index) {
     return {
-      id: `full-width-tab-${index}`,
-      'aria-controls': `full-width-tabpanel-${index}`,
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
     };
 }
 
 const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
         const urlAddress = is_doctor ? "doctor" : "patient";
-        const response = callAPIHandler({method:"GET", url: `/profile/${urlAddress}/`}, true, isRemembered);
+        const response = callAPIHandler({ method: "GET", url: `/profile/${urlAddress}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -82,33 +92,33 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
 
 const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
     try {
-      const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
-      return response;
+        const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+        return response;
     }
     catch (e) {
-      throw e;
+        throw e;
     }
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
+        display: 'flex',
+        '& > *': {
+            margin: theme.spacing(1),
+        },
     },
     large: {
-      width: theme.spacing(16),
-      height: theme.spacing(16),
-      marginRight: theme.spacing(1),
-      marginLeft: theme.spacing(1),
-      //marginRight: theme.spacing(4),
-      //marginLeft: 'em',
-      /* "&:hover": {
-        width: theme.spacing(18),
-        height: theme.spacing(18),
-        margin: theme.spacing(1),
-      } */
+        width: theme.spacing(16),
+        height: theme.spacing(16),
+        marginRight: theme.spacing(1),
+        marginLeft: theme.spacing(1),
+        //marginRight: theme.spacing(4),
+        //marginLeft: 'em',
+        /* "&:hover": {
+          width: theme.spacing(18),
+          height: theme.spacing(18),
+          margin: theme.spacing(1),
+        } */
     },
     tab2: {
         //width: "100vmin",
@@ -122,7 +132,7 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
         fontSize: 9,
-        iconSize: 30 ,
+        iconSize: 30,
         minWidth: 0,
         '&:hover': {
             backgroundColor: 'rgba(138, 182, 214, 0.77)',
@@ -138,7 +148,7 @@ const useStyles = makeStyles((theme) => ({
         borderTop: "3px solid #16E",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
-        color: "#31C", 
+        color: "#31C",
         minWidth: 0,
         fontSize: 10,
     },
@@ -163,14 +173,14 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '0.9em',
         borderRadius: '10px',
         textTransform: 'none',
-        height:'45px',
+        height: '45px',
         '&:hover': {
             backgroundColor: '#5f939a',
         },
     },
     dis: {
         '&:hover': {
-           color: "#31c",
+            color: "#31c",
         },
         '&$focused': {
             backgroundColor: "#f0f0f0",
@@ -196,7 +206,14 @@ const useStyles = makeStyles((theme) => ({
     text: {
         fontSize: 15,
         color: "#000",
-        
+
+    },
+    applyButton: {
+        textTransform: "none",
+        backgroundColor: "#bdc1c5",
+        "&:hover": {
+            backgroundColor: "#9099A1",
+        },
     },
 }));
 
@@ -217,11 +234,11 @@ const StyledTextField = withStyles((theme) => ({
         },
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
-            //borderColor: '#E5E5E5',
-            //background: "linear-gradient(45deg, green 30%, orange 90%)",
+                //borderColor: '#E5E5E5',
+                //background: "linear-gradient(45deg, green 30%, orange 90%)",
             },
             '&:hover fieldset': {
-            borderColor: '#5070F0',
+                borderColor: '#5070F0',
             },
             '&.Mui-focused fieldset': {
                 //backgroundColor: "#f3f3f3",
@@ -230,9 +247,9 @@ const StyledTextField = withStyles((theme) => ({
             },
         },
     },
-  }))(TextField);
+}))(TextField);
 
-export default function Profile () {
+export default function Profile() {
 
     const classes = useStyles();
 
@@ -249,7 +266,7 @@ export default function Profile () {
         catch (e) {
             console.log(e);
         }
-    }   
+    }
 
     var isDoctor = false;
     var isRemembered = false;
@@ -277,33 +294,33 @@ export default function Profile () {
     };
 
     const list_specialization = [
-        {value: 'C', label: 'Cardiologist',},
-        {value: 'D', label: 'Dermatologist',},
-        {value: 'G', label: 'General Practitioner',},
-        {value: 'GY', label: 'Gynecologist',},
-        {value: 'I', label: 'Internist',},
-        {value: 'N', label: 'Neurologist',},
-        {value: 'O', label: 'Obstetrician',},
-        {value: 'OP', label: 'Ophthalmologist',},
-        {value: 'OT', label: 'Otolaryngologist',},
-        {value: 'P', label: 'Pediatrician',},
-        {value: 'PS', label: 'Psychiatrist',},
-        {value: 'U', label: 'Urologist',}
-      ];
+        { value: 'C', label: 'Cardiologist', },
+        { value: 'D', label: 'Dermatologist', },
+        { value: 'G', label: 'General Practitioner', },
+        { value: 'GY', label: 'Gynecologist', },
+        { value: 'I', label: 'Internist', },
+        { value: 'N', label: 'Neurologist', },
+        { value: 'O', label: 'Obstetrician', },
+        { value: 'OP', label: 'Ophthalmologist', },
+        { value: 'OT', label: 'Otolaryngologist', },
+        { value: 'P', label: 'Pediatrician', },
+        { value: 'PS', label: 'Psychiatrist', },
+        { value: 'U', label: 'Urologist', }
+    ];
 
     const list_insurance = [
-        {value: 'O', label: 'Omr',},
-        {value: 'H', label: 'Havades',},
-        {value: 'T', label: 'Takmili',}
-      ];
+        { value: 'O', label: 'Omr', },
+        { value: 'H', label: 'Havades', },
+        { value: 'T', label: 'Takmili', }
+    ];
 
     const list_gender = [
-        {value: 'M', label: 'Male',},
-        {value: 'F', label: 'Female',}
-      ];
+        { value: 'M', label: 'Male', },
+        { value: 'F', label: 'Female', }
+    ];
 
     const specializationMap = (spec) => {
-        switch(spec) {
+        switch (spec) {
             case 'C': return 'Cardiologist';
             case 'D': return 'Dermatologist';
             case 'G': return 'General Practitioner';
@@ -321,7 +338,7 @@ export default function Profile () {
     }
 
     const insuranceMap = (insur) => {
-        switch(insur) {
+        switch (insur) {
             case 'O': return 'Omr';
             case 'H': return 'Havades';
             case 'T': return 'Takmili';
@@ -330,7 +347,7 @@ export default function Profile () {
     }
 
     const genderMap = (gen) => {
-        switch(gen) {
+        switch (gen) {
             case 'M': return 'Male';
             case 'F': return 'Female';
             default: return '';
@@ -397,7 +414,7 @@ export default function Profile () {
     }
 
     const [sent, setSent] = useState(false);
-    if (!sent){
+    if (!sent) {
         callGetAPI();
         setSent(true);
     }
@@ -411,31 +428,31 @@ export default function Profile () {
     const [rateCount, setRateCount] = useState(0);
 
     const fields = isDoctor ?
-                   [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false],
-                    ['Email Address', email, setEmail, <EmailIcon/>, false],
-                    ['Username', username, setUsername, <AccountCircleIcon/>, false],
-                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender],
-                    ['Age', age, setAge, <AlarmIcon/>, false],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false],
-                    ['City', city, setCity, <ApartmentIcon/>, false],
-                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>, false],
-                    ['Filed of Specialization', specialization, setSpecialization, <WorkIcon/>, true, list_specialization],
-                    ['Work Experiece', experience, setExperience, <BuildIcon/>, false]
-                    ]
+        [['First Name', firstName, setFirstName, <DoubleArrowIcon />, false],
+        ['Last Name', lastName, setLastName, <DoubleArrowIcon />, false],
+        ['Email Address', email, setEmail, <EmailIcon />, false],
+        ['Username', username, setUsername, <AccountCircleIcon />, false],
+        ['Gender', gender, setGender, <WcIcon />, true, list_gender],
+        ['Age', age, setAge, <AlarmIcon />, false],
+        ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon />, false],
+        ['City', city, setCity, <ApartmentIcon />, false],
+        ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon />, false],
+        ['Filed of Specialization', specialization, setSpecialization, <WorkIcon />, true, list_specialization],
+        ['Work Experiece', experience, setExperience, <BuildIcon />, false]
+        ]
 
-                   :
+        :
 
-                   [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{color: "inherit"}} />, false],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false],
-                    ['Email Address', email, setEmail, <EmailIcon/>, false],
-                    ['Username', username, setUsername, <AccountCircleIcon/>, false],
-                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender],
-                    ['Age', age, setAge, <AlarmIcon/>, false],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false],
-                    ['City', city, setCity, <ApartmentIcon/>, false],
-                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>, true, list_insurance]
-                    ];
+        [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{ color: "inherit" }} />, false],
+        ['Last Name', lastName, setLastName, <DoubleArrowIcon />, false],
+        ['Email Address', email, setEmail, <EmailIcon />, false],
+        ['Username', username, setUsername, <AccountCircleIcon />, false],
+        ['Gender', gender, setGender, <WcIcon />, true, list_gender],
+        ['Age', age, setAge, <AlarmIcon />, false],
+        ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon />, false],
+        ['City', city, setCity, <ApartmentIcon />, false],
+        ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />, true, list_insurance]
+        ];
 
     const buttonHandler1 = () => {
         setButtonLable1(editProfile ? "Edit Profile" : "Save Changes");
@@ -448,8 +465,11 @@ export default function Profile () {
         }
     }
 
+    const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
+    const [ChangeVisitTimeDuration, setChangeVisitTimeDuration] = useState(false);
+
     return (
-        <div style={{backgroundColor:'#8ab6d6', padding: '0rem'}}>
+        <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -457,100 +477,145 @@ export default function Profile () {
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" className={classes.container}>
-                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px', minHeight: 'inherit' }}>
+                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                     <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
-                        <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/}} > 
-                            <Grid item container justify='center' direction="row" style={{backgroundColor: "#E0E0E0", marginTop: "1rem", borderRadius: "10px", paddingRight: "0.5rem"}}>
-                                <Grid item container xs justify='center' alignItems='center' direction='column' style={{marginBottom: '1em'}}>
+                        <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/ }} >
+                            <Grid item container justify='center' direction="row" style={{ backgroundColor: "#E0E0E0", marginTop: "2em", borderRadius: "10px", paddingRight: "0.5rem" }}>
+                                <Grid item container xs justify='center' alignItems='center' direction='column' style={{ marginBottom: '1em' }}>
                                     <Grid item xs>
                                         <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage} />
                                     </Grid>
                                     <Grid item xs>
                                         <label htmlFor="myInput"><Chip icon={<CreateIcon />} clickable size="small" color="secondary" label="Edit" variant="default" />  </label>
-                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{marginBottom: "1em", display:'none'}} />
+                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{ marginBottom: "1em", display: 'none' }} />
                                     </Grid>
                                 </Grid>
-                                <Grid item xs={8} >   
-                                {isDoctor ? (
-                                    <Box >
-                                        <hr/>
-                                        <Typography className={classes.subtext} >{"Name:"}</Typography>
-                                        <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
-                                        <hr/>
-                                        <Typography className={classes.subtext} >{"Specialization:"}</Typography>
-                                        <Typography className={classes.text}  >{specializationMap(specialization)}</Typography>
-                                        <hr/>
-                                        <Typography className={classes.subtext} >{"Rating:"}</Typography>
-                                        <Box display="flex" >
-                                            <Paper style={{backgroundColor: "#E0E0E0"}}>
-                                                <Button>
-                                                    <StarRating val={rateAvg}/>
-                                                    <Typography>({rateCount})</Typography>
-                                                </Button>
-                                            </Paper>
+                                {isDoctor &&
+                                    <Grid item xs={9}>
+                                        <TextField value={"Visit Time: " + VisitTimeDuration} style={{ width: '73.3%' }}
+                                            InputProps={{
+                                                readOnly: true,
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <AccessTimeIcon />
+                                                    </InputAdornment>
+                                                ),
+                                                endAdornment: (
+                                                    <InputAdornment position="end" style={{ color: 'GrayText' }}>
+                                                        minutes<span>&nbsp;&nbsp;</span>
+                                                    </InputAdornment>
+                                                )
+                                            }}
+                                        />
+                                        <ButtonGroup style={{ width: '25%' }}>
+                                            <Button
+                                                aria-label="reduce"
+                                                onClick={() => {
+                                                    setVisitTimeDuration(Math.max(VisitTimeDuration - 5, 0));
+                                                    setChangeVisitTimeDuration(true);
+                                                }}>
+                                                <KeyboardArrowDownIcon fontSize="small" />
+                                            </Button>
+                                            <Button
+                                                aria-label="increase"
+                                                onClick={() => {
+                                                    setVisitTimeDuration(VisitTimeDuration + 5);
+                                                    setChangeVisitTimeDuration(true);
+                                                }}>
+                                                <KeyboardArrowUpIcon fontSize="small" />
+                                            </Button>
+                                        </ButtonGroup>
+                                    </Grid>
+                                }
+                                {isDoctor &&
+                                    <Grid item xs={9} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
+                                        <Button className={classes.applyButton} style={{ width: '100%' }}
+                                            disabled={!ChangeVisitTimeDuration}
+                                            onClick={() => { setChangeVisitTimeDuration(false); }}>
+                                            Apply Changes
+                                        </Button>
+                                    </Grid>
+                                }
+                                <Grid item xs={9} >
+                                    {isDoctor ? (
+                                        <Box >
+                                            <hr />
+                                            <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                            <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                            <hr />
+                                            <Typography className={classes.subtext} >{"Specialization:"}</Typography>
+                                            <Typography className={classes.text}  >{specializationMap(specialization)}</Typography>
+                                            <hr />
+                                            <Typography className={classes.subtext} >{"Rating:"}</Typography>
+                                            <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em" }} alignItems="center" justifyContent="flex-start">
+                                                <Paper elevation={0} style={{ backgroundColor: "#E0E0E0", display: 'flex', flexDirection: 'row' }}>
+                                                    <StarRating val={rateAvg} />
+                                                    <VisibilityIcon style={{ color: "gray", marginLeft: '0.5em', marginRight: '0.2em' }} />
+                                                    <Typography>{rateCount}</Typography>
+                                                </Paper>
+                                            </Box>
+                                            <hr />
                                         </Box>
-                                        <hr/>
-                                    </Box>
-                                )
-                                :
-                                (
-                                    <Box>
-                                        <hr/>
-                                        <Typography className={classes.subtext} >{"Name:"}</Typography>
-                                        <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
-                                        <hr/>
-                                    </Box>
-                                )}
-                               </Grid>         
+                                    )
+                                        :
+                                        (
+                                            <Box>
+                                                <hr />
+                                                <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                                <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                <hr />
+                                            </Box>
+                                        )}
+                                </Grid>
                             </Grid>
-                        </Grid> 
-                        <Grid item xs container className={classes.tab2} direction="column"   style={{marginTop: "1em"}}>
-                            <Grid item style={{width: "inherit"}}>
-                                {isDoctor ? 
+                        </Grid>
+                        <Grid item xs container className={classes.tab2} direction="column" style={{ marginTop: '2em', marginRight: '2em' }}>
+                            <Grid item style={{ width: "inherit" }}>
+                                {isDoctor ?
                                     <Tabs
                                         value={tabValue2}
                                         onChange={handleChange2}
                                         indicatorColor="inherit"
-                                        style={{width: "inherit"}}
+                                        style={{ width: "inherit" }}
                                         variant="fullWidth"
                                         aria-label="full width tabs example"
-                                        >
-                                            <Tab label="About"  {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Calendar"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Privacy Policy"  {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />                                        
+                                    >
+                                        <Tab label="About"  {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Calendar"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Privacy Policy"  {...a11yProps2(5)} className={(tabValue2 === 5) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                     :
                                     <Tabs
                                         value={tabValue2}
                                         onChange={handleChange2}
                                         indicatorColor="inherit"
-                                        style={{width: "inherit"}}
+                                        style={{ width: "inherit" }}
                                         variant="fullWidth"
                                         aria-label="full width tabs example"
-                                        >
-                                            <Tab label="About" {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Change Password" {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
-                                            {/*<Tab label="Saved Profiles" {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />*/}
-                                            <Tab label="Calendar" {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Notifications" {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                            <Tab label="Privacy Policy" {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />   
+                                    >
+                                        <Tab label="About" {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Change Password" {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
+                                        {/*<Tab label="Saved Profiles" {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />*/}
+                                        <Tab label="Calendar" {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Notifications" {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Privacy Policy" {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                 }
                             </Grid>
                             <Grid item className={classes.tabpanel}>
                                 <TabPanel2 value={tabValue2} index={0} >
                                     <Grid container alignItems="center" direction="column" spacing={2}>
-                                        <Grid item >        
+                                        <Grid item >
                                             <Box display="flex" justifyContent="space-between" >
                                                 <Grid container spacing={3} alignItems="center" >
                                                     {fields.map((item, index) => {
-                                                        return(
+                                                        return (
                                                             <Grid item xs={12} key={index.toString()} >
                                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                                <StyledTextField 
+                                                                <StyledTextField
                                                                     key={index.toString()}
                                                                     variant="outlined"
                                                                     fullWidth
@@ -561,22 +626,22 @@ export default function Profile () {
                                                                     onChange={event => item[2](event.target.value)}
                                                                     InputProps={{
                                                                         startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>),
-                                                                        classes: {root: classes.dis}
+                                                                        classes: { root: classes.dis }
                                                                     }}
-                                                                    >
-                                                                    {item[4] ? 
+                                                                >
+                                                                    {item[4] ?
                                                                         (
-                                                                        item[5].map((option) => (
-                                                                            <MenuItem key={option.value} value={option.value}>
-                                                                                {option.label}
-                                                                            </MenuItem>
-                                                                        )))
+                                                                            item[5].map((option) => (
+                                                                                <MenuItem key={option.value} value={option.value}>
+                                                                                    {option.label}
+                                                                                </MenuItem>
+                                                                            )))
                                                                         :
                                                                         (<></>)
                                                                     }
-                                                                    </StyledTextField>
+                                                                </StyledTextField>
                                                             </Grid>
-                                                            )
+                                                        )
                                                     })}
                                                 </Grid>
                                             </Box>
@@ -587,147 +652,147 @@ export default function Profile () {
                                     </Grid>
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={1} width="100%">
-                                    {isDoctor ? 
+                                    {isDoctor ?
                                         <Box display="flex" flex={1} position="relative">
-                                            <CommentSection username={username}/>
+                                            <CommentSection username={username} />
                                         </Box>
                                         :
                                         <Grid container spacing={3} alignItems="center" justify="center" >
-                                            
+
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField 
+                                                <StyledTextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
-                                                    label="Enter Old Password"
+                                                    label="Old Password"
                                                     type="password"
                                                     InputProps={{
-                                                        startAdornment: (<InputAdornment position="start" ><LockOpenIcon/></InputAdornment>),
-                                                        classes: {root: classes.dis}
+                                                        startAdornment: (<InputAdornment position="start" ><LockOpenIcon /></InputAdornment>),
+                                                        classes: { root: classes.dis }
                                                     }}
-                                                    >
+                                                >
                                                 </StyledTextField>
                                             </Grid>
                                             <Grid item xs={12} >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField 
+                                                <StyledTextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
-                                                    label="Enter New Password"
+                                                    label="New Password"
                                                     type="password"
                                                     InputProps={{
-                                                        startAdornment: (<InputAdornment position="start" ><LockIcon/> </InputAdornment>),
-                                                        classes: {root: classes.dis}
+                                                        startAdornment: (<InputAdornment position="start" ><LockIcon /> </InputAdornment>),
+                                                        classes: { root: classes.dis }
                                                     }}
-                                                    >
+                                                >
                                                 </StyledTextField>
                                             </Grid>
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField 
+                                                <StyledTextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
                                                     label="Confirm New Password"
                                                     type="password"
                                                     InputProps={{
-                                                        startAdornment: (<InputAdornment position="start" ><LockIcon/> </InputAdornment>),
-                                                        classes: {root: classes.dis}
+                                                        startAdornment: (<InputAdornment position="start" ><LockIcon /> </InputAdornment>),
+                                                        classes: { root: classes.dis }
                                                     }}
-                                                    >
+                                                >
                                                 </StyledTextField>
                                             </Grid>
                                             <Grid item>
-                                                <Button className={classes.button} style={{marginTop: '1em'}} >Change Your Password</Button>
+                                                <Button className={classes.button} style={{ marginTop: '1em' }} >Change Your Password</Button>
                                             </Grid>
-                                            
+
                                         </Grid>
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={2}>
-                                    {isDoctor ? 
+                                    {isDoctor ?
                                         <Grid container spacing={3} alignItems="center" justify='center' >
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField 
+                                                <StyledTextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
-                                                    label="Enter Old Password"
+                                                    label="Old Password"
                                                     type="password"
                                                     InputProps={{
-                                                        startAdornment: (<InputAdornment position="start" > <LockOpenIcon/> </InputAdornment>),
-                                                        classes: {root: classes.dis}
+                                                        startAdornment: (<InputAdornment position="start" > <LockOpenIcon /> </InputAdornment>),
+                                                        classes: { root: classes.dis }
                                                     }}
-                                                    >
+                                                >
                                                 </StyledTextField>
                                             </Grid>
                                             <Grid item xs={12} >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField 
+                                                <StyledTextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
-                                                    label="Enter New Password"
+                                                    label="New Password"
                                                     type="password"
                                                     InputProps={{
-                                                        startAdornment: (<InputAdornment position="start" > <LockIcon/> </InputAdornment>),
-                                                        classes: {root: classes.dis}
+                                                        startAdornment: (<InputAdornment position="start" > <LockIcon /> </InputAdornment>),
+                                                        classes: { root: classes.dis }
                                                     }}
-                                                    >
+                                                >
                                                 </StyledTextField>
                                             </Grid>
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField 
+                                                <StyledTextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
                                                     label="Confirm New Password"
                                                     type="password"
                                                     InputProps={{
-                                                        startAdornment: (<InputAdornment position="start" > <LockIcon/> </InputAdornment>),
-                                                        classes: {root: classes.dis}
+                                                        startAdornment: (<InputAdornment position="start" > <LockIcon /> </InputAdornment>),
+                                                        classes: { root: classes.dis }
                                                     }}
-                                                    >
+                                                >
                                                 </StyledTextField>
                                             </Grid>
                                             <Grid item >
                                                 <Button className={classes.button}  >Change Your Password</Button>
                                             </Grid>
                                         </Grid>
-                                    :
+                                        :
                                         <Typography>Calendar</Typography>
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={3}>
-                                    {isDoctor ? 
+                                    {isDoctor ?
                                         <Typography>Calendar</Typography>
-                                    :
+                                        :
                                         <Typography>Notifications</Typography>
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={4}>
-                                    {isDoctor ? 
+                                    {isDoctor ?
                                         <Typography>Notifications</Typography>
-                                    :
+                                        :
                                         <Typography>Privacy Policy</Typography>
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={5}>
                                     {isDoctor ?
-                                    <Typography>Privacy Policy</Typography>
-                                    :
+                                        <Typography>Privacy Policy</Typography>
+                                        :
                                         <></>
                                     }
                                 </TabPanel2>
                             </Grid>
                         </Grid>
-                    </Grid> 
-                </div> 
-            </Container>     
+                    </Grid>
+                </div>
+            </Container>
         </div>
     );
 }

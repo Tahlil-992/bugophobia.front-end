@@ -261,9 +261,9 @@ const useStyles = makeStyles((theme) => ({
     },
     submitButton: {
         textTransform: "none",
-        backgroundColor: 'rgba(42, 172, 61, 0.8)',
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
         "&:hover": {
-            backgroundColor: 'rgba(19, 145, 34, 0.8)',
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
         },
     },
     cancelButton: {
@@ -674,7 +674,7 @@ export default function Profile() {
                                             <Grid container style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
                                                 <ThemeProvider theme={defaultMaterialTheme}>
                                                     <KeyboardDatePicker
-                                                        style={{ width: '10em', headerColor: 'red' }}
+                                                        style={{ width: '55%', headerColor: 'red' }}
                                                         margin="normal"
                                                         id="date-picker-dialog"
                                                         label="Date"
@@ -687,7 +687,7 @@ export default function Profile() {
                                                         }}
                                                     />
                                                     <KeyboardTimePicker
-                                                        style={{ width: '8em' }}
+                                                        style={{ width: '45%' }}
                                                         margin="normal"
                                                         id="time-picker"
                                                         label="Time"
@@ -744,21 +744,23 @@ export default function Profile() {
                                                 <VisibilityIcon style={{ fontSize: "1.25em", color: "gray", marginLeft: '0.5em' }} />
                                                 <Typography style={{ fontSize: "1em", marginLeft: "0.2em" }}>{rateCount}</Typography>
                                             </Box>
-                                            <Box marginTop="1em">
-                                                {!onVote &&
-                                                    <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
-                                                        Rate This Doctor
+                                            { !isDoctor &&
+                                                <Box marginTop="1em">
+                                                    {!onVote &&
+                                                        <Button className={classes.rateButton} style={{ width: "100%" }} onClick={() => setOnVote(true)}>
+                                                            Rate This Doctor
                                                     </Button>}
-                                                {onVote &&
-                                                    <Grid display="flex" alignItems="center" justifyContent="space-between" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                        <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)} style={{ width: '49%', marginRight: '1%' }}>
-                                                            Submit
+                                                    {onVote &&
+                                                        <Grid display="flex" alignItems="center" justifyContent="space-between" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                            <Button className={classes.submitButton} onClick={() => setOnRateSubmit(true)} style={{ width: '49%', marginRight: '1%' }}>
+                                                                Submit
                                                         </Button>
-                                                        <Button className={classes.cancelButton} onClick={() => setOnVote(false)} style={{ width: '49%', marginLeft: '1%' }}>
-                                                            Cancel
+                                                            <Button className={classes.cancelButton} onClick={() => setOnVote(false)} style={{ width: '49%', marginLeft: '1%' }}>
+                                                                Cancel
                                                         </Button>
-                                                    </Grid>}
-                                            </Box>
+                                                        </Grid>}
+                                                </Box>
+                                            }
                                             <hr />
                                         </Box>
                                     )
