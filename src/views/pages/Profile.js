@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, Chip, Container, Link, makeStyles, MenuItem, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Chip, Container, Link, makeStyles, Menu, MenuItem, MenuList, Popover, Toolbar, withStyles } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -25,6 +25,9 @@ import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import CreateIcon from '@material-ui/icons/Create';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
+import CloseIcon from '@material-ui/icons/Close';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
@@ -112,6 +115,7 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(16),
         marginRight: theme.spacing(1),
         marginLeft: theme.spacing(1),
+        marginBottom: theme.spacing(0.5),
         //marginRight: theme.spacing(4),
         //marginLeft: 'em',
         /* "&:hover": {
@@ -125,18 +129,21 @@ const useStyles = makeStyles((theme) => ({
         //marginLeft: "10%",
     },
     onetab: {
-        backgroundColor: 'rgba(138, 182, 214, 0.57)',
+        //backgroundColor: 'rgba(138, 182, 214, 0.57)',
         //border: "1px solid #C5CAEA",
-        color: "#111",
+        color: "#555",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
         fontSize: 9,
         iconSize: 30,
         minWidth: 0,
+        transition: 'background-color 0.15s linear',
         '&:hover': {
-            backgroundColor: 'rgba(138, 182, 214, 0.77)',
-            fontSize: 10,
+            backgroundColor: 'rgba(138, 182, 214, 0.5)',
+            transition: 'background-color 0s',
+            fontSize: 9,
+            fontWeight: 900,
             color: "#000",
         }
     },
@@ -151,6 +158,7 @@ const useStyles = makeStyles((theme) => ({
         color: "#31C",
         minWidth: 0,
         fontSize: 10,
+        fontWeight: 900,
     },
     tabpanel: {
         backgroundColor: "#ebebeb",
@@ -206,7 +214,11 @@ const useStyles = makeStyles((theme) => ({
     text: {
         fontSize: 15,
         color: "#000",
-
+        fontWeight: 500,
+    },
+    poptext: {
+        fontSize: 13,
+        fontWeight: 700,
     },
     applyButton: {
         textTransform: "none",
@@ -215,11 +227,17 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: "#9099A1",
         },
     },
+    chip2: {
+        '&:hover': {
+            variant: 'default',
+        }
+    },
 }));
 
 const StyledTextField = withStyles((theme) => ({
     root: {
         width: "70%",
+        minWidth: '14em',
         marginLeft: "15%",
         backgroundColor: "#f0f0f0",
         color: "#111",
@@ -364,6 +382,7 @@ export default function Profile() {
     }
 
     const [profileImage, setProfileImage] = useState(isDoctor ? DoctorImage : PatientImage);
+    const [isProfileImageSet, setIsProfileImageSet] = useState(false);
 
     const [doctorid, setDoctorid] = useState(0);
     const [firstName, setFirstName] = useState("");
@@ -428,31 +447,31 @@ export default function Profile() {
     const [rateCount, setRateCount] = useState(0);
 
     const fields = isDoctor ?
-        [['First Name', firstName, setFirstName, <DoubleArrowIcon />, false],
-        ['Last Name', lastName, setLastName, <DoubleArrowIcon />, false],
-        ['Email Address', email, setEmail, <EmailIcon />, false],
-        ['Username', username, setUsername, <AccountCircleIcon />, false],
-        ['Gender', gender, setGender, <WcIcon />, true, list_gender],
-        ['Age', age, setAge, <AlarmIcon />, false],
-        ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon />, false],
-        ['City', city, setCity, <ApartmentIcon />, false],
-        ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon />, false],
-        ['Filed of Specialization', specialization, setSpecialization, <WorkIcon />, true, list_specialization],
-        ['Work Experiece', experience, setExperience, <BuildIcon />, false]
-        ]
+                    [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false, [], true],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], true],
+                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false],
+                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false],
+                    ['Gender', gender, setGender, <WcIcon/>, false, [], true],
+                    ['Age', age, setAge, <AlarmIcon/>, false, [], false],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false],
+                    ['City', city, setCity, <ApartmentIcon/>, false, [], false],
+                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>, false, [], true],
+                    ['Filed of Specialization', specializationMap(specialization), setSpecialization, <WorkIcon/>, false, [], true],
+                    ['Work Experiece', experience, setExperience, <BuildIcon/>, false, [], true]
+                    ]
 
-        :
+                :
 
-        [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{ color: "inherit" }} />, false],
-        ['Last Name', lastName, setLastName, <DoubleArrowIcon />, false],
-        ['Email Address', email, setEmail, <EmailIcon />, false],
-        ['Username', username, setUsername, <AccountCircleIcon />, false],
-        ['Gender', gender, setGender, <WcIcon />, true, list_gender],
-        ['Age', age, setAge, <AlarmIcon />, false],
-        ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon />, false],
-        ['City', city, setCity, <ApartmentIcon />, false],
-        ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />, true, list_insurance]
-        ];
+                [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{color: "inherit"}} />, false, [], false],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], false],
+                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false],
+                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false],
+                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender, false],
+                    ['Age', age, setAge, <AlarmIcon/>, false, [], false],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false],
+                    ['City', city, setCity, <ApartmentIcon/>, false, [], false],
+                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>, true, list_insurance, false]
+                    ];
 
     const buttonHandler1 = () => {
         setButtonLable1(editProfile ? "Edit Profile" : "Save Changes");
@@ -460,13 +479,42 @@ export default function Profile() {
     }
 
     const onFileChange = event => {
-        if (event.target.files) {
-            setProfileImage(URL.createObjectURL(event.target.files[0]));
+        try {
+            if (event.target.files) {
+                setProfileImage(URL.createObjectURL(event.target.files[0]));
+                setIsProfileImageSet(true);
+                //event.target.files.set
+            }
         }
+        catch(e) {
+            console.log(e)
+        }
+    }
+
+    const onDeleteFile = () => {
+        setProfileImage(isDoctor ? DoctorImage : PatientImage);
+        setIsProfileImageSet(false);
+    }
+
+    const onFileReset = (event) => {
+        event.target.value = null;
     }
 
     const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
     const [ChangeVisitTimeDuration, setChangeVisitTimeDuration] = useState(false);
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const popoverClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const popoverClose = () => {
+      setAnchorEl(null);
+    };
+  
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
 
     return (
         <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
@@ -483,11 +531,48 @@ export default function Profile() {
                             <Grid item container justify='center' direction="row" style={{ backgroundColor: "#E0E0E0", marginTop: "2em", borderRadius: "10px", paddingRight: "0.5rem" }}>
                                 <Grid item container xs justify='center' alignItems='center' direction='column' style={{ marginBottom: '1em' }}>
                                     <Grid item xs>
-                                        <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage} />
+                                        <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage}  />
                                     </Grid>
                                     <Grid item xs>
-                                        <label htmlFor="myInput"><Chip icon={<CreateIcon />} clickable size="small" color="secondary" label="Edit" variant="default" />  </label>
-                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{ marginBottom: "1em", display: 'none' }} />
+                                        <Chip 
+                                            icon={<CreateIcon />} 
+                                            clickable 
+                                            size="small" 
+                                            color="secondary" 
+                                            label="Edit" 
+                                            variant="default"
+                                            aria-describedby={id}
+                                            onClick={popoverClick} 
+                                            />
+                                        <Popover
+                                            id={id}
+                                            open={open}
+                                            anchorEl={anchorEl}
+                                            onClose={popoverClose}
+                                            anchorOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'center',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'left',
+                                            }}
+                                        >
+                                            
+                                            <label htmlFor="myInput">
+                                                <MenuItem onClick={(event) => {popoverClose();}} >
+                                                    <Typography className={classes.poptext}>Upload a photo...</Typography>
+                                                </MenuItem>
+                                            </label>
+                                            {isProfileImageSet ?
+                                                <MenuItem onClick={(event) => {onDeleteFile(); popoverClose();}} >
+                                                    <Typography className={classes.poptext}>Remove photo</Typography>
+                                                </MenuItem>
+                                                :
+                                                <></>
+                                            } 
+                                        </Popover>
+                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} onClick={onFileReset} style={{ marginBottom: "1em", display: 'none' }} />
                                     </Grid>
                                 </Grid>
                                 {isDoctor &&
@@ -561,8 +646,20 @@ export default function Profile() {
                                         (
                                             <Box>
                                                 <hr />
-                                                <Typography className={classes.subtext} >{"Name:"}</Typography>
-                                                <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                {firstName || lastName ?
+                                                    <div>
+                                                        <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                                        <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                        <hr />
+                                                    </div>
+                                                    :
+                                                    <></>
+                                                }
+                                                <Typography className={classes.subtext} >{"Username:"}</Typography>
+                                                <Typography className={classes.text}  >{username}</Typography>
+                                                <hr />
+                                                <Typography className={classes.subtext} >{"Email Address:"}</Typography>
+                                                <Typography className={classes.text} >{email}</Typography>
                                                 <hr />
                                             </Box>
                                         )}
@@ -617,6 +714,9 @@ export default function Profile() {
                                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
                                                                 <StyledTextField
                                                                     key={index.toString()}
+                                                                    onMouseEnter={() => setDisabled(index)}
+                                                                    onMouseLeave={() => setDisabled(-1)}
+                                                                    disabled={item[6] && (disabled === index)}
                                                                     variant="outlined"
                                                                     fullWidth
                                                                     className={classes.textfield}
