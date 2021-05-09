@@ -8,17 +8,15 @@ import FormLabel from "@material-ui/core/FormLabel";
 import Collapse from "@material-ui/core/Collapse";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
-import { Pagination } from "../../../core/modules/pagination";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import Paper from "@material-ui/core/Paper";
-import Popper from "@material-ui/core/Popper";
-import Grow from "@material-ui/core/Grow";
+import InputLabel from "@material-ui/core/InputLabel";
 
 const useStyles = makeStyles((theme) => ({
     container: {
-        paddingTop: theme.spacing(4),
+        // paddingTop: theme.spacing(4),
     },
     paper: {
         padding: theme.spacing(2),
@@ -27,11 +25,12 @@ const useStyles = makeStyles((theme) => ({
         // flexDirection: 'column',
     },    
     formControl: {
-        margin: theme.spacing(1),
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
         // minWidth: 120,
     },
     inputEmpty: {
-        marginTop: theme.spacing(1),
+        // marginTop: theme.spacing(1),
         backgroundColor: "#FFFFFF",
     },
     submitButton: {
@@ -144,30 +143,32 @@ export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen })
     }
 
     return (
-        // <Box style={{display: "flex", justifyContent: "center", alignItems: "center", alignSelf: "center", zIndex: 12, position: "absolute", ...anchor}}>
-        <Popper style={{zIndex: 12}} open={onExpand} role={undefined} anchorEl={anchorEl !== null ? anchorEl.current : null} transition disablePortal>
-        {({ TransitionProps, placement }) => (
-        <Grow
-        {...TransitionProps}
-        style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-        >
-            <Container style={{paddingTop: 0}} maxWidth="md" className={classes.container}>
-                <Paper className={classes.paper} elevation={3} style={{ backgroundColor: 'rgba(224, 224, 224, 0.4)', borderRadius: "0 0 50px 50px" }}>
-                    <Grid container>
-                        <Grid item xs={12}>
-                        {/* <Collapse in={false} timeout="auto" unmountOnExit> */}
-                        <Container>
-                            <Grid container>
+        <Box style={{display: "flex", justifyContent: "flex-start", alignItems: "center", alignSelf: "center", zIndex: 12, ...anchor}}>
+        <Collapse in={onExpand} timeout="auto" unmountOnExit>
+        
+        {/* // <Popper style={{zIndex: 12}} open={onExpand} role={undefined} anchorEl={anchorEl !== null ? anchorEl.current : null} transition disablePortal>
+        // {({ TransitionProps, placement }) => ( */}
+        {/* // <Grow */}
+        {/* // {...TransitionProps}
+        // style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+        // > */}
+            <Container style={{paddingTop: 0, paddingLeft: 0}} maxWidth="md" className={classes.container}>
+                <Paper className={classes.paper} elevation={3} style={{ backgroundColor: 'whitesmoke', borderRadius: "0 0 10px 0", padding: "1em 0" }}>
+                    {/* <Grid container> */}
+                        {/* <Grid item xs={12}> */}
+                        
+                        <Container style={{padding: "0 1em"}}>
+                            {/* <Grid container> */}
                             <Grid container item xs={12}>
                                 <Grid item xs={6} md={2}>
                                     <FormControl variant={"outlined"} className={classes.formControl}>
-                                        <FormLabel variant="standard" id="username-search-input-label">Username</FormLabel>
-                                        <OutlinedInput id="username-search-input" value={usernameSearchValue} onChange={(event) => setUsernameSearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
+                                        <InputLabel id="username-search-input-label">Username</InputLabel>
+                                        <OutlinedInput label="Username" variant="outlined" id="username-search-input" value={usernameSearchValue} onChange={(event) => setUsernameSearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={6} md={2}>
                                     <FormControl variant={"outlined"} className={classes.formControl}>
-                                        <FormLabel variant="standard" id="specialty-search-input-label">Specialty</FormLabel>
+                                        <InputLabel id="specialty-search-input-label">Specialty</InputLabel>
                                         <Select
                                             labelId="specialty-search-select-label"
                                             id="specialty-search-select"
@@ -175,6 +176,8 @@ export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen })
                                             onChange={(event) => setSpecialtySearchValue(event.target.value)}
                                             className={classes.inputEmpty}
                                             native
+                                            label="Specialty"
+                                            variant="outlined"
                                             >
                                             <option value="">{""}</option>
                                             {specializations.map((spec) => {
@@ -187,13 +190,13 @@ export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen })
                                 </Grid>
                                 <Grid item xs={6} md={2}>
                                     <FormControl variant={"outlined"} className={classes.formControl}>
-                                        <FormLabel variant="standard" id="city-search-input-label">City</FormLabel>
-                                        <OutlinedInput id="city-search-input" value={citySearchValue} onChange={(event) => setCitySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
+                                        <InputLabel id="city-search-input-label">City</InputLabel>
+                                        <OutlinedInput label="city" variant="outlined" id="city-search-input" value={citySearchValue} onChange={(event) => setCitySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
                                     </FormControl>
                                 </Grid>    
                                 <Grid item xs={6} md={2}>
                                     <FormControl variant={"outlined"} className={classes.formControl}>
-                                        <FormLabel variant="standard" id="gender-search-select-label">Gender</FormLabel>
+                                        <InputLabel id="gender-search-select-label">Gender</InputLabel>
                                         <Select
                                             labelId="gender-search-select-label"
                                             id="gender-search-select"
@@ -201,6 +204,8 @@ export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen })
                                             onChange={(event) => setGenderSearchValue(event.target.value)}
                                             className={classes.inputEmpty}
                                             native
+                                            label="Gender"
+                                            variant="outlined"
                                             >
                                             <option value="">{""}</option>
                                             <option value="M">Male</option>
@@ -209,35 +214,37 @@ export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen })
                                     </FormControl>
                                 </Grid>   
                                 <Grid item xs={6} md={3}>
-                                    <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="flex-end" paddingTop="3em" paddingBottom="1em">
-                                    <Button className={classes.submitButton} variant="text" onClick={handleSearchButton}>
+                                    <Box display="flex" justifyContent="center" height="100%">
+                                    <Button className={classes.submitButton} style={{margin: "0.5em 0"}} variant="text" onClick={handleSearchButton}>
                                         Search    
                                     </Button>
                                     {/* </Box>
                                     <Box>   */}
-                                    <Button className={classes.resetButton} variant="contained" onClick={handleResetButton} color="primary" disableElevation>
+                                    <Button className={classes.resetButton} style={{margin: "0.5em 0"}} variant="contained" onClick={handleResetButton} color="primary" disableElevation>
                                         Reset    
                                     </Button>
                                     </Box>   
                                 </Grid>
                                 <Grid item xs={6} md={1}>
-                                    <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="center" paddingTop="2.5em" paddingBottom="0.5em">
+                                    <Box display="flex" justifyContent="center" height="100%">
                                         <IconButton onClick={handleClosePopper}>
                                             <CloseIcon style={{ color: "#611a15" }} />
                                         </IconButton>
                                     </Box>
                                 </Grid>
                             </Grid>
-                            </Grid>
+                            {/* </Grid> */}
                         </Container>
-                        {/* </Collapse> */}
-                        </Grid>
+                        
+                        {/* </Grid> */}
 
-                    </Grid>
+                    {/* </Grid> */}
                 </Paper>
             </Container>
-        </Grow>)}
-        </Popper>
-        // </Box>
+        {/* // </Grow>)} */}
+        {/* // </Popper> */}
+        
+        </Collapse>
+        </Box>
     );
 }

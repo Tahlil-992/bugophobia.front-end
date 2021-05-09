@@ -574,10 +574,10 @@ function Explore({ signOut }) {
                                         {title === "Search Results" && <Pagination
                                             page={searchPage}
                                             pageCount={searchPageCount}
-                                            onBackwardFirstPage={() => setAllSearchParams({...allSearchParams, searchPage: 1})}
-                                            onBackwardPage={() => setAllSearchParams({...allSearchParams, searchPage: searchPage - 1})}
-                                            onForwardLastPage={() => setAllSearchParams({...allSearchParams, searchPage: searchPageCount})}
-                                            onForwardPage={() => setAllSearchParams({...allSearchParams, searchPage: searchPage + 1})}/>}   
+                                            onBackwardFirstPage={() => setAllSearchParams({...allSearchParams, page: 1})}
+                                            onBackwardPage={() => setAllSearchParams({...allSearchParams, page: searchPage - 1})}
+                                            onForwardLastPage={() => setAllSearchParams({...allSearchParams, page: searchPageCount})}
+                                            onForwardPage={() => setAllSearchParams({...allSearchParams, page: searchPage + 1})}/>}   
                                         </Box>                                 
                                     </Box>
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
