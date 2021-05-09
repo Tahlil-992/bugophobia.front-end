@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { IconButton, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormLabel from "@material-ui/core/FormLabel";
-import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import SearchIcon from '@material-ui/icons/Search';
 import Collapse from "@material-ui/core/Collapse";
 import Box from "@material-ui/core/Box";
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Button from "@material-ui/core/Button";
 import { Pagination } from "../../../core/modules/pagination";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import Paper from "@material-ui/core/Paper";
+import Popper from "@material-ui/core/Popper";
+import Grow from "@material-ui/core/Grow";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -50,9 +47,26 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-export const SearchFiltersFragment = ({ setOnFilters, page, pageCount }) => {
+export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen }) => {
     const classes = useStyles();
     const [onExpand, setOnExpand] = useState(false);
+
+    useEffect(() => {
+        setOnExpand(open);
+    }, [open])
+
+    const [anchor, setAnchor] = useState(null);
+
+    useEffect(() => {
+        if (anchorEl && anchorEl.current) {
+            setAnchor(anchorEl.current.getBoundingClientRect());
+        }
+    }, [anchorEl])
+
+    useEffect(() => {
+        console.log("anchor");
+        console.log(anchor);
+    }, [anchor])
 
     const [usernameSearchValue, setUsernameSearchValue] = useState("");
     const [genderSearchValue, setGenderSearchValue] = useState("");
@@ -69,6 +83,21 @@ export const SearchFiltersFragment = ({ setOnFilters, page, pageCount }) => {
             setOnFilters(null);
         }
     }, [filterParams])
+
+    const specializations = [
+        'Cardiologist',
+        'Dermatologist',
+        'General Practitioner',
+        'Gynecologist',
+        'Internist',
+        'Neurologist',
+        'Obstetrician',
+        'Ophthalmologist',
+        'Otolaryngologist',
+        'Pediatrician',
+        'Psychiatrist',
+        'Urologist',
+    ]
 
     const specializationMap = (spec) => {
         switch (spec) {
@@ -89,14 +118,14 @@ export const SearchFiltersFragment = ({ setOnFilters, page, pageCount }) => {
     }
 
     const handleSearchButton = () => {
-        let filters = {};
-        if (usernameSearchValue !== "")
+        let filters = null;
+        if (usernameSearchValue)
             filters = {...filters, q: usernameSearchValue};
-        if (genderSearchValue !== "")
+        if (genderSearchValue)
             filters = {...filters, gender: genderSearchValue};
-        if (citySearchValue !== "")
+        if (citySearchValue)
             filters = {...filters, city: citySearchValue};
-        if (specialtySearchValue !== "")
+        if (specialtySearchValue)
             filters = {...filters, specialization: specializationMap(specialtySearchValue)};
         setFilterParams(filters)
     }
@@ -109,99 +138,106 @@ export const SearchFiltersFragment = ({ setOnFilters, page, pageCount }) => {
         setFilterParams(null);
     }
 
-    return (
-        <>
-        <Container maxWidth="lg" className={classes.container}>
-            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderRadius: "50px" }}>
-                <Grid container>
-                    <Grid item xs={12}>
-                    <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
-                        <Box display="flex" marginLeft="1.5em" alignItems="center">
-                            <SearchIcon color="primary"/>
-                            <Typography component="h2" variant="h6" color="primary">
-                                Advanced Search
-                            </Typography>
-                        </Box>
-                        <Box display="flex" alignItems="center" marginRight="1.5em">
-                            <IconButton onClick={() => setOnExpand(!onExpand)}>
-                                {!onExpand && <KeyboardArrowDownIcon color="primary"/>}
-                                {onExpand && <KeyboardArrowUpIcon color="primary"/>}
-                            </IconButton>
-                        </Box>
-                    </Box>
-                    </Grid>
-                    <Grid item xs={12}>
-                    <Collapse in={onExpand} timeout="auto" unmountOnExit>
-                    <Container>
-                        <Grid container>
-                        <Grid container item xs={12}>
-                            <Grid item xs={6} md={2}>
-                                <FormControl variant={"outlined"} className={classes.formControl}>
-                                    <FormLabel variant="standard" id="username-search-input-label">Username</FormLabel>
-                                    <OutlinedInput id="username-search-input" value={usernameSearchValue} onChange={(event) => setUsernameSearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6} md={2}>
-                                <FormControl variant={"outlined"} className={classes.formControl}>
-                                    <FormLabel variant="standard" id="specialty-search-input-label">Specialty</FormLabel>
-                                    <OutlinedInput id="specialty-search-input" value={specialtySearchValue} onChange={(event) => setSpecialtySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6} md={2}>
-                                <FormControl variant={"outlined"} className={classes.formControl}>
-                                    <FormLabel variant="standard" id="city-search-input-label">City</FormLabel>
-                                    <OutlinedInput id="city-search-input" value={citySearchValue} onChange={(event) => setCitySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
-                                </FormControl>
-                            </Grid>    
-                            <Grid item xs={6} md={2}>
-                                <FormControl variant={"outlined"} className={classes.formControl}>
-                                    <FormLabel variant="standard" id="gender-search-select-label">Gender</FormLabel>
-                                    <Select
-                                        labelId="gender-search-select-label"
-                                        id="gender-search-select"
-                                        value={genderSearchValue}
-                                        onChange={(event) => setGenderSearchValue(event.target.value)}
-                                        className={classes.inputEmpty}
-                                        native
-                                        >
-                                        <option value="">{""}</option>
-                                        <option value="M">Male</option>
-                                        <option value="F">Female</option>
-                                    </Select>
-                                </FormControl>
-                            </Grid>   
-                            <Grid item xs={6} md={2}>
-                                {filterParams !== null && <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="center" paddingTop="2em" paddingBottom="1em">
-                                    <Pagination
-                                        page={page}
-                                        pageCount={pageCount}
-                                        onBackwardFirstPage={() => setFilterParams({...filterParams, page: 1})}
-                                        onBackwardPage={() => setFilterParams({...filterParams, page: page - 1})}
-                                        onForwardLastPage={() => setFilterParams({...filterParams, page: pageCount})}
-                                        onForwardPage={() => setFilterParams({...filterParams, page: page + 1})}/>                                    
-                                </Box>}
-                            </Grid>
-                            <Grid item xs={6} md={2}>
-                                <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="space-evenly" paddingTop="2em" paddingBottom="1em">
-                                <Button className={classes.submitButton} variant="text" onClick={handleSearchButton}>
-                                    Search    
-                                </Button>
-                                {/* </Box>
-                                <Box>   */}
-                                <Button className={classes.resetButton} variant="contained" onClick={handleResetButton} color="primary" disableElevation>
-                                    Reset    
-                                </Button>
-                                </Box>   
-                            </Grid>
-                        </Grid>
-                        </Grid>
-                    </Container>
-                    </Collapse>
-                    </Grid>
+    const handleClosePopper = () => {
+        handleResetButton();
+        setOpen(false);
+    }
 
-                </Grid>
-            </div>
-        </Container>
-        </>
+    return (
+        // <Box style={{display: "flex", justifyContent: "center", alignItems: "center", alignSelf: "center", zIndex: 12, position: "absolute", ...anchor}}>
+        <Popper style={{zIndex: 12}} open={onExpand} role={undefined} anchorEl={anchorEl !== null ? anchorEl.current : null} transition disablePortal>
+        {({ TransitionProps, placement }) => (
+        <Grow
+        {...TransitionProps}
+        style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+        >
+            <Container style={{paddingTop: 0}} maxWidth="md" className={classes.container}>
+                <Paper className={classes.paper} elevation={3} style={{ backgroundColor: 'rgba(224, 224, 224, 0.4)', borderRadius: "0 0 50px 50px" }}>
+                    <Grid container>
+                        <Grid item xs={12}>
+                        {/* <Collapse in={false} timeout="auto" unmountOnExit> */}
+                        <Container>
+                            <Grid container>
+                            <Grid container item xs={12}>
+                                <Grid item xs={6} md={2}>
+                                    <FormControl variant={"outlined"} className={classes.formControl}>
+                                        <FormLabel variant="standard" id="username-search-input-label">Username</FormLabel>
+                                        <OutlinedInput id="username-search-input" value={usernameSearchValue} onChange={(event) => setUsernameSearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6} md={2}>
+                                    <FormControl variant={"outlined"} className={classes.formControl}>
+                                        <FormLabel variant="standard" id="specialty-search-input-label">Specialty</FormLabel>
+                                        <Select
+                                            labelId="specialty-search-select-label"
+                                            id="specialty-search-select"
+                                            value={specialtySearchValue}
+                                            onChange={(event) => setSpecialtySearchValue(event.target.value)}
+                                            className={classes.inputEmpty}
+                                            native
+                                            >
+                                            <option value="">{""}</option>
+                                            {specializations.map((spec) => {
+                                                return (
+                                                    <option value={spec}>{spec}</option>
+                                                )
+                                            })}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6} md={2}>
+                                    <FormControl variant={"outlined"} className={classes.formControl}>
+                                        <FormLabel variant="standard" id="city-search-input-label">City</FormLabel>
+                                        <OutlinedInput id="city-search-input" value={citySearchValue} onChange={(event) => setCitySearchValue(event.target.value)} variant={"standard"} className={classes.inputEmpty}/>
+                                    </FormControl>
+                                </Grid>    
+                                <Grid item xs={6} md={2}>
+                                    <FormControl variant={"outlined"} className={classes.formControl}>
+                                        <FormLabel variant="standard" id="gender-search-select-label">Gender</FormLabel>
+                                        <Select
+                                            labelId="gender-search-select-label"
+                                            id="gender-search-select"
+                                            value={genderSearchValue}
+                                            onChange={(event) => setGenderSearchValue(event.target.value)}
+                                            className={classes.inputEmpty}
+                                            native
+                                            >
+                                            <option value="">{""}</option>
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>   
+                                <Grid item xs={6} md={3}>
+                                    <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="flex-end" paddingTop="3em" paddingBottom="1em">
+                                    <Button className={classes.submitButton} variant="text" onClick={handleSearchButton}>
+                                        Search    
+                                    </Button>
+                                    {/* </Box>
+                                    <Box>   */}
+                                    <Button className={classes.resetButton} variant="contained" onClick={handleResetButton} color="primary" disableElevation>
+                                        Reset    
+                                    </Button>
+                                    </Box>   
+                                </Grid>
+                                <Grid item xs={6} md={1}>
+                                    <Box display="flex" minHeight="100%" maxHeight="100%" justifyContent="center" paddingTop="2.5em" paddingBottom="0.5em">
+                                        <IconButton onClick={handleClosePopper}>
+                                            <CloseIcon style={{ color: "#611a15" }} />
+                                        </IconButton>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                            </Grid>
+                        </Container>
+                        {/* </Collapse> */}
+                        </Grid>
+
+                    </Grid>
+                </Paper>
+            </Container>
+        </Grow>)}
+        </Popper>
+        // </Box>
     );
 }

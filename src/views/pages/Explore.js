@@ -45,6 +45,7 @@ import { MenuList } from '@material-ui/core';
 import Popper from '@material-ui/core/Popper';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
+import { Pagination } from "../../core/modules/pagination";
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -251,6 +252,11 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    advancedSearchButton: {
+        "&:hover": {
+            backgroundColor: "#10217d",
+        },
+    },
     gridList: {
         flexWrap: 'nowrap',
         transform: 'translateZ(0)',
@@ -261,11 +267,14 @@ function Explore({ signOut }) {
     const [showLimitedMenu, setShowLimitedMenu] = useState(false);
     const [limitedSearchInput, setLimitedSearchInput] = useState("");
     const [limitedSearchResults, setLimitedSearchResults] = useState(null);
+
     const anchorRef = useRef(null);
+    const filterAnchorRef = useRef(null);
 
     const [allSearchParams, setAllSearchParams] = useState(null);
     const [searchPage, setSearchPage] = useState(1);
     const [searchPageCount, setSearchPageCount] = useState(1);
+    const [openFilters, setOpenFilters] = useState(false);
 
     const [title, setTitle] = useState("Top Doctors");
 
@@ -413,7 +422,7 @@ function Explore({ signOut }) {
     return (
         <div className={classes.root}>
             <CssBaseline />
-            <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+            <AppBar ref={filterAnchorRef} position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
                 <Toolbar className={classes.toolbar}>
                     <IconButton
                         edge="start"
@@ -456,7 +465,7 @@ function Explore({ signOut }) {
                                             <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0 }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
                                             <Card 
                                                 className={classes.limitedCard} 
-                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: index === 0 ? '10px 10px 0 0' : (index === limitedSearchResults.length - 1 ? '0 0 10px 10px' : '0'), height: '100%',width: "auto", maxWidth: '320px' }}>
+                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%',width: "auto", maxWidth: '320px' }}>
                                                 <Grid style={{ display: 'flex', flexDirection: 'row' }}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
@@ -477,11 +486,21 @@ function Explore({ signOut }) {
                                         </MenuItem>
                                         ))}
                                         {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "10px"}}>
-                                        <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: '320px' }}>
+                                        <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
                                             <Typography style={{color: "#611a15"}}>
                                                 Record Not found
                                             </Typography>
                                         </Card>
+                                        </Box>}
+                                        {limitedSearchInput !== "" && limitedSearchResults &&
+                                        <Box style={{backgroundColor: "#3f51b5", height: '100%', width: "auto"}}>
+                                        <Button
+                                            onClick={() => {setOpenFilters(true); setShowLimitedMenu(false);}}
+                                            style={{textTransform: "none", backgroundColor: "#3f51b5", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
+                                            <Typography style={{color: "#FFFFFF"}}>
+                                                Advanced Search
+                                            </Typography>
+                                        </Button>
                                         </Box>}
                                     </MenuList>
                                     </ClickAwayListener>
@@ -539,15 +558,28 @@ function Explore({ signOut }) {
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                <SearchFiltersFragment setOnFilters={(value) => {setAllSearchParams(value);}} page={searchPage} pageCount={searchPageCount}/>
+                <SearchFiltersFragment anchorEl={filterAnchorRef} setOnFilters={(value) => {setAllSearchParams(value);}} open={openFilters} setOpen={(value) => setOpenFilters(value)}/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container>
                         <Grid item xs={12}>
                             <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px' }}>
                                 <React.Fragment>
-                                    <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
-                                        {title}
-                                    </Typography>
+                                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                                        <Box flex={1}>
+                                        <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
+                                            {title}
+                                        </Typography>
+                                        </Box>
+                                        <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end" paddingRight="4em">
+                                        {title === "Search Results" && <Pagination
+                                            page={searchPage}
+                                            pageCount={searchPageCount}
+                                            onBackwardFirstPage={() => setAllSearchParams({...allSearchParams, searchPage: 1})}
+                                            onBackwardPage={() => setAllSearchParams({...allSearchParams, searchPage: searchPage - 1})}
+                                            onForwardLastPage={() => setAllSearchParams({...allSearchParams, searchPage: searchPageCount})}
+                                            onForwardPage={() => setAllSearchParams({...allSearchParams, searchPage: searchPage + 1})}/>}   
+                                        </Box>                                 
+                                    </Box>
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card, index) => (
