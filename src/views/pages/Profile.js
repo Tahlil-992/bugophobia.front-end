@@ -214,7 +214,11 @@ const useStyles = makeStyles((theme) => ({
     text: {
         fontSize: 15,
         color: "#000",
-
+        fontWeight: 500,
+    },
+    poptext: {
+        fontSize: 13,
+        fontWeight: 700,
     },
     applyButton: {
         textTransform: "none",
@@ -492,6 +496,10 @@ export default function Profile() {
         setIsProfileImageSet(false);
     }
 
+    const onFileReset = (event) => {
+        event.target.value = null;
+    }
+
     const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
     const [ChangeVisitTimeDuration, setChangeVisitTimeDuration] = useState(false);
 
@@ -553,18 +561,18 @@ export default function Profile() {
                                             
                                             <label htmlFor="myInput">
                                                 <MenuItem onClick={(event) => {popoverClose();}} >
-                                                    <Typography className={classes.text}>Upload a photo...</Typography>
+                                                    <Typography className={classes.poptext}>Upload a photo...</Typography>
                                                 </MenuItem>
                                             </label>
                                             {isProfileImageSet ?
                                                 <MenuItem onClick={(event) => {onDeleteFile(); popoverClose();}} >
-                                                    <Typography className={classes.text}>Remove photo</Typography>
+                                                    <Typography className={classes.poptext}>Remove photo</Typography>
                                                 </MenuItem>
                                                 :
                                                 <></>
                                             } 
                                         </Popover>
-                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} style={{ marginBottom: "1em", display: 'none' }} />
+                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} onClick={onFileReset} style={{ marginBottom: "1em", display: 'none' }} />
                                     </Grid>
                                 </Grid>
                                 {isDoctor &&
@@ -638,8 +646,20 @@ export default function Profile() {
                                         (
                                             <Box>
                                                 <hr />
-                                                <Typography className={classes.subtext} >{"Name:"}</Typography>
-                                                <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                {firstName || lastName ?
+                                                    <div>
+                                                        <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                                        <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                        <hr />
+                                                    </div>
+                                                    :
+                                                    <></>
+                                                }
+                                                <Typography className={classes.subtext} >{"Username:"}</Typography>
+                                                <Typography className={classes.text}  >{username}</Typography>
+                                                <hr />
+                                                <Typography className={classes.subtext} >{"Email Address:"}</Typography>
+                                                <Typography className={classes.text} >{email}</Typography>
                                                 <hr />
                                             </Box>
                                         )}

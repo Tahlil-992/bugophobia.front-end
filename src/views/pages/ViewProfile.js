@@ -184,7 +184,7 @@ const useStyles = makeStyles((theme) => ({
         //marginLeft: "10%",
     },
     onetab: {
-        backgroundColor: 'rgba(138, 182, 214, 0.57)',
+        //backgroundColor: 'rgba(138, 182, 214, 0.57)',
         //border: "1px solid #C5CAEA",
         color: "#111",
         borderTopRightRadius: "10px",
@@ -193,10 +193,13 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 9,
         iconSize: 30,
         minWidth: 0,
+        transition: 'background-color 0.15s linear',
         '&:hover': {
-            backgroundColor: 'rgba(138, 182, 214, 0.77)',
-            fontSize: 10,
+            backgroundColor: 'rgba(138, 182, 214, 0.5)',
+            transition: 'background-color 0s',
+            fontSize: 9,
             color: "#000",
+            fontWeight: 900,
         }
     },
     seltab: {
@@ -223,6 +226,7 @@ const useStyles = makeStyles((theme) => ({
     textfield: {
         width: "70%",
         marginLeft: "15%",
+        minWidth: '14em',
         backgroundColor: "#f0f0f0",
         color: "#111",
         '&:hover': {
@@ -291,6 +295,7 @@ const useStyles = makeStyles((theme) => ({
     text: {
         fontSize: 15,
         color: "#000",
+        fontWeight: 500,
     },
     container: {
         padding: theme.spacing(4),
@@ -613,7 +618,7 @@ export default function Profile() {
                                     <Grid item xs>
                                         <Avatar className={classes.large} src={profileImage}></Avatar>
                                     </Grid>
-                                    {isViewedDoctor ?
+                                    {isViewedDoctor && !isDoctor ?
                                         <Grid item xs>
                                             {isSaved ?
                                                 <Chip
@@ -768,8 +773,20 @@ export default function Profile() {
                                         (
                                             <Box>
                                                 <hr />
-                                                <Typography className={classes.subtext} >{"Name:"}</Typography>
-                                                <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                {firstName || lastName ?
+                                                    <div>
+                                                        <Typography className={classes.subtext} >{"Name:"}</Typography>
+                                                        <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
+                                                        <hr />
+                                                    </div>
+                                                    :
+                                                    <></>
+                                                }
+                                                <Typography className={classes.subtext} >{"Username:"}</Typography>
+                                                <Typography className={classes.text}  >{username}</Typography>
+                                                <hr />
+                                                <Typography className={classes.subtext} >{"Email Address:"}</Typography>
+                                                <Typography className={classes.text} >{email}</Typography>
                                                 <hr />
                                             </Box>
 
