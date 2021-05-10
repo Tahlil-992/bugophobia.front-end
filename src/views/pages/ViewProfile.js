@@ -225,19 +225,18 @@ const useStyles = makeStyles((theme) => ({
     },
     textfield: {
         width: "70%",
-        marginLeft: "15%",
         minWidth: '14em',
-        backgroundColor: "#f0f0f0",
-        color: "#111",
+        marginLeft: "15%",
+        //backgroundColor: "#f0f0f0",
+        transition: 'margin 0.15s linear',
+        //transition: 'width 0.075s linear',
         '&:hover': {
             backgroundColor: "#f3f3f3",
-            color: "#1ee",
             width: "74%",
             marginLeft: "13%",
+            transition: 'margin 0s',
+            //transition: 'width 0s',
         },
-        '&$disabled': {
-            backgroundColor: "#f00000",
-        }
     },
     dis: {
         '&:hover': {
