@@ -47,7 +47,7 @@ const callLoginAPI = async ({ email, password }, isRemembered) => {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: '100vh',
+        height: '100%',
     },
     image: {
         backgroundImage: 'url(../../assets/images/OnlineDoctor.jpg);',
@@ -69,10 +69,10 @@ const useStyles = makeStyles((theme) => ({
     Btn: {
         backgroundColor: '#40bad5',
         textAlign: 'center',
-        fontSize: '16px',
+        fontSize: '1.05em',
         borderRadius: '10px',
         textTransform: 'none',
-        height: '45px',
+        height: '2.5em',
         '&:hover': {
             backgroundColor: '#5f939a',
         },
@@ -181,16 +181,16 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
     return (
         <React.Fragment >
             <AppBar position="relative">
-                <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
+                <Toolbar style={{ backgroundColor: '#10217d', height: '5%' }}>
                     <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
                     <Typography variant="h6" color="inherit" noWrap>Login Page</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid container component="main" className={classes.root} style={{ paddingTop: '50px', paddingBottom: '50px', paddingRight: '350px', paddingLeft: '350px', height: '690px', backgroundColor: '#8ab6d6' }}>
+            <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
                 <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
                 <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
                     <div className={classes.paper}>
-                        <Grid container spacing={2} style={{ padding: '10px' }}>
+                        <Grid container spacing={2} style={{ padding: '0.7em' }}>
                             <Grid item xs={12}>
                                 <TextField
                                     error={isEmailEmpty}
@@ -243,7 +243,7 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                             </Grid>
                         </Grid>
                         <Box display="flex" justifyContent="space-between">
-                            <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{width:'315px', marginBottom: '20px'}}>Log in</Button>
+                            <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{width:'19em', marginBottom: '1.25em'}}>Log in</Button>
                         </Box>
                         <Grid>
                             {isLoading && <LoadingSpinner />}
