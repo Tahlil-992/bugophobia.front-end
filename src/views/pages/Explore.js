@@ -24,7 +24,6 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
@@ -37,11 +36,10 @@ import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStor
 import { signOut } from '../../core/Authentication/action/authActions';
 import { Link } from "react-router-dom";
 import { SearchFiltersFragment } from "./searchFilterComponents/SearchFilters";
-import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Box from "@material-ui/core/Box";
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import { MenuList } from '@material-ui/core';
+import MenuList from '@material-ui/core/MenuList';
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Popper from '@material-ui/core/Popper';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
@@ -492,8 +490,7 @@ function Explore({ signOut }) {
                                             </Typography>
                                         </Card>
                                         </Box>}
-                                        {limitedSearchInput !== "" && limitedSearchResults &&
-                                        <Box style={{backgroundColor: "#3f51b5", height: '100%', width: "auto"}}>
+                                        {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{backgroundColor: "#3f51b5", height: '100%', width: "auto", justifyContent: "center"}}>
                                         <Button
                                             onClick={() => {setOpenFilters(true); setShowLimitedMenu(false);}}
                                             style={{textTransform: "none", backgroundColor: "#3f51b5", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
