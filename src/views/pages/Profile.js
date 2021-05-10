@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, Chip, Container, Link, makeStyles, Menu, MenuItem, MenuList, Popover, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Button, Chip, Container, IconButton, Link, makeStyles, MenuItem, Popover, Snackbar, Toolbar, } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -17,17 +17,11 @@ import WorkIcon from '@material-ui/icons/Work';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import VpnKeyIcon from '@material-ui/icons/VpnKey';
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import SecurityIcon from '@material-ui/icons/Security';
-import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import CreateIcon from '@material-ui/icons/Create';
-import CancelIcon from '@material-ui/icons/Cancel';
-import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import CloseIcon from '@material-ui/icons/Close';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
@@ -37,7 +31,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StarRating from "./RatingComponent/rating";
 import Paper from '@material-ui/core/Paper';
-import { HorizontalSplit } from '@material-ui/icons';
 import Rating from '@material-ui/lab/Rating';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
@@ -93,6 +86,17 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
     }
 }
 
+const callEditProfileAPI = async (mainUsername, data, is_doctor, isRemembered) => {
+    try {
+        const urlAddress = is_doctor ? "doctor" : "patient";
+        const response = callAPIHandler({ method: "PUT", url: `/profile/${urlAddress}/update/${mainUsername}/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
@@ -116,13 +120,6 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(1),
         marginLeft: theme.spacing(1),
         marginBottom: theme.spacing(0.5),
-        //marginRight: theme.spacing(4),
-        //marginLeft: 'em',
-        /* "&:hover": {
-          width: theme.spacing(18),
-          height: theme.spacing(18),
-          margin: theme.spacing(1),
-        } */
     },
     tab2: {
         //width: "100vmin",
@@ -186,11 +183,26 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
+    textfield: {
+        width: "70%",
+        minWidth: '14em',
+        marginLeft: "15%",
+        //backgroundColor: "#f0f0f0",
+        transition: 'margin 0.15s linear',
+        //transition: 'width 0.075s linear',
+        '&:hover': {
+            backgroundColor: "#f3f3f3",
+            width: "74%",
+            marginLeft: "13%",
+            transition: 'margin 0s',
+            //transition: 'width 0s',
+        },
+    },
     dis: {
         '&:hover': {
-            color: "#31c",
+            color: "#000",
         },
-        '&$focused': {
+        '&:focused': {
             backgroundColor: "#f0f0f0",
             color: "#1ee",
         },
@@ -234,38 +246,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const StyledTextField = withStyles((theme) => ({
-    root: {
-        width: "70%",
-        minWidth: '14em',
-        marginLeft: "15%",
-        backgroundColor: "#f0f0f0",
-        color: "#111",
-        '&:hover': {
-            backgroundColor: "#f3f3f3",
-            color: "#1ee",
-            width: "74%",
-            marginLeft: "13%",
-        },
-        '&$focused': {
-            backgroundColor: "#e9e9e9",
-        },
-        '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-                //borderColor: '#E5E5E5',
-                //background: "linear-gradient(45deg, green 30%, orange 90%)",
-            },
-            '&:hover fieldset': {
-                borderColor: '#5070F0',
-            },
-            '&.Mui-focused fieldset': {
-                //backgroundColor: "#f3f3f3",
-                color: "#1ee",
-                textEmphasisColor: '#1ee',
-            },
-        },
-    },
-}))(TextField);
+const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
+
+const SUCCESS_COLOR = "#1e4620";
+const SUCCESS_BACKGROUND = "#c2fcc2";
+const ERROR_COLOR = "#611a15";
+const ERROR_BACKGROUND = "#f9a099";
+
+const fileTypes = '.png, .jpg, .jpeg, .gif, .ico, .svg';
+const fileTypesList = ['png','jpg', 'jpeg', 'gif', 'ico', 'svg'];
 
 export default function Profile() {
 
@@ -398,6 +388,30 @@ export default function Profile() {
     const [experience, setExperience] = useState("");
     const [insurance, setInsurance] = useState("");
 
+    const [mainUsername, setMainUsername] = useState("");
+
+    const [isEmailValid, setIsEmailValid] = useState(true);
+    const [isUsernameValid, setIsUsernameValid] = useState(true);
+
+    const [emailhelper, setemailhelper] = useState("");
+    const [userhelper, setuserhelper] = useState("");
+
+    const checkEmail = (email) => {
+        const res = emailRegex.test(email)
+        setIsEmailValid(res);
+        if (!res) {
+            setemailhelper("Email is invalid")
+        }
+    }
+    
+    const checkUsername = (username) => {
+        const res = userNameRegex.test(username);
+        setIsUsernameValid(res);
+        if (!res) {
+            setuserhelper("Username is invalid")
+        }
+    }
+
     useEffect(() => {
         callGetDetailRatingAPI();
     }, [doctorid])
@@ -412,6 +426,7 @@ export default function Profile() {
                 setLastName(nullCheck(payload.user.last_name));
                 setEmail(nullCheck(payload.user.email));
                 setUsername(nullCheck(payload.user.username));
+                setMainUsername(nullCheck(payload.user.username));
                 setGender((payload.user.gender));
                 setAge(nullCheck(payload.user.age));
                 setPhoneNumber(nullCheck(payload.user.phone_number));
@@ -438,6 +453,72 @@ export default function Profile() {
         setSent(true);
     }
 
+    const callEditAPI = async () => {
+        if (isEmailValid && isUsernameValid) {
+            try {
+                const data = isDoctor ?
+                {
+                    email: email,
+                    username: username,
+                    phone_number: phoneNumber,
+                    city: city
+                }
+                :    
+                {
+                    email: email,
+                    username: username,
+                    first_name: firstName,
+                    last_name: lastName,
+                    gender: gender,
+                    age: age ? age : 0,
+                    phone_number: phoneNumber,
+                    city: city
+                }
+                const response = await callEditProfileAPI(mainUsername, data, isDoctor, isRemembered);
+                if (response.status === 200) {
+                    setMessage("Your profile updated successfully!");
+                    setSnackColor([SUCCESS_BACKGROUND, SUCCESS_COLOR]);
+                    setOpenSnackBar(true);
+                    setDetailChange(false);
+                    setemailhelper("");
+                    setuserhelper("");
+
+                    let payload = response.payload;
+                    setMainUsername(nullCheck(payload.username));
+                }
+            }
+            catch (error) {
+                if (error.status === 400) {
+                    if (error.payload.username) {
+                        setMessage("User with such username already exist; Please choose another username.");
+                        setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                        setUsernameError(true);
+                        setOpenSnackBar(true);
+                    }
+                    else if (error.payload.email) {
+                        setMessage("User with such email address already exist; Please enter another email.");
+                        setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                        setEmailError(true);
+                        setOpenSnackBar(true);
+                    }
+                }
+                console.log(error);
+            }
+        }
+        else {
+            if (!isEmailValid) {
+                setMessage("Invalid Pattern for email address!");
+                setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                setOpenSnackBar(true);
+            }
+            else if (!isUsernameValid) {
+                setMessage("Invalid Pattern for username");
+                setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                setOpenSnackBar(true);
+            }
+        }
+    }
+
     const [disabled, setDisabled] = useState(-1);
 
     const [editProfile, setEditProfile] = useState(false);
@@ -446,31 +527,50 @@ export default function Profile() {
     const [rateAvg, setRateAvg] = useState(0);
     const [rateCount, setRateCount] = useState(0);
 
+    const [emailError, setEmailError] = useState(false);
+    const [usernameError, setUsernameError] = useState(false);
+
+    const [detailChange, setDetailChange] = useState(false);
+
+    const IDLE = () => {
+        // (o_o) \\
+    }
+
+    const emailErrorTrue = () => {
+        setEmailError(false);
+        setIsEmailValid(true);
+    }
+
+    const usernameErrorTrue = () => {
+        setUsernameError(false);
+        setIsUsernameValid(true);
+    }
+
     const fields = isDoctor ?
-                    [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false, [], true],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], true],
-                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false],
-                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false],
-                    ['Gender', gender, setGender, <WcIcon/>, false, [], true],
-                    ['Age', age, setAge, <AlarmIcon/>, false, [], false],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false],
-                    ['City', city, setCity, <ApartmentIcon/>, false, [], false],
-                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>, false, [], true],
-                    ['Filed of Specialization', specializationMap(specialization), setSpecialization, <WorkIcon/>, false, [], true],
-                    ['Work Experiece', experience, setExperience, <BuildIcon/>, false, [], true]
+                    [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false, [], true, false, IDLE, IDLE, ''],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], true, false, IDLE, IDLE, ''],
+                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false, (emailError || !isEmailValid), emailErrorTrue, checkEmail, emailhelper],
+                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false, (usernameError  || !isUsernameValid), usernameErrorTrue, checkUsername, userhelper],
+                    ['Gender', gender, setGender, <WcIcon/>, false, [], true, false, IDLE, IDLE, ''],
+                    ['Age', age, setAge, <AlarmIcon/>, false, [], true, false, IDLE, IDLE, ''],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false, false, IDLE, IDLE, ''],
+                    ['City', city, setCity, <ApartmentIcon/>, false, [], false, false, IDLE, IDLE, ''],
+                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>, false, [], true, false, IDLE, IDLE, ''],
+                    ['Filed of Specialization', specializationMap(specialization), setSpecialization, <WorkIcon/>, false, [], true, false, IDLE, IDLE, ''],
+                    ['Work Experiece', experience, setExperience, <BuildIcon/>, false, [], true, false, IDLE, IDLE, '']
                     ]
 
                 :
 
-                [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{color: "inherit"}} />, false, [], false],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], false],
-                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false],
-                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false],
-                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender, false],
-                    ['Age', age, setAge, <AlarmIcon/>, false, [], false],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false],
-                    ['City', city, setCity, <ApartmentIcon/>, false, [], false],
-                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>, true, list_insurance, false]
+                [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{color: "inherit"}} />, false, [], false, false, IDLE, IDLE, ''],
+                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], false, false, IDLE, IDLE, ''],
+                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false, (emailError || !isEmailValid), emailErrorTrue, checkEmail, emailhelper],
+                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false, (usernameError  || !isUsernameValid), usernameErrorTrue, checkUsername, userhelper],
+                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender, false, false, IDLE, IDLE, ''],
+                    ['Age', age, setAge, <AlarmIcon/>, false, [], false, false, IDLE, IDLE, ''],
+                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false, false, IDLE, IDLE, ''],
+                    ['City', city, setCity, <ApartmentIcon/>, false, [], false, false, IDLE, IDLE, ''],
+                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>, true, list_insurance, false, false, IDLE, IDLE, '']
                     ];
 
     const buttonHandler1 = () => {
@@ -481,9 +581,17 @@ export default function Profile() {
     const onFileChange = event => {
         try {
             if (event.target.files) {
-                setProfileImage(URL.createObjectURL(event.target.files[0]));
-                setIsProfileImageSet(true);
-                //event.target.files.set
+                const allowedExtensions = fileTypesList;
+                const { name:fileName, size:fileSize } = event.target.files[0];
+                const fileExtension = fileName.split(".").pop();
+                if (allowedExtensions.includes(fileExtension.toLowerCase())) {
+                    setProfileImage(URL.createObjectURL(event.target.files[0]));
+                    setIsProfileImageSet(true);
+                }
+                else {
+                    setProfileImage(isDoctor ? DoctorImage : PatientImage);
+                    setIsProfileImageSet(false);
+                }
             }
         }
         catch(e) {
@@ -515,6 +623,15 @@ export default function Profile() {
   
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
+
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [message, setMessage] = useState("");
+    const [snackColor, setSnackColor] = useState("");
+
+    const snackClose = () => {
+        setOpenSnackBar(false);
+        setMessage("");
+    }
 
     return (
         <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
@@ -572,7 +689,7 @@ export default function Profile() {
                                                 <></>
                                             } 
                                         </Popover>
-                                        <input id="myInput" type="file" accept="image/*" onChange={onFileChange} onClick={onFileReset} style={{ marginBottom: "1em", display: 'none' }} />
+                                        <input id="myInput" type="file" accept={fileTypes} onChange={onFileChange} onClick={onFileReset} style={{ marginBottom: "1em", display: 'none' }} />
                                     </Grid>
                                 </Grid>
                                 {isDoctor &&
@@ -712,18 +829,29 @@ export default function Profile() {
                                                         return (
                                                             <Grid item xs={12} key={index.toString()} >
                                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                                <StyledTextField
+                                                                <TextField
                                                                     key={index.toString()}
                                                                     onMouseEnter={() => setDisabled(index)}
                                                                     onMouseLeave={() => setDisabled(-1)}
                                                                     disabled={item[6] && (disabled === index)}
+                                                                    error={item[7]}
                                                                     variant="outlined"
                                                                     fullWidth
                                                                     className={classes.textfield}
                                                                     label={item[0]}
                                                                     value={item[1]}
                                                                     select={item[4]}
-                                                                    onChange={event => item[2](event.target.value)}
+                                                                    helperText={item[10]}
+                                                                    onChange={
+                                                                        event => {
+                                                                            item[2](event.target.value); 
+                                                                            item[8]();
+                                                                            item[9](event.target.value);
+                                                                            if (!detailChange) {
+                                                                                setDetailChange(true);
+                                                                            }
+                                                                        }
+                                                                    }
                                                                     InputProps={{
                                                                         startAdornment: (<InputAdornment position="start" >{item[3]}</InputAdornment>),
                                                                         classes: { root: classes.dis }
@@ -739,16 +867,32 @@ export default function Profile() {
                                                                         :
                                                                         (<></>)
                                                                     }
-                                                                </StyledTextField>
+                                                                </TextField>
                                                             </Grid>
                                                         )
                                                     })}
                                                 </Grid>
                                             </Box>
-                                        </Grid>
+                                        </Grid>                                                                             
                                         <Grid item>
-                                            <Button className={classes.button} >Update Your Profile</Button>
+                                            <Button className={classes.button} onClick={callEditAPI} disabled={!detailChange} >Update Your Profile</Button>
                                         </Grid>
+                                        <Snackbar
+                                            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                                            open={openSnackBar}
+                                            message={
+                                                <Box display="flex" alignItems="center">
+                                                    <ErrorOutlineIcon style={{ color: snackColor[1], marginRight: "0.5em" }} />
+                                                    <Typography style={{ color: snackColor[1] }}>{message}</Typography>
+                                                    <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                                                        <CloseIcon onClick={snackClose} style={{ color: snackColor[1] }} />
+                                                    </IconButton>
+                                                </Box>}
+                                            ContentProps={{ style: { backgroundColor: snackColor[0] } }}
+                                            autoHideDuration={6000}
+                                            onClose={snackClose}
+                                            resumeHideDuration={0}>
+                                        </Snackbar>
                                     </Grid>
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={1} width="100%">
@@ -761,7 +905,7 @@ export default function Profile() {
 
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField
+                                                <TextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
@@ -772,11 +916,11 @@ export default function Profile() {
                                                         classes: { root: classes.dis }
                                                     }}
                                                 >
-                                                </StyledTextField>
+                                                </TextField>
                                             </Grid>
                                             <Grid item xs={12} >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField
+                                                <TextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
@@ -787,11 +931,11 @@ export default function Profile() {
                                                         classes: { root: classes.dis }
                                                     }}
                                                 >
-                                                </StyledTextField>
+                                                </TextField>
                                             </Grid>
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField
+                                                <TextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
@@ -802,7 +946,7 @@ export default function Profile() {
                                                         classes: { root: classes.dis }
                                                     }}
                                                 >
-                                                </StyledTextField>
+                                                </TextField>
                                             </Grid>
                                             <Grid item>
                                                 <Button className={classes.button} style={{ marginTop: '1em' }} >Change Your Password</Button>
@@ -816,7 +960,7 @@ export default function Profile() {
                                         <Grid container spacing={3} alignItems="center" justify='center' >
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField
+                                                <TextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
@@ -827,11 +971,11 @@ export default function Profile() {
                                                         classes: { root: classes.dis }
                                                     }}
                                                 >
-                                                </StyledTextField>
+                                                </TextField>
                                             </Grid>
                                             <Grid item xs={12} >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField
+                                                <TextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
@@ -842,11 +986,11 @@ export default function Profile() {
                                                         classes: { root: classes.dis }
                                                     }}
                                                 >
-                                                </StyledTextField>
+                                                </TextField>
                                             </Grid>
                                             <Grid item xs={12}  >
                                                 {/*<Typography style={{paddingLeft: "1rem", paddingBottom: "0.5rem", marginLeft: "15%"}}>{" " + item[0]}</Typography>*/}
-                                                <StyledTextField
+                                                <TextField
                                                     variant="outlined"
                                                     fullWidth
                                                     className={classes.textfield}
@@ -857,7 +1001,7 @@ export default function Profile() {
                                                         classes: { root: classes.dis }
                                                     }}
                                                 >
-                                                </StyledTextField>
+                                                </TextField>
                                             </Grid>
                                             <Grid item >
                                                 <Button className={classes.button}  >Change Your Password</Button>
