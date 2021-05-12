@@ -393,12 +393,18 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                 />
               </Grid>
             </Grid>
+<<<<<<< HEAD
             {isdoctor &&
               <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
             }
             {!isdoctor &&
               <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
             }
+=======
+            <Box display="flex" justifyContent="space-between">
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
+            </Box>
+>>>>>>> 15f4fafa5d59f0bd4d34382443236972d78d3898
             <Grid>
               {isLoading && <LoadingSpinner />}
             </Grid>
