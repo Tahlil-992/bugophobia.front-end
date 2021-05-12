@@ -101,6 +101,8 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const [FirstName, setFirstName] = useState("");
+  const [LastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -164,7 +166,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const callAPI = async () => {
     try {
       const data = isdoctor
-        ? { user: { email: email, password: password, username: username, is_doctor: true }, gmc_number: Number(gmcNum) }
+        ? { user: { email: email, password: password, username: username, first_name: FirstName, last_name: LastName, is_doctor: true }, gmc_number: Number(gmcNum) }
         : { user: { email: email, password: password, username: username, is_doctor: false } }
       const response = await callSignUPAPI(data, isdoctor);
 
@@ -222,7 +224,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     if (ispasswordValid)
       setpasshelper("");
     else
-      setpasshelper("Password should be at least 8 characters including lowercase and uppercase letters and numbers. Symbols are optional.");
+      setpasshelper("Password should be at least 8 characters including lowercase and uppercase letters and numbers.");
   }, [ispasswordValid]);
 
   useEffect(() => {
@@ -255,7 +257,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
           {!isdoctor && <Typography variant="h6" color="inherit" noWrap>Patient SignUp Page</Typography>}
         </Toolbar>
       </AppBar>
-      <Grid container component="main" className={classes.root} style={{ paddingTop: '2%', paddingBottom: '2%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
+      <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
         <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
         <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
           <div className={classes.paper}>
@@ -270,19 +272,19 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                       id="FirstName"
                       label="First Name"
                       name="FirstName"
-                      value={gmcNum}
-                      onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
+                      value={FirstName}
+                      onChange={event => { setFirstName(event.target.value); }}
                       InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
                     />
-                    <TextField style={{ width: '50%', marginLeft: '1%' }}
+                    <TextField style={{ width: '50%', marginLeft: '1%' }} size="Normal"
                       variant="outlined"
                       required
                       fullWidth
                       id="LastName"
                       label="Last Name"
                       name="LastName"
-                      value={gmcNum}
-                      onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
+                      value={LastName}
+                      onChange={event => { setLastName(event.target.value); }}
                       InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
                     />
                   </Grid>
@@ -392,10 +394,10 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
               </Grid>
             </Grid>
             {isdoctor &&
-                <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
             }
             {!isdoctor &&
-                <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
             }
             <Grid>
               {isLoading && <LoadingSpinner />}

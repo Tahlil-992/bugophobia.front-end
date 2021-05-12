@@ -73,3 +73,7 @@
     border-radius: 10px;
     background-color: #10217d;
 }
+.MuiTextField-root input {
+    padding-top: 0.9em;
+    padding-bottom: 0.9em; 
+}
