@@ -34,11 +34,7 @@ import Paper from '@material-ui/core/Paper';
 import Rating from '@material-ui/lab/Rating';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
-import Select from '@material-ui/core/Select';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
-import MailIcon from '@material-ui/icons/Mail';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 
@@ -234,10 +230,25 @@ const useStyles = makeStyles((theme) => ({
     },
     applyButton: {
         textTransform: "none",
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
+        "&:hover": {
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
+        },
+    },
+    cancelButton: {
+        textTransform: "none",
         backgroundColor: "#bdc1c5",
         "&:hover": {
             backgroundColor: "#9099A1",
         },
+    },
+    underline: {
+        "&&&:before": {
+            borderBottom: "none"
+        },
+        "&&:after": {
+            borderBottom: "none"
+        }
     },
     chip2: {
         '&:hover': {
@@ -255,7 +266,7 @@ const ERROR_COLOR = "#611a15";
 const ERROR_BACKGROUND = "#f9a099";
 
 const fileTypes = '.png, .jpg, .jpeg, .gif, .ico, .svg';
-const fileTypesList = ['png','jpg', 'jpeg', 'gif', 'ico', 'svg'];
+const fileTypesList = ['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg'];
 
 export default function Profile() {
 
@@ -403,7 +414,7 @@ export default function Profile() {
             setemailhelper("Email is invalid")
         }
     }
-    
+
     const checkUsername = (username) => {
         const res = userNameRegex.test(username);
         setIsUsernameValid(res);
@@ -457,23 +468,23 @@ export default function Profile() {
         if (isEmailValid && isUsernameValid) {
             try {
                 const data = isDoctor ?
-                {
-                    email: email,
-                    username: username,
-                    phone_number: phoneNumber,
-                    city: city
-                }
-                :    
-                {
-                    email: email,
-                    username: username,
-                    first_name: firstName,
-                    last_name: lastName,
-                    gender: gender,
-                    age: age ? age : 0,
-                    phone_number: phoneNumber,
-                    city: city
-                }
+                    {
+                        email: email,
+                        username: username,
+                        phone_number: phoneNumber,
+                        city: city
+                    }
+                    :
+                    {
+                        email: email,
+                        username: username,
+                        first_name: firstName,
+                        last_name: lastName,
+                        gender: gender,
+                        age: age ? age : 0,
+                        phone_number: phoneNumber,
+                        city: city
+                    }
                 const response = await callEditProfileAPI(mainUsername, data, isDoctor, isRemembered);
                 if (response.status === 200) {
                     setMessage("Your profile updated successfully!");
@@ -547,31 +558,31 @@ export default function Profile() {
     }
 
     const fields = isDoctor ?
-                    [['First Name', firstName, setFirstName, <DoubleArrowIcon/>, false, [], true, false, IDLE, IDLE, ''],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], true, false, IDLE, IDLE, ''],
-                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false, (emailError || !isEmailValid), emailErrorTrue, checkEmail, emailhelper],
-                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false, (usernameError  || !isUsernameValid), usernameErrorTrue, checkUsername, userhelper],
-                    ['Gender', gender, setGender, <WcIcon/>, false, [], true, false, IDLE, IDLE, ''],
-                    ['Age', age, setAge, <AlarmIcon/>, false, [], true, false, IDLE, IDLE, ''],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false, false, IDLE, IDLE, ''],
-                    ['City', city, setCity, <ApartmentIcon/>, false, [], false, false, IDLE, IDLE, ''],
-                    ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon/>, false, [], true, false, IDLE, IDLE, ''],
-                    ['Filed of Specialization', specializationMap(specialization), setSpecialization, <WorkIcon/>, false, [], true, false, IDLE, IDLE, ''],
-                    ['Work Experiece', experience, setExperience, <BuildIcon/>, false, [], true, false, IDLE, IDLE, '']
-                    ]
+        [['First Name', firstName, setFirstName, <DoubleArrowIcon />, false, [], true, false, IDLE, IDLE, ''],
+        ['Last Name', lastName, setLastName, <DoubleArrowIcon />, false, [], true, false, IDLE, IDLE, ''],
+        ['Email Address', email, setEmail, <EmailIcon />, false, [], false, (emailError || !isEmailValid), emailErrorTrue, checkEmail, emailhelper],
+        ['Username', username, setUsername, <AccountCircleIcon />, false, [], false, (usernameError || !isUsernameValid), usernameErrorTrue, checkUsername, userhelper],
+        ['Gender', gender, setGender, <WcIcon />, false, [], true, false, IDLE, IDLE, ''],
+        ['Age', age, setAge, <AlarmIcon />, false, [], true, false, IDLE, IDLE, ''],
+        ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon />, false, [], false, false, IDLE, IDLE, ''],
+        ['City', city, setCity, <ApartmentIcon />, false, [], false, false, IDLE, IDLE, ''],
+        ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon />, false, [], true, false, IDLE, IDLE, ''],
+        ['Filed of Specialization', specializationMap(specialization), setSpecialization, <WorkIcon />, false, [], true, false, IDLE, IDLE, ''],
+        ['Work Experiece', experience, setExperience, <BuildIcon />, false, [], true, false, IDLE, IDLE, '']
+        ]
 
-                :
+        :
 
-                [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{color: "inherit"}} />, false, [], false, false, IDLE, IDLE, ''],
-                    ['Last Name', lastName, setLastName, <DoubleArrowIcon/>, false, [], false, false, IDLE, IDLE, ''],
-                    ['Email Address', email, setEmail, <EmailIcon/>, false, [], false, (emailError || !isEmailValid), emailErrorTrue, checkEmail, emailhelper],
-                    ['Username', username, setUsername, <AccountCircleIcon/>, false, [], false, (usernameError  || !isUsernameValid), usernameErrorTrue, checkUsername, userhelper],
-                    ['Gender', gender, setGender, <WcIcon/>, true, list_gender, false, false, IDLE, IDLE, ''],
-                    ['Age', age, setAge, <AlarmIcon/>, false, [], false, false, IDLE, IDLE, ''],
-                    ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon/>, false, [], false, false, IDLE, IDLE, ''],
-                    ['City', city, setCity, <ApartmentIcon/>, false, [], false, false, IDLE, IDLE, ''],
-                    ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon/>, true, list_insurance, false, false, IDLE, IDLE, '']
-                    ];
+        [['First Name', firstName, setFirstName, <DoubleArrowIcon style={{ color: "inherit" }} />, false, [], false, false, IDLE, IDLE, ''],
+        ['Last Name', lastName, setLastName, <DoubleArrowIcon />, false, [], false, false, IDLE, IDLE, ''],
+        ['Email Address', email, setEmail, <EmailIcon />, false, [], false, (emailError || !isEmailValid), emailErrorTrue, checkEmail, emailhelper],
+        ['Username', username, setUsername, <AccountCircleIcon />, false, [], false, (usernameError || !isUsernameValid), usernameErrorTrue, checkUsername, userhelper],
+        ['Gender', gender, setGender, <WcIcon />, true, list_gender, false, false, IDLE, IDLE, ''],
+        ['Age', age, setAge, <AlarmIcon />, false, [], false, false, IDLE, IDLE, ''],
+        ['Phone Number', phoneNumber, setPhoneNumber, <PhoneAndroidIcon />, false, [], false, false, IDLE, IDLE, ''],
+        ['City', city, setCity, <ApartmentIcon />, false, [], false, false, IDLE, IDLE, ''],
+        ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />, true, list_insurance, false, false, IDLE, IDLE, '']
+        ];
 
     const buttonHandler1 = () => {
         setButtonLable1(editProfile ? "Edit Profile" : "Save Changes");
@@ -582,7 +593,7 @@ export default function Profile() {
         try {
             if (event.target.files) {
                 const allowedExtensions = fileTypesList;
-                const { name:fileName, size:fileSize } = event.target.files[0];
+                const { name: fileName, size: fileSize } = event.target.files[0];
                 const fileExtension = fileName.split(".").pop();
                 if (allowedExtensions.includes(fileExtension.toLowerCase())) {
                     setProfileImage(URL.createObjectURL(event.target.files[0]));
@@ -594,7 +605,7 @@ export default function Profile() {
                 }
             }
         }
-        catch(e) {
+        catch (e) {
             console.log(e)
         }
     }
@@ -614,13 +625,13 @@ export default function Profile() {
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const popoverClick = (event) => {
-      setAnchorEl(event.currentTarget);
+        setAnchorEl(event.currentTarget);
     };
-  
+
     const popoverClose = () => {
-      setAnchorEl(null);
+        setAnchorEl(null);
     };
-  
+
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
@@ -648,19 +659,19 @@ export default function Profile() {
                             <Grid item container justify='center' direction="row" style={{ backgroundColor: "#E0E0E0", marginTop: "2em", borderRadius: "10px", paddingRight: "0.5rem" }}>
                                 <Grid item container xs justify='center' alignItems='center' direction='column' style={{ marginBottom: '1em' }}>
                                     <Grid item xs>
-                                        <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage}  />
+                                        <Avatar alt={(isDoctor ? DoctorImage : PatientImage)} className={classes.large} src={profileImage} />
                                     </Grid>
                                     <Grid item xs>
-                                        <Chip 
-                                            icon={<CreateIcon />} 
-                                            clickable 
-                                            size="small" 
-                                            color="secondary" 
-                                            label="Edit" 
+                                        <Chip
+                                            icon={<CreateIcon />}
+                                            clickable
+                                            size="small"
+                                            color="secondary"
+                                            label="Edit"
                                             variant="default"
                                             aria-describedby={id}
-                                            onClick={popoverClick} 
-                                            />
+                                            onClick={popoverClick}
+                                        />
                                         <Popover
                                             id={id}
                                             open={open}
@@ -675,43 +686,38 @@ export default function Profile() {
                                                 horizontal: 'left',
                                             }}
                                         >
-                                            
+
                                             <label htmlFor="myInput">
-                                                <MenuItem onClick={(event) => {popoverClose();}} >
+                                                <MenuItem onClick={(event) => { popoverClose(); }} >
                                                     <Typography className={classes.poptext}>Upload a photo...</Typography>
                                                 </MenuItem>
                                             </label>
                                             {isProfileImageSet ?
-                                                <MenuItem onClick={(event) => {onDeleteFile(); popoverClose();}} >
+                                                <MenuItem onClick={(event) => { onDeleteFile(); popoverClose(); }} >
                                                     <Typography className={classes.poptext}>Remove photo</Typography>
                                                 </MenuItem>
                                                 :
                                                 <></>
-                                            } 
+                                            }
                                         </Popover>
                                         <input id="myInput" type="file" accept={fileTypes} onChange={onFileChange} onClick={onFileReset} style={{ marginBottom: "1em", display: 'none' }} />
                                     </Grid>
                                 </Grid>
                                 {isDoctor &&
                                     <Grid item xs={9}>
-                                        <TextField value={"Visit Time: " + VisitTimeDuration} style={{ width: '73.3%' }}
+                                        <TextField value={"Visit Time: " + VisitTimeDuration + " minutes"} style={{ width: '73%', height: '1em' }} size="small"
                                             InputProps={{
+                                                className : classes.underline,
                                                 readOnly: true,
                                                 startAdornment: (
                                                     <InputAdornment position="start">
                                                         <AccessTimeIcon />
                                                     </InputAdornment>
                                                 ),
-                                                endAdornment: (
-                                                    <InputAdornment position="end" style={{ color: 'GrayText' }}>
-                                                        minutes<span>&nbsp;&nbsp;</span>
-                                                    </InputAdornment>
-                                                )
                                             }}
                                         />
-                                        <ButtonGroup style={{ width: '25%' }}>
+                                        <ButtonGroup style={{ width: '25%', height:'90%', paddingTop:'1%' }}>
                                             <Button
-                                                aria-label="reduce"
                                                 onClick={() => {
                                                     setVisitTimeDuration(Math.max(VisitTimeDuration - 5, 0));
                                                     setChangeVisitTimeDuration(true);
@@ -719,7 +725,6 @@ export default function Profile() {
                                                 <KeyboardArrowDownIcon fontSize="small" />
                                             </Button>
                                             <Button
-                                                aria-label="increase"
                                                 onClick={() => {
                                                     setVisitTimeDuration(VisitTimeDuration + 5);
                                                     setChangeVisitTimeDuration(true);
@@ -731,10 +736,15 @@ export default function Profile() {
                                 }
                                 {isDoctor &&
                                     <Grid item xs={9} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
-                                        <Button className={classes.applyButton} style={{ width: '100%' }}
+                                        <Button className={classes.applyButton} style={{ width: '49%', marginRight:'1%' }}
                                             disabled={!ChangeVisitTimeDuration}
                                             onClick={() => { setChangeVisitTimeDuration(false); }}>
                                             Apply Changes
+                                        </Button>
+                                        <Button className={classes.cancelButton} style={{ width: '49%', marginLeft:'1%' }}
+                                            disabled={!ChangeVisitTimeDuration}
+                                            onClick={() => { setChangeVisitTimeDuration(false); }}>
+                                            Cancel
                                         </Button>
                                     </Grid>
                                 }
@@ -844,7 +854,7 @@ export default function Profile() {
                                                                     helperText={item[10]}
                                                                     onChange={
                                                                         event => {
-                                                                            item[2](event.target.value); 
+                                                                            item[2](event.target.value);
                                                                             item[8]();
                                                                             item[9](event.target.value);
                                                                             if (!detailChange) {
@@ -873,7 +883,7 @@ export default function Profile() {
                                                     })}
                                                 </Grid>
                                             </Box>
-                                        </Grid>                                                                             
+                                        </Grid>
                                         <Grid item>
                                             <Button className={classes.button} onClick={callEditAPI} disabled={!detailChange} >Update Your Profile</Button>
                                         </Grid>

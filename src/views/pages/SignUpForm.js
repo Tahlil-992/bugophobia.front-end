@@ -35,6 +35,7 @@ import h4 from "../../assets/images/login-signup/h4.jpg";
 import h5 from "../../assets/images/login-signup/h5.jpg";
 import h6 from "../../assets/images/login-signup/h6.jpg";
 import h7 from "../../assets/images/login-signup/h7.jpg";
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 
 const callSignUPAPI = async (data, isdoctor) => {
   try {
@@ -75,10 +76,10 @@ const useStyles = makeStyles((theme) => ({
   Btn: {
     backgroundColor: '#40bad5',
     textAlign: 'center',
-    fontSize: '16px',
+    fontSize: '1.05em',
     borderRadius: '10px',
     textTransform: 'none',
-    height: '45px',
+    height: '2.5em',
     '&:hover': {
       backgroundColor: '#5f939a',
     },
@@ -100,6 +101,8 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const [FirstName, setFirstName] = useState("");
+  const [LastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -163,7 +166,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const callAPI = async () => {
     try {
       const data = isdoctor
-        ? { user: { email: email, password: password, username: username, is_doctor: true }, gmc_number: Number(gmcNum) }
+        ? { user: { email: email, password: password, username: username, first_name: FirstName, last_name: LastName, is_doctor: true }, gmc_number: Number(gmcNum) }
         : { user: { email: email, password: password, username: username, is_doctor: false } }
       const response = await callSignUPAPI(data, isdoctor);
 
@@ -221,7 +224,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     if (ispasswordValid)
       setpasshelper("");
     else
-      setpasshelper("Password should be at least 8 characters including lowercase and uppercase letters and numbers. Symbols are optional.");
+      setpasshelper("Password should be at least 8 characters including lowercase and uppercase letters and numbers.");
   }, [ispasswordValid]);
 
   useEffect(() => {
@@ -248,19 +251,47 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   return (
     <React.Fragment >
       <AppBar position="relative">
-        <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
+        <Toolbar style={{ backgroundColor: '#10217d', height: '5%' }}>
           <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
           {isdoctor && <Typography variant="h6" color="inherit" noWrap>Doctor SignUp Page</Typography>}
           {!isdoctor && <Typography variant="h6" color="inherit" noWrap>Patient SignUp Page</Typography>}
         </Toolbar>
       </AppBar>
-      <Grid container component="main" className={classes.root} style={{ paddingTop: '40px', paddingBottom: '40px', paddingRight: '350px', paddingLeft: '350px', height: '690px', backgroundColor: '#8ab6d6' }}>
+      <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
         <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
         <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
           <div className={classes.paper}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {isdoctor &&
+              {isdoctor &&
+                <Grid item xs={12}>
+                  <Grid style={{ display: 'flex', flexDirection: 'row' }}>
+                    <TextField style={{ width: '48%', marginRight: '1%' }}
+                      variant="outlined"
+                      required
+                      fullWidth
+                      id="FirstName"
+                      label="First Name"
+                      name="FirstName"
+                      value={FirstName}
+                      onChange={event => { setFirstName(event.target.value); }}
+                      InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
+                    />
+                    <TextField style={{ width: '49%', marginLeft: '1%' }} size="Normal"
+                      variant="outlined"
+                      required
+                      fullWidth
+                      id="LastName"
+                      label="Last Name"
+                      name="LastName"
+                      value={LastName}
+                      onChange={event => { setLastName(event.target.value); }}
+                      InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
+                    />
+                  </Grid>
+                </Grid>
+              }
+              {isdoctor &&
+                <Grid item xs={12}>
                   <TextField
                     error={!isgmcValid}
                     variant="outlined"
@@ -275,8 +306,8 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                       startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
                     }}
                   />
-                }
-              </Grid>
+                </Grid>
+              }
               <Grid item xs={12}>
                 <TextField
                   error={!isEmailValid}
@@ -362,9 +393,12 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                 />
               </Grid>
             </Grid>
-            <Box display="flex" justifyContent="space-between">
-              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '325px', marginBottom: '20px', marginTop: '20px' }}>Sign up</Button>
-            </Box>
+            {isdoctor &&
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
+            }
+            {!isdoctor &&
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
+            }
             <Grid>
               {isLoading && <LoadingSpinner />}
             </Grid>
@@ -404,10 +438,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
             </Box>
           </Paper>
         </Snackbar>
-        <Modal
-          open={openModal}
-          onClose={() => goToLogin()}
-        >
+        <Modal open={openModal} onClose={() => goToLogin()}>
           <div className={classes.paper} display="flex" color='#1e4620'>
             <CheckCircleIcon />
             <h2>SignUp was Successful!</h2>
@@ -415,7 +446,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
           </div>
         </Modal>
       </Grid>
-    </React.Fragment>
+    </React.Fragment >
   );
 }
 const mapStateToProps = (state) => {
