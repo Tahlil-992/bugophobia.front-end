@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(2),
     },
     heroContent: {
-        padding: theme.spacing(3, 0, 8),
+        padding: theme.spacing(3, 0, 3),
     },
     heroButtons: {
         marginTop: theme.spacing(4),
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     Btn: {
         backgroundColor: '#40bad5',
         textAlign: 'center',
-        fontSize: '16px',
+        fontSize: '1em',
         borderRadius: '10px',
         textTransform: 'none',
         height:'45px',
@@ -49,16 +49,16 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
     const classes = useStyles();
     return (
         <React.Fragment>
-            <AppBar position="relative">
-                <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
+            <AppBar position="relative" style={{height:'5%'}}>
+                <Toolbar style={{ backgroundColor: '#10217d' }}>
                     <Typography variant="h6" color="inherit" noWrap>Let's Get Started</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid style={{ backgroundColor: '#8ab6d6' }}>
-                <div className={classes.heroContent} style={{ backgroundColor: '#E0E0E0', height: '60vh', display: 'flex', flexDirection: 'row', marginLeft: '100px', marginRight: '100px', borderBottomLeftRadius: '100px', borderBottomRightRadius: '100px' }}>
+            <Grid style={{ backgroundColor: '#8ab6d6', height:'60%', justifyContent:'center', alignItems:'center' }}>
+                <div className={classes.heroContent} style={{ backgroundColor: '#E0E0E0', display: 'flex', flexDirection: 'row', marginLeft: '8%', marginRight: '8%', borderBottomLeftRadius: '100px', borderBottomRightRadius: '100px' }}>
                     <Container>
                         <Grid style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Grid item style={{ width: '55%', borderRadius: '10px', height: '60vh' }}>
+                            <Grid item style={{ width: '55%', borderRadius: '10px' }}>
                                 <Typography style={{ marginTop: '50px' }} component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
                                     Virtual Healthcare
                                 </Typography>
@@ -68,23 +68,23 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                 <div className={classes.heroButtons}>
                                     <Grid container spacing={10} justify="center">
                                         <Grid item>
-                                            <img src={DoctorImg} alt="DoctorUser" style={{ height: '100px', width: '100px' }} />
+                                            <img src={DoctorImg} alt="DoctorUser" style={{ height: '6.5em', width: '6.5em' }} />
                                         </Grid>
                                         <Grid item>
-                                            <img src={PatientImg} alt="PatientUser" style={{ height: '100px', width: '100px' }} />
+                                            <img src={PatientImg} alt="PatientUser" style={{ height: '6.5em', width: '6.5em' }} />
                                         </Grid>
                                     </Grid>
                                     <Grid container spacing={2} justify="center">
                                         <Grid item style={{ marginRight: '55px' }}>
                                             <Link to="login" style={{ textDecoration: 'none' }}>
-                                                <Button onClick={changeToDoctor} className={classes.Btn} align="center" style={{ marginTop: '0px', padding: '10px 25px' }}>
+                                                <Button onClick={changeToDoctor} className={classes.Btn} align="center" style={{ padding: '1em 1.6em' }}>
                                                     Doctor
                                                 </Button>
                                             </Link>
                                         </Grid>
                                         <Grid item>
                                             <Link to="login" style={{ textDecoration: 'none' }}>
-                                                <Button onClick={changeToPatient} className={classes.Btn} align="center" style={{ marginTop: '0px', padding: '10px 25px' }}>
+                                                <Button onClick={changeToPatient} className={classes.Btn} align="center" style={{ padding: '1em 1.6em' }}>
                                                     Patient
                                                 </Button>
                                             </Link>
@@ -93,17 +93,17 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                 </div>
                             </Grid>
                             <Grid item style={{ width: '45%' }}>
-                                <img src={OnlineDoctor} style={{ width: '507px', height: '517.5px', borderRadius: '10px' }} />
+                                <img src={OnlineDoctor} style={{ width: '30em', height: '30.62em', borderRadius: '200px' }} />
                             </Grid>
                         </Grid>
                     </Container>
                 </div>
             </Grid>
-            <footer className={classes.footer} style={{ backgroundColor: '#8ab6d6', height: '150px' }}>
+            <footer className={classes.footer} style={{ backgroundColor: '#8ab6d6' }}>
                 <Typography style={{ color: '#8ab6d6' }}>footer block</Typography>
                 <Typography variant="h6" align="center" gutterBottom>Footer</Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Something here to give the footer a purpose!</Typography>
-                <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '20px', marginTop: '5px' }}>about us</Link>
+                <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '1.25em' }}>about us</Link>
             </footer>
         </React.Fragment>
     );
