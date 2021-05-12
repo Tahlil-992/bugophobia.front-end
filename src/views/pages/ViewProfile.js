@@ -668,7 +668,7 @@ export default function Profile() {
                                     />
                                     {isViewedDoctor && !VisitTimeClick ?
                                         <Grid item xs>
-                                            <Button onClick={() => setVisitTimeClick(true)} className={classes.button} >Take a Visit Time</Button>
+                                            <Button disabled={isDoctor} onClick={() => setVisitTimeClick(true)} className={classes.button} >Take a Visit Time</Button>
                                         </Grid>
                                         :
                                         <></>

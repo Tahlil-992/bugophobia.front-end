@@ -276,7 +276,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                       onChange={event => { setFirstName(event.target.value); }}
                       InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
                     />
-                    <TextField style={{ width: '50%', marginLeft: '1%' }} size="Normal"
+                    <TextField style={{ width: '49%', marginLeft: '1%' }} size="Normal"
                       variant="outlined"
                       required
                       fullWidth
@@ -393,18 +393,12 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                 />
               </Grid>
             </Grid>
-<<<<<<< HEAD
             {isdoctor &&
               <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
             }
             {!isdoctor &&
               <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
             }
-=======
-            <Box display="flex" justifyContent="space-between">
-              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
-            </Box>
->>>>>>> 15f4fafa5d59f0bd4d34382443236972d78d3898
             <Grid>
               {isLoading && <LoadingSpinner />}
             </Grid>
