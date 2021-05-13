@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundPosition: 'center',
     },
     paper: {
-        margin: theme.spacing(8, 5),
+        margin: theme.spacing(15, 3.5),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -243,7 +243,7 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                             </Grid>
                         </Grid>
                         <Box display="flex" justifyContent="space-between">
-                            <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{width:'19em', marginBottom: '1.25em'}}>Log in</Button>
+                            <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{width:'21em', marginBottom: '1.25em'}}>Log in</Button>
                         </Box>
                         <Grid>
                             {isLoading && <LoadingSpinner />}

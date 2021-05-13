@@ -36,6 +36,8 @@ import h5 from "../../assets/images/login-signup/h5.jpg";
 import h6 from "../../assets/images/login-signup/h6.jpg";
 import h7 from "../../assets/images/login-signup/h7.jpg";
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+import WorkIcon from '@material-ui/icons/Work';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const callSignUPAPI = async (data, isdoctor) => {
   try {
@@ -52,6 +54,8 @@ const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 const numRegex = RegExp(/^-?[0-9,\.]+$/);
 
+
+
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
@@ -65,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition: 'center',
   },
   paper: {
-    margin: theme.spacing(6, 6),
+    margin: theme.spacing(5, 3.5),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -84,12 +88,21 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: '#5f939a',
     },
   },
+  MuiSelect: {
+    select: {
+      //padding: undefined,
+      paddingTop: '0.9em',
+      paddingBottom: '0.9em',
+      //height: undefined,
+    },
+  },
 }));
+const Specializations = ["General Practitioner", "Cardiologist", 'Dermatologist', 'Gynecologist', 'Internist', 'Neurologist', 'Obstetrician', 'Ophthalmologist', 'Otolaryngologist', "Pediatrician", "Psychiatrist", "Urologist"];
 
 const SignUp = ({ isdoctor, setIsDoctor }) => {
 
+  const space = (isdoctor ? '2.5em' : '6em');
   const classes = useStyles();
-
   const history = useHistory();
 
   const images = [h1, h2, h3, h4, h5, h6, h7];
@@ -108,6 +121,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const [password, setPassword] = useState("");
   const [configPass, setConfigPass] = useState("");
   const [gmcNum, setgmcNum] = useState("");
+  const [Specialization, setSpecialization] = useState("");
 
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isUsernameValid, setIsUsernameValid] = useState(true);
@@ -163,10 +177,28 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
     setMessage("");
   }
 
+  const specializationMap = (spec) => {
+    switch (spec) {
+      case 'Cardiologist': return 'C';
+      case 'Dermatologist': return 'D';
+      case 'General Practitioner': return 'G';
+      case 'Gynecologist': return 'GY';
+      case 'Internist': return 'I';
+      case 'Neurologist': return 'N';
+      case 'Obstetrician': return 'O';
+      case 'Ophthalmologist': return 'OP';
+      case 'Otolaryngologist': return 'OT';
+      case 'Pediatrician': return 'P';
+      case 'Psychiatrist': return 'PS';
+      case 'Urologist': return 'U';
+      default: return '';
+    }
+  }
+
   const callAPI = async () => {
     try {
       const data = isdoctor
-        ? { user: { email: email, password: password, username: username, first_name: FirstName, last_name: LastName, is_doctor: true }, gmc_number: Number(gmcNum) }
+        ? { user: { email: email, password: password, username: username, first_name: FirstName, last_name: LastName, is_doctor: true }, gmc_number: Number(gmcNum), filed_of_specialization: specializationMap(Specialization) }
         : { user: { email: email, password: password, username: username, is_doctor: false } }
       const response = await callSignUPAPI(data, isdoctor);
 
@@ -260,12 +292,12 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
       <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
         <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
         <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
-          <div className={classes.paper}>
+          <div className={classes.paper} style={{ marginTop: space }}>
             <Grid container spacing={2}>
               {isdoctor &&
                 <Grid item xs={12}>
                   <Grid style={{ display: 'flex', flexDirection: 'row' }}>
-                    <TextField style={{ width: '48%', marginRight: '1%' }}
+                    <TextField style={{ width: '46%', marginRight: '1%' }}
                       variant="outlined"
                       required
                       fullWidth
@@ -276,7 +308,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                       onChange={event => { setFirstName(event.target.value); }}
                       InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
                     />
-                    <TextField style={{ width: '49%', marginLeft: '1%' }} size="Normal"
+                    <TextField style={{ width: '52%', marginLeft: '1%' }} size="Normal"
                       variant="outlined"
                       required
                       fullWidth
@@ -288,24 +320,6 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                       InputProps={{ startAdornment: (<InputAdornment position="start"><DoubleArrowIcon /></InputAdornment>) }}
                     />
                   </Grid>
-                </Grid>
-              }
-              {isdoctor &&
-                <Grid item xs={12}>
-                  <TextField
-                    error={!isgmcValid}
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="MedicalLicenseNumber"
-                    label="Medical License Number"
-                    name="MedicalLicenseNumber"
-                    value={gmcNum}
-                    onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
-                    InputProps={{
-                      startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
-                    }}
-                  />
                 </Grid>
               }
               <Grid item xs={12}>
@@ -326,6 +340,47 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                   helperText={emailhelper}
                 />
               </Grid>
+              {isdoctor &&
+                <Grid item xs={12}>
+                  <Grid style={{ display: 'flex', flexDirection: 'row' }}>
+                    <TextField style={{ width: '46%', marginRight: '1%' }}
+                      error={!isgmcValid}
+                      variant="outlined"
+                      required
+                      fullWidth
+                      id="MedicalLicenseNumber"
+                      label="GMC Number"
+                      name="MedicalLicenseNumber"
+                      value={gmcNum}
+                      onChange={event => { setgmcNum(event.target.value); checkGMC(event.target.value); }}
+                      InputProps={{
+                        startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
+                      }}
+                    />
+                    <TextField style={{ width: '52%', marginLeft: '1%' }} select
+                      classes
+                      variant="outlined"
+                      required
+                      fullWidth
+                      id="Specialization"
+                      label="Specialization"
+                      name="Specialization"
+                      value={Specialization}
+                      onChange={event => { setSpecialization(event.target.value); }}
+                      inputProps={{
+                        style: { paddingTop: '0.9em', paddingBottom: '0.9em' }
+                      }}
+                      SelectProps={{ native: true }}
+                    >
+                        {Specializations.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                    </TextField>
+                  </Grid>
+                </Grid>
+              }
               <Grid item xs={12}>
                 <TextField
                   error={!isUsernameValid}
@@ -394,10 +449,10 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
               </Grid>
             </Grid>
             {isdoctor &&
-              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '21.8em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
             }
             {!isdoctor &&
-              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '19.5em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
+              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '21.8em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
             }
             <Grid>
               {isLoading && <LoadingSpinner />}
