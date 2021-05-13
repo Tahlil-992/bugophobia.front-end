@@ -202,7 +202,7 @@ export default function About(props) {
     }
 
     return (
-        <Grid container spacing={3} alignItems="center" justify='center' style={{marginTop: '1em', marginBottom: '1em'}}>
+        <Grid container spacing={3} alignItems="center" justify='center' style={{marginTop: '0em', marginBottom: '1em'}}>
             <Grid item className={classes.typographygrid}>
                 <Typography className={classes.title}>
                     Personal Informaton
