@@ -2,19 +2,10 @@ import React, { useEffect, useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { AppBar, Avatar, Badge, Button, Chip, Container, IconButton, Link, makeStyles, Paper, Toolbar, withStyles } from '@material-ui/core';
+import { AppBar, Avatar, Button, Chip, Container, IconButton, Link, makeStyles, Paper, Toolbar } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import InputAdornment from "@material-ui/core/InputAdornment";
-import EmailIcon from '@material-ui/icons/Email';
-import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
-import WcIcon from '@material-ui/icons/Wc';
-import ApartmentIcon from '@material-ui/icons/Apartment';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import BuildIcon from '@material-ui/icons/Build';
-import WorkIcon from '@material-ui/icons/Work';
-import AlarmIcon from '@material-ui/icons/Alarm';
-import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import BookmarkIcon from '@material-ui/icons/Bookmark';
 import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder';
@@ -41,6 +32,7 @@ import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, } from
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import About from './About'
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -167,39 +159,27 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(1),
         marginLeft: theme.spacing(1),
         marginBottom: theme.spacing(1),
-        /* "&:hover": {
-          width: theme.spacing(18),
-          height: theme.spacing(18),
-          margin: theme.spacing(1),
-        } */
-    },
-    tab: {
-        //width: 700,
     },
     grid: {
         marginTop: "0rem",
     },
-    tab2: {
-        //width: "75vmax",
-        //marginLeft: "10%",
-    },
     onetab: {
         //backgroundColor: 'rgba(138, 182, 214, 0.57)',
         //border: "1px solid #C5CAEA",
-        color: "#111",
+        color: "#555",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderBottom: "3px solid #16E",
         fontSize: 9,
         iconSize: 30,
         minWidth: 0,
-        transition: 'background-color 0.15s linear',
+        transition: 'all 0.15s linear, border 0s',
         '&:hover': {
-            backgroundColor: 'rgba(138, 182, 214, 0.5)',
-            transition: 'background-color 0s',
+            backgroundColor: '#c0c0c0',
+            transition: 'all 0s',
             fontSize: 9,
-            color: "#000",
             fontWeight: 900,
+            color: "#000",
         }
     },
     seltab: {
@@ -210,9 +190,11 @@ const useStyles = makeStyles((theme) => ({
         borderTop: "3px solid #16E",
         borderRight: "3px solid #16E",
         borderLeft: "3px solid #16E",
-        color: "#31C",
+        color: "#16e",
         minWidth: 0,
         fontSize: 10,
+        fontWeight: 900,
+        transition: 'all 0.15s linear, border 0s',
     },
     tabpanel: {
         backgroundColor: "#ebebeb",
@@ -222,26 +204,6 @@ const useStyles = makeStyles((theme) => ({
         borderBottomRightRadius: "10px",
         borderBottomLeftRadius: "10px",
         marginBottom: "2rem",
-    },
-    textfield: {
-        width: "70%",
-        minWidth: '14em',
-        marginLeft: "15%",
-        //backgroundColor: "#f0f0f0",
-        transition: 'margin 0.15s linear',
-        //transition: 'width 0.075s linear',
-        '&:hover': {
-            backgroundColor: "#f3f3f3",
-            width: "74%",
-            marginLeft: "13%",
-            transition: 'margin 0s',
-            //transition: 'width 0s',
-        },
-    },
-    dis: {
-        '&:hover': {
-            color: "#000",
-        },
     },
     button: {
         backgroundColor: '#40bad5',
@@ -416,6 +378,7 @@ export default function Profile() {
     const [username, setUsername] = useState("");
     const [gender, setGender] = useState("");
     const [age, setAge] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [city, setCity] = useState("");
     const [gmcNumber, setGmcNumber] = useState("");
     const [specialization, setSpecialization] = useState("");
@@ -437,16 +400,17 @@ export default function Profile() {
                 setLastName(nullCheck(payload.user.last_name));
                 setEmail(nullCheck(payload.user.email));
                 setUsername(nullCheck(payload.user.username));
-                setGender(genderMap(payload.user.gender));
+                setGender(nullCheck(payload.user.gender));
                 setAge(nullCheck(payload.user.age));
+                setPhoneNumber(nullCheck(payload.user.phone_number));
                 setCity(nullCheck(payload.user.city));
                 if (isViewedDoctor) {
                     setGmcNumber(nullCheck(payload.gmc_number));
-                    setSpecialization(specializationMap(payload.filed_of_specialization));
+                    setSpecialization((payload.filed_of_specialization));
                     setExperience(nullCheck(payload.work_experience));
                 }
                 else {
-                    setInsurance(insuranceMap(payload.insurance_type));
+                    setInsurance((payload.insurance_type));
                 }
             }
         }
@@ -561,8 +525,6 @@ export default function Profile() {
         }
     }, [openSnackBar])
 
-    const [disabled, setDisabled] = useState(-1);
-
     const [selectedDate, setSelectedDate] = useState(new Date(Date().toLocaleString()));
     const handleDateChange = (date) => {
         setSelectedDate(date);
@@ -574,31 +536,6 @@ export default function Profile() {
         },
     });
     const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
-
-    const fields = isViewedDoctor ?
-        [['First Name', firstName, setFirstName, <DoubleArrowIcon />],
-        ['Last Name', lastName, setLastName, <DoubleArrowIcon />],
-        ['Email Address', email, setEmail, <EmailIcon />],
-        ['Username', username, setUsername, <AccountCircleIcon />],
-        ['Gender', gender, setGender, <WcIcon />],
-        ['Age', age, setAge, <AlarmIcon />],
-        ['City', city, setCity, <ApartmentIcon />],
-        ['GMC Number', gmcNumber, setGmcNumber, <LocalHospitalIcon />],
-        ['Filed of Specialization', specialization, setSpecialization, <WorkIcon />],
-        ['Work Experiece', experience, setExperience, <BuildIcon />]
-        ]
-
-        :
-
-        [['First Name', firstName, setFirstName, <DoubleArrowIcon />],
-        ['Last Name', lastName, setLastName, <DoubleArrowIcon />],
-        ['Email Address', email, setEmail, <EmailIcon />],
-        ['Username', username, setUsername, <AccountCircleIcon />],
-        ['Gender', gender, setGender, <WcIcon />],
-        ['Age', age, setAge, <AlarmIcon />],
-        ['City', city, setCity, <ApartmentIcon />],
-        ['Insurance Type', insurance, setInsurance, <LocalHospitalIcon />]
-        ];
 
     return (
         <div style={{ backgroundColor: '#8ab6d6' }}>
@@ -721,7 +658,7 @@ export default function Profile() {
                                             <Typography className={classes.text}  >{firstName + " " + lastName}</Typography>
                                             <hr />
                                             <Typography className={classes.subtext} >{"Specialization:"}</Typography>
-                                            <Typography className={classes.text}  >{(specialization)}</Typography>
+                                            <Typography className={classes.text}  >{specializationMap(specialization)}</Typography>
                                             <hr />
                                             <Typography className={classes.subtext} >{"Rating:"}</Typography>
                                             <Box
@@ -794,7 +731,7 @@ export default function Profile() {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs container className={classes.tab2} direction="column" style={{ marginTop: '2em', marginRight: '2em' }} >
+                        <Grid item xs container direction="column" style={{ marginTop: '2em', marginRight: '2em' }} >
                             <Grid item style={{ width: "inherit" }}>
                                 {isViewedDoctor ?
                                     <Tabs
@@ -823,33 +760,25 @@ export default function Profile() {
                             </Grid>
                             <Grid item className={classes.tabpanel}>
                                 <TabPanel value={tabValue} index={0}>
-                                    <Box display="flex" justifyContent="space-between" >
-                                        <Grid container spacing={3} alignItems="flex-start">
-                                            {fields.map((item, index) => {
-                                                return (
-                                                    <Grid item xs={12} key={index.toString()}>
-                                                        <TextField
-                                                            key={index.toString()}
-                                                            onMouseEnter={() => setDisabled(index)}
-                                                            onMouseLeave={() => setDisabled(-1)}
-                                                            disabled={(disabled === index)}
-                                                            variant="outlined"
-                                                            fullWidth
-                                                            label={item[0]}
-                                                            value={item[1]}
-                                                            className={classes.textfield}
-                                                            onChange={event => item[2](event.target.value)}
-                                                            InputProps={{
-                                                                startAdornment: (<InputAdornment position="start">{item[3]}</InputAdornment>),
-                                                                classes: { root: classes.dis }
-                                                            }}
-                                                        />
-                                                    </Grid>
-                                                )
-                                            })
-                                            }
-                                        </Grid>
-                                    </Box>
+                                    <About 
+                                        isDoctor={isViewedDoctor}
+                                        viewProfile={true} 
+                                        setSent={setSent}
+                                        firstName={firstName}               setFirstName={setFirstName}
+                                        lastName={lastName}                 setLastName={setLastName}
+                                        email={email}                       setEmail={setEmail}
+                                        username={username}                 setUsername={setUsername}
+                                        gender={gender}                     setGender={setGender}
+                                        age={age}                           setAge={setAge}
+                                        phoneNumber={phoneNumber}           setPhoneNumber={setPhoneNumber}
+                                        city={city}                         setCity={setCity}
+                                        gmcNumber={gmcNumber}               setGmcNumber={setGmcNumber}
+                                        specialization={specialization}     setSpecialization={setSpecialization}
+                                        experience={experience}             setExperience={setExperience}
+                                        insurance={insurance}               setInsurance={setInsurance}
+                                        isEmailValid={true}
+                                        isUsernameValid={true}
+                                        />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={1}>
                                     <Box display="flex" flex={1} position="relative">
