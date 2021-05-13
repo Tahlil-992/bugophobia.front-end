@@ -92,10 +92,15 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
                 )
             })} */}
             {!show && <LoadingSpinner />}
-            {count === 0 && msgType !== Severity.ERROR &&
+            {count === 0 && msgType !== Severity.ERROR && !isdoctor &&
                 <Typography
                     style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "inherit", marginRight: "1em", marginLeft: "1em" }}>
-                    Be the first to comment
+                    Be the first to comment.
+                </Typography>}
+            {count === 0 && msgType !== Severity.ERROR && isdoctor &&
+                <Typography
+                    style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "inherit", marginRight: "1em", marginLeft: "1em" }}>
+                    No comments so far.
                 </Typography>}
         </Paper>
         <Box 
