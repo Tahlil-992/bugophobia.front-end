@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
-import { Button, makeStyles, MenuItem, withStyles, } from '@material-ui/core';
+import { Button, makeStyles, MenuItem, Typography, withStyles, } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import EmailIcon from '@material-ui/icons/Email';
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
         padding: '1em 4em 1em 4em',
-        margin: '1em 0em 1em 0em',
+        margin: '1em 0em 0em 0em',
         textAlign: 'center',
         fontSize: '0.9em',
         borderRadius: '10px',
@@ -83,9 +83,16 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "12%",
         marginRight: '12%',
     },
-    subtext: {
+    typographygrid: {
+        width: "70%",
+        minWidth: '16em',
+        marginLeft: "15%",
+        marginRight: '15%',
+    },
+    title: {
         fontSize: 11,
         color: "#222",
+        fontWeight: 600,
     },
     text: {
         fontSize: 15,
@@ -101,6 +108,7 @@ const useStyles = makeStyles((theme) => ({
 export default function About(props) {
 
     const isDoctor = props.isDoctor;
+    const viewProfile = props.viewProfile;
     const callEditAPI = props.callEditAPI;
     const setSent = props.setSent;
     const [firstName, setFirstName] = [props.firstName, props.setFirstName];
@@ -194,14 +202,19 @@ export default function About(props) {
     }
 
     return (
-        <Grid container spacing={3} alignItems="center" justify='center' style={{marginTop: '1em'}}>
+        <Grid container spacing={3} alignItems="center" justify='center' style={{marginTop: '1em', marginBottom: '1em'}}>
+            <Grid item className={classes.typographygrid}>
+                <Typography className={classes.title}>
+                    Personal Informaton
+                </Typography>
+            </Grid>
             <Grid item container className={classes.textfieldgrid}>
                 <MyTextField
                     variant="outlined"
                     className={classes.textfieldleft}
                     label='First Name'
                     value={firstName}
-                    disabled={isDoctor}
+                    disabled={isDoctor || viewProfile}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <DoubleArrowIcon/> </InputAdornment>),
                     }}
@@ -219,7 +232,7 @@ export default function About(props) {
                     className={classes.textfieldright}
                     label='Last Name'
                     value={lastName}
-                    disabled={isDoctor}
+                    disabled={isDoctor || viewProfile}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <DoubleArrowIcon/> </InputAdornment>),
                     }}
@@ -239,7 +252,7 @@ export default function About(props) {
                     className={classes.textfield}
                     label='Gender'
                     value={gender}
-                    disabled={isDoctor}
+                    disabled={isDoctor || viewProfile}
                     select={!isDoctor}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <WcIcon/> </InputAdornment>),
@@ -266,7 +279,7 @@ export default function About(props) {
                     className={classes.textfield}
                     label='Age'
                     value={age}
-                    disabled={isDoctor}
+                    disabled={isDoctor || viewProfile}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <AlarmIcon/> </InputAdornment>),
                     }}
@@ -281,12 +294,18 @@ export default function About(props) {
                 />
             </Grid>
             <hr width='80%'/>
+            <Grid item className={classes.typographygrid}>
+                <Typography className={classes.title}>
+                    Authentication
+                </Typography>
+            </Grid>
             <Grid item className={classes.textfieldgrid} >
                 <MyTextField
                     variant="outlined"
                     className={classes.textfield}
                     label='Email Address'
                     value={email}
+                    disabled={viewProfile}
                     error={!isEmailValid}
                     helperText={emailhelper}
                     InputProps={{
@@ -308,6 +327,7 @@ export default function About(props) {
                     className={classes.textfield}
                     label='Username'
                     value={username}
+                    disabled={viewProfile}
                     error={!isUsernameValid}
                     helperText={userhelper}
                     InputProps={{
@@ -324,12 +344,18 @@ export default function About(props) {
                 />
             </Grid>
             <hr width='80%'/>
+            <Grid item className={classes.typographygrid}>
+                <Typography className={classes.title}>
+                    Contact
+                </Typography>
+            </Grid>
             <Grid item className={classes.textfieldgrid} >
                 <MyTextField
                     variant="outlined"
                     className={classes.textfield}
                     label='Phone Number'
                     value={phoneNumber}
+                    disabled={viewProfile}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <PhoneAndroidIcon/> </InputAdornment>),
                     }}
@@ -349,6 +375,7 @@ export default function About(props) {
                     className={classes.textfield}
                     label='Address'
                     value={city}
+                    disabled={viewProfile}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <ApartmentIcon/> </InputAdornment>),
                     }}
@@ -363,6 +390,11 @@ export default function About(props) {
                 />
             </Grid>
             <hr width='80%'/>
+            <Grid item className={classes.typographygrid}>
+                <Typography className={classes.title}>
+                    Medical Informaton
+                </Typography>
+            </Grid>
             {isDoctor ? 
                 <>
                     <Grid item className={classes.textfieldgrid} >
@@ -432,7 +464,7 @@ export default function About(props) {
                         variant="outlined"
                         className={classes.textfield}
                         label='Insurance Type'
-                        value={insurance}
+                        value={insuranceMap(insurance)}
                         disabled
                         InputProps={{
                             startAdornment: (<InputAdornment position="start" > <LocalHospitalIcon/> </InputAdornment>),
@@ -448,15 +480,19 @@ export default function About(props) {
                     />
                 </Grid>
             }
-            <Grid item>
-                <Button 
-                    className={classes.button} 
-                    onClick={() => {callEditAPI(); setDetailChange(false);}} 
-                    disabled={!detailChange} 
-                >
-                    Update Your Profile
-                </Button>
-            </Grid>
+            {viewProfile ?
+                <></>
+                :
+                <Grid item>
+                    <Button 
+                        className={classes.button}
+                        onClick={() => {callEditAPI(); setDetailChange(false);}} 
+                        disabled={!detailChange} 
+                    >
+                        Update Your Profile
+                    </Button>
+                </Grid>
+            }
         </Grid>
     );
 }
