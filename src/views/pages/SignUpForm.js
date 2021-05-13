@@ -97,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const Specializations = [ "General Practitioner" ,"Cardiologist" ,'Dermatologist','Gynecologist' , 'Internist', 'Neurologist', 'Obstetrician', 'Ophthalmologist', 'Otolaryngologist', "Pediatrician", "Psychiatrist", "Urologist" ];
+const Specializations = ["General Practitioner", "Cardiologist", 'Dermatologist', 'Gynecologist', 'Internist', 'Neurologist', 'Obstetrician', 'Ophthalmologist', 'Otolaryngologist', "Pediatrician", "Psychiatrist", "Urologist"];
 
 const SignUp = ({ isdoctor, setIsDoctor }) => {
 
@@ -372,11 +372,11 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                       }}
                       SelectProps={{ native: true }}
                     >
-                      {Specializations.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
+                        {Specializations.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
                     </TextField>
                   </Grid>
                 </Grid>
