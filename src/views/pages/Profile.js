@@ -348,22 +348,6 @@ export default function Profile() {
     const [emailhelper, setemailhelper] = useState("");
     const [userhelper, setuserhelper] = useState("");
 
-    const checkEmail = (email) => {
-        const res = emailRegex.test(email)
-        setIsEmailValid(res);
-        if (!res) {
-            setemailhelper("Email is invalid")
-        }
-    }
-
-    const checkUsername = (username) => {
-        const res = userNameRegex.test(username);
-        setIsUsernameValid(res);
-        if (!res) {
-            setuserhelper("Username is invalid")
-        }
-    }
-
     useEffect(() => {
         callGetDetailRatingAPI();
     }, [doctorid])
