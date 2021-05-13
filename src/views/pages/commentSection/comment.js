@@ -89,11 +89,11 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
 
     const day_postfix = (day) => {
         switch (day) {
-            case "1":
+            case 1:
                 return "st";
-            case "2":
+            case 2:
                 return "nd";
-            case "3":
+            case 3:
                 return "rd";
             default:
                 return "th";
@@ -183,7 +183,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
                         {commentProps.patient.user.username}
                     </Typography>
                     <Typography variant="caption" color={"textSecondary"}>
-                        {!isToday(current_date, created_date) ? months[Number(created_date.month) - 1] + " " + created_date.day + day_postfix(created_date.day)
+                        {!isToday(current_date, created_date) ? months[Number(created_date.month) - 1] + " " + Number(created_date.day) + day_postfix(Number(created_date.day))
                             + ((Number(created_date.year) === current_date.getFullYear() ? "" : ", " + created_date.year)) :
                             "Today"}
                     </Typography>

@@ -1,6 +1,6 @@
+import React, { useState, useEffect } from "react";
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
-import React, { useState } from "react";
 import Comment from "./comment";
 import AddComment from "./AddComment";
 import { LoadingSpinner } from "../../../assets/loading.spinner";
@@ -8,31 +8,19 @@ import { Pagination } from "../../../core/modules/pagination";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography"
 import { Severity } from ".";
-// import Slide from '@material-ui/core/Slide';
 import Box from '@material-ui/core/Box';
 import { connect } from "react-redux";
 import { Paper } from "@material-ui/core";
 
 const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMessage, isdoctor, username }) => {
-    // const [curComments, setCurComments] = useState(comments);
     const [msgType, setMsgType] = useState({type: ""});
-    const [direction, setDirection] = useState("right");
-    const [onSlide, setOnSlide] = useState(true);
+    const [onChangePage, setOnChangePage] = useState(false);
 
-    // useEffect(() => {
-    //     // if (direction !== "") {
-    //     //     setOnSlide(true);
-    //     // }
-    //     if (direction === "left") {
-    //         setCurComments(comments);
-    //     }
-    //     else {
-    //         setCurComments(comments);
-    //     }
-    //     // console.log("A:" + direction);
-    //     setDirection("");
-    //     // console.log("B:" + direction);
-    // }, [direction]);
+    useEffect(() => {
+        if (show) {
+            setOnChangePage(false);
+        }
+    }, [show])
 
     return (
         <>
@@ -42,60 +30,35 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
                 <AddComment doctor_username={username} setMessage={(msg) => {setMessage(msg); setMsgType(msg.type)}} reload={() => reload(page)} />
             </Box>}
             <Box style={{marginTop: "1em", marginBottom: "1em"}}>
-            {show && comments.map((comment, index) => {
+            {!onChangePage && comments.map((comment, index) => {
                 return (
                     <Box key={"Box-comment-" + comment.id}>
-                    {/* <Slide key={"slide-A-" + comment.id} direction={direction === "left" ? "left" : "right"} in={onSlide} exit={!onSlide} mountOnEnter unmountOnExit timeout={{enter: 1000, exit: 10000}}> */}
                     <Card 
                         key={"card-" + comment.id} 
-                        style={{wordBreak: "break-word", minWidth: "95%", maxWidth: "95%" , marginRight: "1em", marginLeft: "1em", borderRadius: (index == 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
-                        (index == comments.length - 1 ? "0 0 7px 7px" : "0")) }}
+                        style={{wordBreak: "break-word", minWidth: "95%", maxWidth: "95%" , marginRight: "1em", marginLeft: "1em", borderRadius: (index === 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
+                        (index === comments.length - 1 ? "0 0 7px 7px" : "0")) }}
                         >
                         <>
                         <CardContent>
-                            <Comment setMessage={(msg) => {setMessage(msg); setMsgType(msg.type);}} commentInfo={comment} reload={() => reload(page)}/>
+                            <Comment setMessage={(msg) => {setMessage(msg); setMsgType(msg.type);}} commentInfo={comment} reload={() => reload(count % 5 !== 1 ? page : (page !== 1 ? page - 1 : 1))}/>
                         </CardContent>
                         {index !== comments.length - 1 && <Divider/>}
                         </>
                     </Card>
-                    
-                    {/* </Slide> */}
-
-                    {/* <Slide key={"slide-B-" + comment.id} direction={direction === "left" ? "left" : "right"} in={!onSlide} exit={onSlide} mountOnEnter unmountOnExit timeout={{enter: 1000, exit: 10000}}>
-                    <Card 
-                        // key={"card-" + comment.id} 
-                        style={{ maxWidth: "90%", margin: "auto", borderRadius: (index == 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
-                        (index == comments.length - 1 ? "0 0 7px 7px" : "0")) }}
-                        >
-                        <>
-                        <CardContent>
-                            <Comment setMessage={(msg) => {setMessage(msg); setMsgType(msg.type);}} commentInfo={comment} reload={() => reload(page)}/>
-                        </CardContent>
-                        {index !== comments.length - 1 && <Divider/>}
-                        </>
-                    </Card>
-                    
-                    </Slide> */}
                     </Box>
                 )
             })}
             </Box>
-            {/* {show && curComments.map(comment => {
-                return (
-                    <Slide direction={direction} in={!onSlide} exit={onSlide} mountOnEnter unmountOnExit timeout={{enter: 6000, exit: 10000}}>
-                    <Card key={comment.id} raised style={{ maxWidth: "90%", margin: "auto", marginTop: "1em" }}>
-                        <CardContent>
-                            <Comment setMessage={(msg) => {setMessage(msg); setMsgType(msg.type);}} commentInfo={comment} reload={() => reload(page)}/>
-                        </CardContent>
-                    </Card>
-                    </Slide>
-                )
-            })} */}
             {!show && <LoadingSpinner />}
-            {count === 0 && msgType !== Severity.ERROR &&
+            {count === 0 && msgType !== Severity.ERROR && !isdoctor &&
                 <Typography
                     style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "inherit", marginRight: "1em", marginLeft: "1em" }}>
-                    Be the first to comment
+                    Be the first to comment.
+                </Typography>}
+            {count === 0 && msgType !== Severity.ERROR && isdoctor &&
+                <Typography
+                    style={{ margin: "auto", padding: "0.5em 0", marginTop: "1em", backgroundColor: "inherit", marginRight: "1em", marginLeft: "1em" }}>
+                    No comments so far.
                 </Typography>}
         </Paper>
         <Box 
@@ -103,10 +66,10 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
             <Pagination
                 pageCount={pageCount}
                 page={page}
-                onBackwardPage={() => {setDirection("left"); setOnSlide(true); reload(page - 1);}}
-                onForwardPage={() => {setDirection("right"); setOnSlide(true);reload(page + 1);}}
-                onForwardLastPage={() => {setDirection("right"); setOnSlide(true); reload(pageCount);}}
-                onBackwardFirstPage={() => {setDirection("left"); setOnSlide(true); reload(1);}} />
+                onBackwardPage={() => {reload(page - 1); setOnChangePage(true);}}
+                onForwardPage={() => {reload(page + 1); setOnChangePage(true);}}
+                onForwardLastPage={() => {reload(pageCount); setOnChangePage(true);}}
+                onBackwardFirstPage={() => {reload(1); setOnChangePage(true);}} />
         </Box>
         </>
     );
