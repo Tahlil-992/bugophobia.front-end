@@ -74,6 +74,17 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalPaper: {
+    backgroundColor: '#86E08C',
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
@@ -493,12 +504,16 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
             </Box>
           </Paper>
         </Snackbar>
-        <Modal open={openModal} onClose={() => goToLogin()}>
-          <div className={classes.paper} display="flex" color='#1e4620'>
-            <CheckCircleIcon />
+        <Modal className={classes.modal} open={openModal} onClose={() => goToLogin()}>
+          <Box className={classes.modalPaper}>
+          <Box style={{display: "flex", alignItems: "center"}}>
+            <CheckCircleIcon style={{marginRight: "1em"}}/>
             <h2>SignUp was Successful!</h2>
+          </Box>
+          <Box style={{display: "flex"}} justifyContent="flex-end">
             <Button onClick={() => goToLogin()}>Dismiss</Button>
-          </div>
+          </Box>
+          </Box>
         </Modal>
       </Grid>
     </React.Fragment >
