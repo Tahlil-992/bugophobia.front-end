@@ -224,7 +224,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
       setPassword("");
       setConfigPass("");
       setOpenSnackBar(true);
-      if (error.payload.user !== null && error.payload.user !== undefined) {
+      if (error.payload && error.payload.user !== null && error.payload.user !== undefined) {
         const err_payload = error.payload.user;
         let err_message = "";
         const keys = Object.keys(err_payload);
