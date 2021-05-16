@@ -14,7 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import { makeStyles, createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { LoadingSpinner } from "../../assets/loading.spinner";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import EmailIcon from '@material-ui/icons/Email';
@@ -36,8 +36,6 @@ import h5 from "../../assets/images/login-signup/h5.jpg";
 import h6 from "../../assets/images/login-signup/h6.jpg";
 import h7 from "../../assets/images/login-signup/h7.jpg";
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
-import WorkIcon from '@material-ui/icons/Work';
-import MenuItem from '@material-ui/core/MenuItem';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const callSignUPAPI = async (data, isdoctor) => {
@@ -55,7 +53,6 @@ const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 const numRegex = RegExp(/^-?[0-9,\.]+$/);
 
-
 const SpecializationAutocomplete = withStyles({
   inputRoot: {
     '&&[class*="MuiOutlinedInput-root"] $input': {
@@ -64,6 +61,7 @@ const SpecializationAutocomplete = withStyles({
   },
   input: {}
 })(Autocomplete);
+
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
@@ -77,7 +75,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition: 'center',
   },
   paper: {
-    margin: theme.spacing(5, 3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -310,9 +307,9 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
       </AppBar>
       <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
         <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
-        <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
-          <div className={classes.paper} style={{ marginTop: space }}>
-            <Grid container spacing={2}>
+        <Grid item style={{ position:'relative', width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
+          <div className={classes.paper} class="vertical_center_element">
+            <Grid container spacing={2} >
               {isdoctor &&
                 <Grid item xs={12}>
                   <Grid style={{ display: 'flex', flexDirection: 'row' }}>

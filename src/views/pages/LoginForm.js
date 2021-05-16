@@ -188,8 +188,8 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
             </AppBar>
             <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
                 <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
-                <Grid item style={{ width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
-                    <div className={classes.paper}>
+                <Grid item style={{ position:'relative', width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
+                    <div className={classes.paper} class="vertical_center_element">
                         <Grid container spacing={2} style={{ padding: '0.7em' }}>
                             <Grid item xs={12}>
                                 <TextField
