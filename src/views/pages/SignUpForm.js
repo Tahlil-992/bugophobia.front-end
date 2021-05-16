@@ -14,7 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles';
 import { LoadingSpinner } from "../../assets/loading.spinner";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import EmailIcon from '@material-ui/icons/Email';
@@ -38,6 +38,7 @@ import h7 from "../../assets/images/login-signup/h7.jpg";
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import WorkIcon from '@material-ui/icons/Work';
 import MenuItem from '@material-ui/core/MenuItem';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const callSignUPAPI = async (data, isdoctor) => {
   try {
@@ -55,7 +56,14 @@ const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}
 const numRegex = RegExp(/^-?[0-9,\.]+$/);
 
 
-
+const SpecializationAutocomplete = withStyles({
+  inputRoot: {
+    '&&[class*="MuiOutlinedInput-root"] $input': {
+      paddingTop: 5.5, paddingBottom: 5.5
+    },
+  },
+  input: {}
+})(Autocomplete);
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
@@ -69,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition: 'center',
   },
   paper: {
-    margin: theme.spacing(5, 3.5),
+    margin: theme.spacing(5, 3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -132,7 +140,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const [password, setPassword] = useState("");
   const [configPass, setConfigPass] = useState("");
   const [gmcNum, setgmcNum] = useState("");
-  const [Specialization, setSpecialization] = useState("");
+  const [Specialization, setSpecialization] = useState(Specializations[0]);
 
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isUsernameValid, setIsUsernameValid] = useState(true);
@@ -354,7 +362,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
               {isdoctor &&
                 <Grid item xs={12}>
                   <Grid style={{ display: 'flex', flexDirection: 'row' }}>
-                    <TextField style={{ width: '46%', marginRight: '1%' }}
+                    <TextField style={{ width: '36%', marginRight: '1%' }}
                       error={!isgmcValid}
                       variant="outlined"
                       required
@@ -368,27 +376,19 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                         startAdornment: (<InputAdornment position="start"><LocalHospitalIcon /></InputAdornment>),
                       }}
                     />
-                    <TextField style={{ width: '52%', marginLeft: '1%' }} select
-                      classes
-                      variant="outlined"
-                      required
-                      fullWidth
+                    <SpecializationAutocomplete style={{ width: '62%', marginLeft: '1%' }}
                       id="Specialization"
-                      label="Specialization"
-                      name="Specialization"
+                      options={Specializations}
+                      getOptionLabel={(option) => option}
                       value={Specialization}
-                      onChange={event => { setSpecialization(event.target.value); }}
-                      inputProps={{
-                        style: { paddingTop: '0.9em', paddingBottom: '0.9em' }
-                      }}
-                      SelectProps={{ native: true }}
-                    >
-                        {Specializations.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                    </TextField>
+                      renderInput={(params) => (
+                        <TextField {...params} required label="Specialization" variant="outlined" InputLabelProps={{ shrink: true }} />
+                      )}
+                      ListboxProps={
+                        { style: { maxHeight: '10em' } }
+                      }
+                      onChange={(event, value) => setSpecialization(value)}
+                    />
                   </Grid>
                 </Grid>
               }
@@ -458,13 +458,15 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
                   helperText={configpasshelper}
                 />
               </Grid>
+              <Grid item xs={12}>
+                {isdoctor &&
+                  <Button fullWidth type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
+                }
+                {!isdoctor &&
+                  <Button fullWidth type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
+                }
+              </Grid>
             </Grid>
-            {isdoctor &&
-              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '21.8em', marginBottom: '1em', marginTop: '1em' }}>Sign up</Button>
-            }
-            {!isdoctor &&
-              <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ width: '21.8em', marginBottom: '1.25em', marginTop: '1.5em' }}>Sign up</Button>
-            }
             <Grid>
               {isLoading && <LoadingSpinner />}
             </Grid>
@@ -506,13 +508,13 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
         </Snackbar>
         <Modal className={classes.modal} open={openModal} onClose={() => goToLogin()}>
           <Box className={classes.modalPaper}>
-          <Box style={{display: "flex", alignItems: "center"}}>
-            <CheckCircleIcon style={{marginRight: "1em"}}/>
-            <h2>SignUp was Successful!</h2>
-          </Box>
-          <Box style={{display: "flex"}} justifyContent="flex-end">
-            <Button onClick={() => goToLogin()}>Dismiss</Button>
-          </Box>
+            <Box style={{ display: "flex", alignItems: "center" }}>
+              <CheckCircleIcon style={{ marginRight: "1em" }} />
+              <h2>SignUp was Successful!</h2>
+            </Box>
+            <Box style={{ display: "flex" }} justifyContent="flex-end">
+              <Button onClick={() => goToLogin()}>Dismiss</Button>
+            </Box>
           </Box>
         </Modal>
       </Grid>

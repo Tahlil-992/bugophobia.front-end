@@ -86,10 +86,10 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
     const images = [h1, h2, h3, h4, h5, h6, h7];
     const [index, setindex] = useState(0);
     useEffect(() => {
-      const interval = setInterval(() => {
-        setindex(index => index === 6 ? 0 : index + 1);
-      }, 3000);
-      return () => clearInterval(interval);
+        const interval = setInterval(() => {
+            setindex(index => index === 6 ? 0 : index + 1);
+        }, 3000);
+        return () => clearInterval(interval);
     }, []);
 
     const [email, setEmail] = useState("");
@@ -241,10 +241,10 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                                     label="Remember me"
                                     onChange={(event) => setChecked(event.target.checked)} />
                             </Grid>
+                            <Grid item xs={12}>
+                                <Button fullWidth type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{ marginBottom: '1.25em' }}>Log in</Button>
+                            </Grid>
                         </Grid>
-                        <Box display="flex" justifyContent="space-between">
-                            <Button type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmit()} style={{width:'21em', marginBottom: '1.25em'}}>Log in</Button>
-                        </Box>
                         <Grid>
                             {isLoading && <LoadingSpinner />}
                         </Grid>
