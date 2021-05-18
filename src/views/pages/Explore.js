@@ -265,6 +265,7 @@ function Explore({ signOut }) {
     const [showLimitedMenu, setShowLimitedMenu] = useState(false);
     const [limitedSearchInput, setLimitedSearchInput] = useState("");
     const [limitedSearchResults, setLimitedSearchResults] = useState(null);
+    const [limitedWidth, setLimitedWidth] = useState("auto");
 
     const anchorRef = useRef(null);
     const filterAnchorRef = useRef(null);
@@ -275,6 +276,14 @@ function Explore({ signOut }) {
     const [openFilters, setOpenFilters] = useState(false);
 
     const [title, setTitle] = useState("Top Doctors");
+
+    // useEffect(() => {
+    //     if (anchorRef && anchorRef.current) {
+    //         const w = anchorRef.current.getBoundingClientRect().width;
+    //         setLimitedWidth(w);
+    //         console.log("anchorWidth = " + w);
+    //     }
+    // }, [showLimitedMenu])
 
     useEffect(() => {
         if (limitedSearchInput)
@@ -300,6 +309,11 @@ function Explore({ signOut }) {
 
     const handleOnLimitedSearchInputChange = (event) => {
         setLimitedSearchInput(event.target.value);
+        // if (anchorRef && anchorRef.current) {
+        //     const w = anchorRef.current.getBoundingClientRect().width;
+        //     setLimitedWidth(w);
+        //     console.log("anchorWidth = " + w);
+        // }
     }
 
     const handleClickListItem = (event) => {
@@ -449,8 +463,14 @@ function Explore({ signOut }) {
                                     onChange={handleOnLimitedSearchInputChange}
                                     />
                             </div>
-                            <div>
-                            {<Popper open={showLimitedMenu} anchorEl={anchorRef !== null ? anchorRef.current : null} role={undefined} transition disablePortal>
+                            <Box style={{ display: "flex" }}>
+                            {<Popper 
+                                open={showLimitedMenu} 
+                                anchorEl={anchorRef !== null ? anchorRef.current : null} 
+                                role={undefined} 
+                                transition 
+                                disablePortal 
+                                placement="bottom-start">
                             {({ TransitionProps, placement }) => (
                                 <Grow
                                 {...TransitionProps}
@@ -463,7 +483,7 @@ function Explore({ signOut }) {
                                             <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0 }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
                                             <Card 
                                                 className={classes.limitedCard} 
-                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%',width: "auto", maxWidth: '320px' }}>
+                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%',width: "auto" }}>
                                                 <Grid style={{ display: 'flex', flexDirection: 'row' }}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
@@ -505,7 +525,7 @@ function Explore({ signOut }) {
                                 </Grow>
                             )}
                             </Popper>}
-                            </div>
+                            </Box>
                         </div>
                     </div>
                     <IconButton color="inherit">
