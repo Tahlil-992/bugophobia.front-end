@@ -13,6 +13,7 @@ import Explore from "../src/views/pages/Explore";
 import Profile from "../src/views/pages/Profile";
 import ViewProfile from "../src/views/pages/ViewProfile";
 import SavedAccounts from "../src/views/pages/SavedAccounts";
+import CalendarPage from "../src/views/pages/Calendar";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import CommentSection from "./views/pages/commentSection";
@@ -85,7 +86,6 @@ function App({ setIsDoctor, login, rememberMe }) {
             <Route exact path="/">
               {is_doctor ? <Redirect to="/doctor/explore" /> : <Redirect to="/patient/explore" />}
             </Route>
-            
             <Route exact path="/patient/explore">
               <Explore />
             </Route>
@@ -103,6 +103,9 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/SavedAccounts">
               <SavedAccounts />
+            </Route>
+            <Route exact path="/Calendar">
+              <CalendarPage />
             </Route>
           </>
         )}

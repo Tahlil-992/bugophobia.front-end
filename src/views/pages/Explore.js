@@ -44,6 +44,9 @@ import Popper from '@material-ui/core/Popper';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import { Pagination } from "../../core/modules/pagination";
+import EventIcon from '@material-ui/icons/Event';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -556,6 +559,14 @@ function Explore({ signOut }) {
                                 <ListItemText primary="Profile" />
                             </ListItem>
                         </Link>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/Calendar">
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <EventIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Calendar" />
+                            </ListItem>
+                        </Link>
                         <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
                             <ListItem button>
                                 <ListItemIcon>
@@ -569,6 +580,12 @@ function Explore({ signOut }) {
                                 <ExitToAppIcon />
                             </ListItemIcon>
                             <ListItemText primary="Sign out" />
+                        </ListItem>
+                        <ListItem button>
+                            <ListItemIcon>
+                                <DeleteIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Delete Account" />
                         </ListItem>
                     </div>
                 </List>
