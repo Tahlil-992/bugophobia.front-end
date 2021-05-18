@@ -197,17 +197,17 @@ export const SearchFiltersFragment = ({ anchorEl, setOnFilters, open, setOpen })
                                     </Select>
                                 </FormControl>
                             </Grid>   
-                            <Grid item xs={6} md={2}>
-                                <Box display="flex" justifyContent="space-between" height="100%" style={{paddingTop: "1em"}}>
-                                <Button className={classes.submitButton} style={{margin: "0 0 1em 0.6em"}} variant="text" onClick={handleSearchButton}>
+                            <Grid item xs={9} md={2}>
+                                <Box display="flex" justifyContent="flex-start" height="100%" style={{paddingTop: "1em"}}>
+                                <Button className={classes.submitButton} style={{margin: "0 2em 1em 0"}} variant="text" onClick={handleSearchButton}>
                                     Search    
                                 </Button>
-                                <Button className={classes.resetButton} style={{margin: "0 0 1em 0"}} variant="contained" onClick={handleResetButton} disableElevation>
+                                <Button className={classes.resetButton} style={{margin: "0 0 1em 2em"}} variant="contained" onClick={handleResetButton} disableElevation>
                                     Reset    
                                 </Button>
                                 </Box>   
                             </Grid>
-                            <Grid item xs={6} md={2}>
+                            <Grid item xs={3} md={2}>
                                 <Box display="flex" justifyContent="flex-end" alignItems="flex-start">
                                     <IconButton onClick={handleClosePopper}>
                                         <CloseIcon style={{ color: "#611a15" }} />

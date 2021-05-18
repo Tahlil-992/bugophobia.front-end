@@ -226,9 +226,9 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#e7e7e7',
+        backgroundColor: 'rgba(255, 247, 155, 0.3)',
         "&:hover": {
-            backgroundColor: '#f3f3f3',
+            backgroundColor: 'rgba(255, 236, 186, 0.5)',
         },
     },
     cardGrid: {
@@ -469,7 +469,7 @@ function Explore({ signOut }) {
                                                         className={classes.cardMedia}
                                                         image={DoctorImage}
                                                         title="Image title"
-                                                        style={{paddingBottom: 0, height: "3em", width: "3em"}} />
+                                                        style={{paddingBottom: 0, height: "3em", width: "3em", marginLeft: "10px"}} />
                                                     <CardContent className={classes.cardContent} style={{paddingBottom: 0}}>
                                                         <Typography variant="h6">
                                                             {list.user.username}
@@ -490,11 +490,11 @@ function Explore({ signOut }) {
                                             </Typography>
                                         </Card>
                                         </Box>}
-                                        {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{backgroundColor: "#3f51b5", height: '100%', width: "auto", justifyContent: "center"}}>
+                                        {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{backgroundColor: "#73c17f", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px"}}>
                                         <Button
                                             onClick={() => {setOpenFilters(true); setShowLimitedMenu(false);}}
-                                            style={{textTransform: "none", backgroundColor: "#3f51b5", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
-                                            <Typography style={{color: "#FFFFFF"}}>
+                                            style={{textTransform: "none", backgroundColor: "#73c17f", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
+                                            <Typography style={{color: "#000", margin: "0.5em 0"}}>
                                                 Advanced Search
                                             </Typography>
                                         </Button>
