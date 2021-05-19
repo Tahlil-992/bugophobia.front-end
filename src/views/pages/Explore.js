@@ -256,6 +256,11 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    limitedCardContent: {
+        display: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     advancedSearchButton: {
         "&:hover": {
             backgroundColor: "#10217d",
@@ -486,17 +491,13 @@ function Explore({ signOut }) {
                                 transition 
                                 disablePortal 
                                 placement="bottom-start"
-                                style={{width: "100%"}}>
-                                
-                                {/* <Collapse in={showLimitedMenu} timeout="auto" unmountOnExit style={{width: focused ? expandedSearchWidth : collapsedSearchWidth}}> */}
-                                
+                                style={{width: "100%"}}>                                                                
                                 {({ TransitionProps, placement }) => (
-                                    <Grow
-                                    {...TransitionProps}
-                                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-                                    width: "100%" }}
-                                    >
-                                        
+                                <Grow
+                                {...TransitionProps}
+                                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                                width: "100%" }}
+                                >                                        
                                 <Paper>
                                     <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
                                     <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
@@ -505,13 +506,13 @@ function Explore({ signOut }) {
                                             <Card 
                                                 className={classes.limitedCard} 
                                                 style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
-                                                <Grid style={{ display: 'flex', flexDirection: 'row' }}>
+                                                <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
                                                         image={DoctorImage}
                                                         title="Image title"
-                                                        style={{paddingBottom: 0, height: "3em", width: "3em", marginLeft: "10px"}} />
-                                                    <CardContent className={classes.cardContent} style={{paddingBottom: 0}}>
+                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: 0}} />
+                                                    <CardContent className={classes.limitedCardContent} style={{paddingBottom: 0}}>
                                                         <Typography variant="h6">
                                                             {list.user.username}
                                                         </Typography>
@@ -519,7 +520,7 @@ function Explore({ signOut }) {
                                                             {specializationMap(list.filed_of_specialization)}
                                                         </Typography>
                                                     </CardContent>
-                                                </Grid>
+                                                </Grid>                                       
                                             </Card>
                                             </Button>
                                         </MenuItem>
@@ -542,17 +543,10 @@ function Explore({ signOut }) {
                                         </Box>}
                                     </MenuList>
                                     </ClickAwayListener>
-                                </Paper>
-                                
+                                </Paper>                                
                                 </Grow>)}
-                                
-                                 {/* </Collapse> */}
-                                
                                 </Popper>
                                 </Container>
-                                {/* </Grow>
-                            )}
-                            </Popper>} */}
                             </Box>
                         </div>
                     </div>
