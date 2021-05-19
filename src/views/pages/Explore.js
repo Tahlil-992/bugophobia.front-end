@@ -47,6 +47,7 @@ import { Pagination } from "../../core/modules/pagination";
 import EventIcon from '@material-ui/icons/Event';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { Collapse } from '@material-ui/core';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -89,6 +90,8 @@ const getLimitedSearchCallAPI = async (username, isRemembered) => {
 }
 
 const drawerWidth = 240;
+const collapsedSearchWidth = '12rem';
+const expandedSearchWidth = '24rem';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -165,9 +168,9 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: '20ch',
+            width: collapsedSearchWidth,
             '&:focus': {
-                width: '35ch',
+                width: expandedSearchWidth,
             },
         },
     },
@@ -234,6 +237,9 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: 'rgba(255, 236, 186, 0.5)',
         },
     },
+    limitedPopper: {
+        width: "35ch",
+    },
     cardGrid: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
@@ -279,6 +285,9 @@ function Explore({ signOut }) {
     const [openFilters, setOpenFilters] = useState(false);
 
     const [title, setTitle] = useState("Top Doctors");
+    const [focused, setFocused] = React.useState(false);
+    const onFocus = () => setFocused(true);
+    const onBlur = () => setFocused(false);
 
     // useEffect(() => {
     //     if (anchorRef && anchorRef.current) {
@@ -454,6 +463,7 @@ function Explore({ signOut }) {
                         </div>
                         <div>
                             <div ref={anchorRef}>
+                                <ClickAwayListener onClickAway={(event) => {handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth)}}>
                                 <InputBase
                                     placeholder="Search…"
                                     classes={{
@@ -461,32 +471,43 @@ function Explore({ signOut }) {
                                         input: classes.inputInput,
                                     }}
                                     inputProps={{ 'aria-label': 'search' }}
-                                    onClick={handleClickListItem}
+                                    onClick={(event) => {handleClickListItem(event); setLimitedWidth(expandedSearchWidth)}}
                                     value={limitedSearchInput}
                                     onChange={handleOnLimitedSearchInputChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
                                     />
+                                </ClickAwayListener>
                             </div>
                             <Box style={{ display: "flex" }}>
-                            {<Popper 
+                            <Container maxWidth={false} disableGutters style={{width: focused ? expandedSearchWidth : collapsedSearchWidth}}>
+                                <Popper 
                                 open={showLimitedMenu} 
-                                anchorEl={anchorRef !== null ? anchorRef.current : null} 
+                                anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
+                                className={classes.limitedPopper}
                                 role={undefined} 
                                 transition 
                                 disablePortal 
-                                placement="bottom-start">
-                            {({ TransitionProps, placement }) => (
-                                <Grow
-                                {...TransitionProps}
-                                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                                >
+                                placement="bottom-start"
+                                style={{width: "100%"}}>
+                                
+                                {/* <Collapse in={showLimitedMenu} timeout="auto" unmountOnExit style={{width: focused ? expandedSearchWidth : collapsedSearchWidth}}> */}
+                                
+                                {({ TransitionProps, placement }) => (
+                                    <Grow
+                                    {...TransitionProps}
+                                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                                    width: "100%" }}
+                                    >
+                                        
                                 <Paper>
                                     <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
                                     <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
                                         {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
-                                            <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0 }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
+                                            <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
                                             <Card 
                                                 className={classes.limitedCard} 
-                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%',width: "auto" }}>
+                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
                                                 <Grid style={{ display: 'flex', flexDirection: 'row' }}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
@@ -525,9 +546,16 @@ function Explore({ signOut }) {
                                     </MenuList>
                                     </ClickAwayListener>
                                 </Paper>
-                                </Grow>
+                                
+                                </Grow>)}
+                                
+                                 {/* </Collapse> */}
+                                
+                                </Popper>
+                                </Container>
+                                {/* </Grow>
                             )}
-                            </Popper>}
+                            </Popper>} */}
                             </Box>
                         </div>
                     </div>
