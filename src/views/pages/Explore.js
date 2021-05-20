@@ -45,7 +45,6 @@ import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import { Pagination } from "../../core/modules/pagination";
 import EventIcon from '@material-ui/icons/Event';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 const callTopDoctorsAPI = async () => {
@@ -89,6 +88,8 @@ const getLimitedSearchCallAPI = async (username, isRemembered) => {
 }
 
 const drawerWidth = 240;
+const collapsedSearchWidth = '12rem';
+const expandedSearchWidth = '24rem';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -165,9 +166,9 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: '20ch',
+            width: collapsedSearchWidth,
             '&:focus': {
-                width: '35ch',
+                width: expandedSearchWidth,
             },
         },
     },
@@ -234,6 +235,9 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: 'rgba(255, 236, 186, 0.5)',
         },
     },
+    limitedPopper: {
+        width: "35ch",
+    },
     cardGrid: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
@@ -249,6 +253,11 @@ const useStyles = makeStyles((theme) => ({
     },
     cardContent: {
         flexGrow: 1,
+        display: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    limitedCardContent: {
         display: 'center',
         justifyContent: 'center',
         alignItems: 'center',
@@ -279,6 +288,9 @@ function Explore({ signOut }) {
     const [openFilters, setOpenFilters] = useState(false);
 
     const [title, setTitle] = useState("Top Doctors");
+    const [focused, setFocused] = React.useState(false);
+    const onFocus = () => setFocused(true);
+    const onBlur = () => setFocused(false);
 
     // useEffect(() => {
     //     if (anchorRef && anchorRef.current) {
@@ -296,6 +308,10 @@ function Explore({ signOut }) {
             else {
                 setLimitedSearchResults(null);
             }
+        }
+        else
+        {
+            setLimitedSearchResults(null);
         }
     }, [limitedSearchInput])
 
@@ -409,6 +425,8 @@ function Explore({ signOut }) {
             if (response.status === 200)
             {
                 setLimitedSearchResults(response.payload);
+                if (!showLimitedMenu)
+                    setShowLimitedMenu(true);
             }
         }
         catch {
@@ -454,6 +472,7 @@ function Explore({ signOut }) {
                         </div>
                         <div>
                             <div ref={anchorRef}>
+                                <ClickAwayListener onClickAway={(event) => {handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth)}}>
                                 <InputBase
                                     placeholder="Search…"
                                     classes={{
@@ -461,39 +480,46 @@ function Explore({ signOut }) {
                                         input: classes.inputInput,
                                     }}
                                     inputProps={{ 'aria-label': 'search' }}
-                                    onClick={handleClickListItem}
+                                    onClick={(event) => {handleClickListItem(event); setLimitedWidth(expandedSearchWidth)}}
                                     value={limitedSearchInput}
                                     onChange={handleOnLimitedSearchInputChange}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
                                     />
+                                </ClickAwayListener>
                             </div>
                             <Box style={{ display: "flex" }}>
-                            {<Popper 
+                            <Container maxWidth={false} disableGutters style={{width: focused ? expandedSearchWidth : collapsedSearchWidth}}>
+                                <Popper 
                                 open={showLimitedMenu} 
-                                anchorEl={anchorRef !== null ? anchorRef.current : null} 
+                                anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
+                                className={classes.limitedPopper}
                                 role={undefined} 
                                 transition 
                                 disablePortal 
-                                placement="bottom-start">
-                            {({ TransitionProps, placement }) => (
+                                placement="bottom-start"
+                                style={{width: "100%"}}>                                                                
+                                {({ TransitionProps, placement }) => (
                                 <Grow
                                 {...TransitionProps}
-                                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                                >
-                                <Paper>
+                                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                                width: "100%" }}
+                                >                                        
+                                <Paper style={{borderRadius: "5px"}}>
                                     <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
                                     <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
                                         {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
-                                            <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0 }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
+                                            <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
                                             <Card 
                                                 className={classes.limitedCard} 
-                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%',width: "auto" }}>
-                                                <Grid style={{ display: 'flex', flexDirection: 'row' }}>
+                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
+                                                <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
                                                         image={DoctorImage}
                                                         title="Image title"
-                                                        style={{paddingBottom: 0, height: "3em", width: "3em", marginLeft: "10px"}} />
-                                                    <CardContent className={classes.cardContent} style={{paddingBottom: 0}}>
+                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: 0}} />
+                                                    <CardContent className={classes.limitedCardContent} style={{paddingBottom: 0}}>
                                                         <Typography variant="h6">
                                                             {list.user.username}
                                                         </Typography>
@@ -501,14 +527,14 @@ function Explore({ signOut }) {
                                                             {specializationMap(list.filed_of_specialization)}
                                                         </Typography>
                                                     </CardContent>
-                                                </Grid>
+                                                </Grid>                                       
                                             </Card>
                                             </Button>
                                         </MenuItem>
                                         ))}
-                                        {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "10px"}}>
-                                        <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
-                                            <Typography style={{color: "#611a15"}}>
+                                        {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0"}}>
+                                        <Card style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
+                                            <Typography style={{color: "#611a15", margin: "0.5em 0"}}>
                                                 Record Not found
                                             </Typography>
                                         </Card>
@@ -524,10 +550,10 @@ function Explore({ signOut }) {
                                         </Box>}
                                     </MenuList>
                                     </ClickAwayListener>
-                                </Paper>
-                                </Grow>
-                            )}
-                            </Popper>}
+                                </Paper>                                
+                                </Grow>)}
+                                </Popper>
+                                </Container>
                             </Box>
                         </div>
                     </div>
