@@ -45,9 +45,7 @@ import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import { Pagination } from "../../core/modules/pagination";
 import EventIcon from '@material-ui/icons/Event';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { Collapse } from '@material-ui/core';
 
 const callTopDoctorsAPI = async () => {
     try {
