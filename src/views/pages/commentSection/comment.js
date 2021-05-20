@@ -179,7 +179,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
             </Grid>
             <Grid item xs={12} md={10}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant={"body2"} color="secondary">
+                    <Typography variant={"body2"} style={{color: "#3f51b5"}}>
                         {commentProps.patient.user.username}
                     </Typography>
                     <Typography variant="caption" color={"textSecondary"}>
@@ -235,7 +235,7 @@ const Comment = ({ commentInfo, reload, remember_me, setMessage, email }) => {
                             <EditIcon onClick={() => setOnEdit(true)} color="primary" />
                         </IconButton>}
                         <IconButton disabled={onEdit} onClick={async() => {await callDeleteAPI();}}>
-                            <DeleteIcon color={onEdit ? "disabled" : "secondary"} />
+                            <DeleteIcon style={{color: onEdit ? "disabled" : "#E03030"}} />
                         </IconButton>
                     </Box>}
                 </Box>
