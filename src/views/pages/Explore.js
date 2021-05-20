@@ -311,6 +311,10 @@ function Explore({ signOut }) {
                 setLimitedSearchResults(null);
             }
         }
+        else
+        {
+            setLimitedSearchResults(null);
+        }
     }, [limitedSearchInput])
 
     useEffect(() => {
@@ -423,6 +427,8 @@ function Explore({ signOut }) {
             if (response.status === 200)
             {
                 setLimitedSearchResults(response.payload);
+                if (!showLimitedMenu)
+                    setShowLimitedMenu(true);
             }
         }
         catch {
@@ -501,7 +507,7 @@ function Explore({ signOut }) {
                                 style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
                                 width: "100%" }}
                                 >                                        
-                                <Paper>
+                                <Paper style={{borderRadius: "5px"}}>
                                     <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
                                     <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
                                         {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
@@ -528,9 +534,9 @@ function Explore({ signOut }) {
                                             </Button>
                                         </MenuItem>
                                         ))}
-                                        {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "10px"}}>
-                                        <Card className={classes.limitedCard} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
-                                            <Typography style={{color: "#611a15"}}>
+                                        {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0"}}>
+                                        <Card style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
+                                            <Typography style={{color: "#611a15", margin: "0.5em 0"}}>
                                                 Record Not found
                                             </Typography>
                                         </Card>
