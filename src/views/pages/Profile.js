@@ -28,6 +28,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 
 import About from './About';
 import ChangePassword from './ChangePassword';
+import Offices from './Offices';
 
 function TabPanel2(props) {
     const { children, value, index, ...other } = props;
@@ -41,7 +42,7 @@ function TabPanel2(props) {
             {...other}
         >
             {value === index && (
-                <Box p={3}>
+                <Box p={1}>
                     {children}
                 </Box>
             )}
@@ -701,7 +702,7 @@ export default function Profile() {
                                         <Tab label="About"  {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
                                         <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
                                         <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Calendar"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Offices"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
                                         <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                     :
@@ -770,7 +771,7 @@ export default function Profile() {
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={3}>
                                     {isDoctor ?
-                                        <Typography>Calendar</Typography>
+                                        <Offices/>
                                         :
                                         <Typography>Notifications</Typography>
                                     }
