@@ -157,6 +157,16 @@ const newRateCallAPI = ({ doctor_id, amount }, isRemembered) => {
     }
 }
 
+const callReserveTakeAPI = async (start_time, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "POST", url: ("/schedule/create_reservation/"), data: {start_time: start_time} }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -472,6 +482,20 @@ export default function Profile() {
         }
     }
 
+    const callReserveTake = async (start_time) => {
+        try {
+            const response = await callReserveTakeAPI(start_time, isRemembered);
+            if (response.status === 201) {
+                setMessage("Ok");
+                setOpenSnackBar(true);
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
     const [sent, setSent] = useState(false);
     if (!sent) {
         //callGetAPI();
@@ -687,7 +711,7 @@ export default function Profile() {
                                                     />
                                                 </ThemeProvider>
                                                 <Grid display="flex" alignItems="center" justifyContent="space-between" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                    <Button onClick={() => setVisitTimeClick(false)} className={classes.button} className={classes.submitButton} style={{ width: '49%', marginRight: '1%' }}>Submit</Button>
+                                                    <Button onClick={() => {setVisitTimeClick(false); callReserveTake(selectedDate)}} className={classes.button} className={classes.submitButton} style={{ width: '49%', marginRight: '1%' }}>Submit</Button>
                                                     <Button onClick={() => setVisitTimeClick(false)} className={classes.button} className={classes.cancelButton} style={{ width: '49%', marginLeft: '1%' }}>Cancel</Button>
                                                 </Grid>
                                             </Grid>
