@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "../../style.css";
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -39,8 +40,8 @@ export default function CalendarPage() {
             <Container maxWidth="lg" className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
-                        <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight:'37.1em'}}>
-                            <Calendar
+                        <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
+                            <Calendar style={{ outlineColor: 'red' }}
                                 localizer={localizer}
                                 events={[
                                     {
@@ -53,11 +54,13 @@ export default function CalendarPage() {
                                         'title': 'visit 2',
                                         'allDay': false,
                                         'start': new Date(2021, 5, 19, 17, 0),
-                                        'end': new Date(2021, 5, 19, 18, 0), 
+                                        'end': new Date(2021, 5, 19, 18, 0),
                                     }
                                 ]}
                                 step={60}
                                 showMultiDayTimes
+                                min={new Date(2008, 0, 1, 8, 0)} // 8.00 AM
+                                max={new Date(2008, 0, 1, 23, 0)} // Max will be 6.00 PM!z
                                 startAccessor="start"
                                 endAccessor="end"
                             />
