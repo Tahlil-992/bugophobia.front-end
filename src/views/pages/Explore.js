@@ -29,6 +29,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
+import PatientImage from "../../assets/images/patient.png";
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
@@ -46,6 +47,9 @@ import Paper from '@material-ui/core/Paper';
 import { Pagination } from "../../core/modules/pagination";
 import EventIcon from '@material-ui/icons/Event';
 import DeleteIcon from '@material-ui/icons/Delete';
+import StarRating from "./RatingComponent/rating";
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import { Avatar } from '@material-ui/core';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -60,6 +64,27 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
     try {
         const urlAddress = is_doctor ? "doctor" : "patient";
         const response = callAPIHandler({ method: "GET", url: `/auth/detail/${urlAddress}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
+    try {
+        const urlAddress = is_doctor ? "doctor" : "patient";
+        const response = callAPIHandler({ method: "GET", url: `/profile/${urlAddress}/update/${mainUsername}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -220,10 +245,14 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: '#e7e7e7',
-        transition: "transform 0.15s ease-in-out",
+        transition: 'all 0.3s ease',
+        color: '#222',
         "&:hover": {
             transform: "scale3d(1.1, 1.1, 1)",
-            backgroundColor: '#f3f3f3',
+            backgroundColor: 'rgba(36, 36, 128, 1)',
+            boxShadow: '0px 0px 20px rgba(36, 36, 128, 1)',
+            transition: 'all 0.3s ease',
+            color: '#fff',
         },
     },
     limitedCard: {
@@ -241,6 +270,7 @@ const useStyles = makeStyles((theme) => ({
     cardGrid: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
+        
     },
     cardMedia: {
         height: '15vh',
@@ -248,14 +278,16 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex',
-        marginTop: '10px',
-        marginBottom: '10px',
+        marginTop: '1em',
+        marginBottom: '1em',
+        border: '3px solid #ebebeb'
     },
     cardContent: {
         flexGrow: 1,
         display: 'center',
         justifyContent: 'center',
         alignItems: 'center',
+        color: 'inherit',
     },
     limitedCardContent: {
         display: 'center',
@@ -361,6 +393,7 @@ function Explore({ signOut }) {
         document.location.reload();
     }
     const [cards, setcards] = useState([]);
+    const [proPictures, setProPictures] = useState({});
     const specializationMap = (spec) => {
         switch (spec) {
             case 'C': return 'Cardiologist';
@@ -379,6 +412,9 @@ function Explore({ signOut }) {
         }
     }
     const [username, setUsername] = useState("");
+    const [got, setGot] = useState(false);
+    const [rateAvg, setRateAvg] = useState({});
+    const [rateCount, setRateCount] = useState({});
     const callGetAPI = async () => {
         try {
             const response1 = await callTopDoctorsAPI();
@@ -387,16 +423,75 @@ function Explore({ signOut }) {
             if (response2.status === 200) {
                 setUsername(response2.payload.user.username);
             }
+            setGot(true);
         }
         catch (error) {
             console.log(error);
         }
     }
+
+    const callProfilePictureGetAPI = async () => {
+        try {
+            cards.map( async (card, index) => {
+                const uname = card.user.username;
+                const response = await callProfilePictureAPI(uname, card.user.is_doctor, isRemembered);
+                if (response.status === 200) {
+                    let pro_picture = response.payload.pro_picture;
+                    if (pro_picture === null) {
+                        proPictures[index] = (card.user.is_doctor ? DoctorImage : PatientImage);
+                    }
+                    else {
+                        proPictures[index] = (pro_picture);
+                    }
+                }
+            });
+            setSent(!sent);
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const callGetDetailRatingAPI = async () => {
+        try {
+            cards.map( async (card, index) => {
+                const response = await getRatingDetailCallAPI({ doctor_id: card.user.id });
+                // console.log(response);
+                if (response.status == 200) {
+                    const payload = response.payload;
+                    rateCount[index] = (payload.number);
+                    //rateCount.push(payload.number);
+                    //rateAvg.push(payload.avg);
+                    rateAvg[index] = (payload.avg);
+                    setSent(!sent);
+                }
+            });
+            setSent(!sent);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+
     const [sent, setSent] = useState(false);
     if (!sent) {
-        callGetAPI();
+        //callGetAPI();
         setSent(true);
     }
+    useEffect(() => {
+        callGetAPI();
+    }, []);
+    useEffect(() => {
+        if (got) {
+            callProfilePictureGetAPI();
+        }
+    }, [got]);
+    useEffect(() => {
+        if (got) {
+            callGetDetailRatingAPI();
+        }
+    }, [got])
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleDrawerOpen = () => {
@@ -643,14 +738,12 @@ function Explore({ signOut }) {
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card, index) => (
-                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0' }}>
-                                                    <Button style={{ textTransform: 'none', textAlign: 'center' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0',  }}>
+                                                    <Button style={{ textTransform: 'none', textAlign: 'center',  }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
                                                         <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
-                                                            <Grid style={{ display: 'flex', flexDirection: 'row' }}>
-                                                                <CardMedia
-                                                                    className={classes.cardMedia}
-                                                                    image={DoctorImage}
-                                                                    title="Image title" />
+                                                            <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                               
+                                                                <Avatar className={classes.cardMedia} src={proPictures[index]}/>
                                                                 <CardContent className={classes.cardContent}>
                                                                     <Typography gutterBottom variant="h5" component="h2">
                                                                         {card.user.username}
@@ -658,6 +751,13 @@ function Explore({ signOut }) {
                                                                     <Typography>
                                                                         {specializationMap(card.filed_of_specialization)}
                                                                     </Typography>
+                                                                    <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
+                                                                        <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                            <StarRating val={rateAvg[index]} />
+                                                                            <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
+                                                                            <Typography style={{color: 'inherit'}}>{rateCount[index]}</Typography>
+                                                                        </Paper>
+                                                                    </Box>
                                                                 </CardContent>
                                                             </Grid>
                                                         </Card>
