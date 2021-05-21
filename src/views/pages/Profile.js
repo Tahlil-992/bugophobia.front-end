@@ -85,6 +85,28 @@ const callEditProfileAPI = async (mainUsername, data, is_doctor, isRemembered) =
     }
 }
 
+const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
+    try {
+        const urlAddress = is_doctor ? "doctor" : "patient";
+        const response = callAPIHandler({ method: "GET", url: `/profile/${urlAddress}/update/${mainUsername}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callProfilePictureEditAPI = async (mainUsername, data, is_doctor, isRemembered) => {
+    try {
+        const urlAddress = is_doctor ? "doctor" : "patient";
+        const response = callAPIHandler({ method: "PUT", url: `/profile/${urlAddress}/update/${mainUsername}/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
@@ -393,11 +415,41 @@ export default function Profile() {
         }
     }
 
+    const callProfilePictureGetAPI = async () => {
+        try {
+            const response = await callProfilePictureAPI(mainUsername, isDoctor, isRemembered);
+            if (response.status === 200) {
+                let pro_picture = response.payload.pro_picture;
+                if (pro_picture === null) {
+                    setProfileImage(isDoctor ? DoctorImage : PatientImage);
+                    setIsProfileImageSet(false);
+                }
+                else {
+                    setProfileImage(pro_picture);
+                    setIsProfileImageSet(true);
+                }
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
     const [sent, setSent] = useState(false);
     if (!sent) {
-        callGetAPI();
+        //callGetAPI();
         setSent(true);
     }
+    useEffect(() => {
+        callGetAPI();
+    }, []);
+
+    useEffect(() => {
+        if (got) {
+            callProfilePictureGetAPI();
+        }
+    }, [got]);
 
     useEffect(() => {
         if (got) {
@@ -479,6 +531,19 @@ export default function Profile() {
         }
     }
 
+    const callProfilePictureSendAPI = async (data) => {
+        try {
+            const response = await callProfilePictureEditAPI(mainUsername, data, isDoctor, isRemembered);
+            if (response.status === 200) {
+                
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
     const [rateAvg, setRateAvg] = useState(0);
     const [rateCount, setRateCount] = useState(0);
 
@@ -489,8 +554,13 @@ export default function Profile() {
                 const { name: fileName, size: fileSize } = event.target.files[0];
                 const fileExtension = fileName.split(".").pop();
                 if (allowedExtensions.includes(fileExtension.toLowerCase())) {
+                    let form_data = new FormData();
+                    form_data.append('pro_picture', event.target.files[0], event.target.files[0].name);
+                    form_data.append('username', mainUsername);
+                    form_data.append('email', mainEmail);
                     setProfileImage(URL.createObjectURL(event.target.files[0]));
                     setIsProfileImageSet(true);
+                    callProfilePictureSendAPI(form_data);
                 }
                 else {
                     setMessage('Please upload files with common image extentions!');
@@ -509,6 +579,12 @@ export default function Profile() {
     const onDeleteFile = () => {
         setProfileImage(isDoctor ? DoctorImage : PatientImage);
         setIsProfileImageSet(false);
+        const data = {
+            username: username,
+            email: email,
+            pro_picture: null,
+        }
+        callProfilePictureSendAPI(data);
     }
 
     const onFileReset = (event) => {

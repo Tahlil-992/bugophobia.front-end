@@ -86,6 +86,17 @@ const callProfileAPI = async (data, is_viewed_doctor, isRemembered) => {
     }
 }
 
+const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
+    try {
+        const urlAddress = is_doctor ? "doctor" : "patient";
+        const response = callAPIHandler({ method: "GET", url: `/profile/${urlAddress}/update/${mainUsername}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const callSaveProfileAPI = async (data, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "POST", url: "/profile/save/", data: data }, true, isRemembered);
@@ -389,6 +400,8 @@ export default function Profile() {
         callGetDetailRatingAPI();
     }, [doctorid])
 
+    const [got, setGot] = useState(false);
+
     const callGetAPI = async () => {
         try {
             const data = { username: viewedUsername };
@@ -411,6 +424,26 @@ export default function Profile() {
                 }
                 else {
                     setInsurance((payload.insurance_type));
+                }
+                setGot(true);
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const callProfilePictureGetAPI = async () => {
+        try {
+            const response = await callProfilePictureAPI(username, isViewedDoctor, isRemembered);
+            if (response.status === 200) {
+                let pro_picture = response.payload.pro_picture;
+                if (pro_picture === null) {
+                    setProfileImage(isDoctor ? DoctorImage : PatientImage);
+                }
+                else {
+                    setProfileImage(pro_picture);
                 }
             }
         }
@@ -441,10 +474,21 @@ export default function Profile() {
 
     const [sent, setSent] = useState(false);
     if (!sent) {
-        callGetAPI();
-        callGetSaveAPI();
+        //callGetAPI();
+        //callGetSaveAPI();
         setSent(true);
     }
+
+    useEffect(() => {
+        callGetAPI();
+        callGetSaveAPI();
+    }, []);
+
+    useEffect(() => {
+        if (got) {
+            callProfilePictureGetAPI();
+        }
+    }, [got]);
 
     const saveButtonHandler = async () => {
         try {
