@@ -275,6 +275,7 @@ const useStyles = makeStyles((theme) => ({
     cardMedia: {
         height: '15vh',
         width: '15vh',
+        marginLeft:'0.5em',
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex',
