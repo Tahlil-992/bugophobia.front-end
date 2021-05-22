@@ -88,9 +88,3 @@
     padding: 1.2em;
     transform: translateY(-50%);
 }
-.rbc-day-slot .rbc-time-slot {
-    border: unset;
-  }
-.rbc-timeslot-group:nth-child(n+1){ 
-    border-top: 3px solid gray;
-}

@@ -59,8 +59,8 @@ export default function CalendarPage() {
                                 ]}
                                 step={60}
                                 showMultiDayTimes
-                                min={new Date(2008, 0, 1, 8, 0)} // 8.00 AM
-                                max={new Date(2008, 0, 1, 23, 0)} // Max will be 6.00 PM!z
+                                min={new Date(2021, 5, 1, 8, 0)}
+                                max={new Date(2021, 5, 1, 23, 0)} 
                                 startAccessor="start"
                                 endAccessor="end"
                             />
