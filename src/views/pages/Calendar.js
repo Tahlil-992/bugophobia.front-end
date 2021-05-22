@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import "../../style.css";
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -10,25 +9,28 @@ import Button from '@material-ui/core/Button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Link } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import format from 'date-fns/format'
-import parse from 'date-fns/parse'
-import startOfWeek from 'date-fns/startOfWeek'
-import getDay from 'date-fns/getDay'
+import format from 'date-fns/format';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import getDay from 'date-fns/getDay';
+import "../../style.css";
+
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
 }
-
 const useStyles = makeStyles((theme) => ({
     container: {
         paddingTop: theme.spacing(4),
     },
 }));
-
 export default function CalendarPage() {
     const classes = useStyles();
     const localizer = momentLocalizer(moment);
+    const minTime = new Date();
+    minTime.setHours(6,0,0);
+    const maxTime = new Date();
+    maxTime.setHours(23,30,0);  
     return (
         <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
@@ -41,26 +43,32 @@ export default function CalendarPage() {
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
                         <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
-                            <Calendar style={{ outlineColor: 'red' }}
+                            <Calendar style={{ height : '37rem' }}
                                 localizer={localizer}
                                 events={[
                                     {
                                         'title': 'visit 1',
                                         'allDay': false,
-                                        'start': new Date(2021, 5, 19, 10, 0),
-                                        'end': new Date(2021, 5, 19, 14, 0),
+                                        'start': new Date(2021, 4, 19, 10, 0),
+                                        'end': new Date(2021, 4, 19, 11, 0),
                                     },
                                     {
                                         'title': 'visit 2',
                                         'allDay': false,
-                                        'start': new Date(2021, 5, 19, 17, 0),
-                                        'end': new Date(2021, 5, 19, 18, 0),
-                                    }
+                                        'start': new Date(2021, 4, 19, 18, 0),
+                                        'end': new Date(2021, 4, 19, 18, 45),
+                                    },
+                                    {
+                                        'title': 'visit 3',
+                                        'allDay': false,
+                                        'start': new Date(2021, 4, 21, 17, 0),
+                                        'end': new Date(2021, 4, 21, 17, 30),
+                                    },
                                 ]}
                                 step={60}
                                 showMultiDayTimes
-                                min={new Date(2021, 5, 1, 8, 0)}
-                                max={new Date(2021, 5, 1, 23, 0)} 
+                                min={minTime}
+                                max={maxTime} 
                                 startAccessor="start"
                                 endAccessor="end"
                             />
