@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Backdrop, Box, Button, Fade, Grid, IconButton, InputAdornment, makeStyles, Modal, Paper, TextareaAutosize, TextField, Typography } from "@material-ui/core";
+import "../../style.css";
+import { Backdrop, Box, Button, Fade, Grid, IconButton, makeStyles, Modal, Paper, TextareaAutosize, TextField, Typography } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
 import DoneIcon from '@material-ui/icons/Done';
 import ClearIcon from '@material-ui/icons/Clear';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
+import TitleIcon from '@material-ui/icons/Title';
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 /*
 <Modal
@@ -59,8 +63,10 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#f6f6f6',
         transition: 'all 0.3s ease',
         '&:hover': {
-            backgroundColor: '#ffffff',
-            transition: 'all 0.2s ease',
+            backgroundColor: 'rgba(36, 36, 128, 1)',
+            boxShadow: '0px 0px 20px 10px rgba(36, 36, 128, 0.7)',
+            transition: 'all 0.3s ease',
+            color: '#fff',
         },
     },
     pluspaper: {
@@ -70,8 +76,10 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         transition: 'all 0.3s ease',
         '&:hover': {
-            backgroundColor: 'rgba(16, 16, 64, 0.2)',
+            backgroundColor: 'rgba(36, 128, 36, 1)',
+            boxShadow: '0px 0px 20px 10px rgba(36, 128, 36, 0.7)',
             transition: 'all 0.2s ease',
+            color: '#fff',
         },
     },
     title: {
@@ -111,15 +119,20 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         marginLeft: '0%',
         marginRight: '0%',
+        overflowX: 'visible',
+        overflowY: 'visible',
     },
     backicon: {
         //padding: '0.3em',
         marginBottom: '0.5em',
         backgroundColor: 'rgba(36, 36, 128, 0.3)',
         transition: 'all 0.3s ease',
+        position: 'sticky',
+        top: '0%',
+        alignSelf: 'flex-start',
         '&:hover': {
-            backgroundColor: 'rgba(36, 36, 128, 0.8)',
-            boxShadow: '0px 0px 20px rgba(36, 36, 128, 0.8)',
+            backgroundColor: 'rgba(36, 36, 128, 1)',
+            boxShadow: '0px 0px 20px rgba(36, 36, 128, 1)',
             transition: 'all 0.3s ease',
             color: '#fff',
         },
@@ -129,9 +142,11 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: '0.5em',
         backgroundColor: 'rgba(36, 128, 36, 0.3)',
         transition: 'all 0.3s ease',
+        position: 'sticky',
+        top: '0%',
         '&:hover': {
-            backgroundColor: 'rgba(36, 128, 36, 0.8)',
-            boxShadow: '0px 0px 20px rgba(36, 128, 36, 0.8)',
+            backgroundColor: 'rgba(36, 128, 36, 1)',
+            boxShadow: '0px 0px 20px rgba(36, 128, 36, 1)',
             transition: 'all 0.3s ease',
             color: '#fff',
         },
@@ -141,9 +156,11 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: '0.5em',
         backgroundColor: 'rgba(128, 36, 36, 0.3)',
         transition: 'all 0.3s ease',
+        position: 'sticky',
+        top: '0%',
         '&:hover': {
-            backgroundColor: 'rgba(128, 36, 36, 0.8)',
-            boxShadow: '0px 0px 20px rgba(128, 36, 36, 0.8)',
+            backgroundColor: 'rgba(128, 36, 36, 1)',
+            boxShadow: '0px 0px 20px rgba(128, 36, 36, 1)',
             transition: 'all 0.3s ease',
             color: '#fff',
         },
@@ -151,6 +168,8 @@ const useStyles = makeStyles((theme) => ({
     sidebar: {
         borderRight: '1px solid #aaa',
         marginRight: '1em',
+        overflowX: 'visible',
+        overflowY: 'visible',
     },
     textfield: {
         width: '100%',
@@ -273,7 +292,7 @@ export default function Offices() {
     const addOffice = () => {
         const index = offices.length;
         var newOffices = offices;
-        newOffices.push(['Office ' + (index+1), '', []]);
+        newOffices.push(['Office ' + (index+1), '', ['']]);
         setOffices(newOffices);
         goToOffice(index);
     };
@@ -312,7 +331,7 @@ export default function Offices() {
             </Grid>
         </Grid>
         :
-        <Grid container justify='flex-start' spacing={1} direction='row' className={classes.officegrid}>
+        <Grid container  spacing={1} direction='row' className={classes.officegrid}>
             <Grid item xs={1} container direction='column' className={classes.sidebar}>
                 <IconButton onClick={backToList} className={classes.backicon}>
                     <ArrowBackIcon />
@@ -327,15 +346,19 @@ export default function Offices() {
             <Grid item xs={11} container direction='row' spacing={2} style={{marginTop: '0em'}}> 
                 <Grid item xs={12} style={{ textAlign: 'center',  }} inputProps={{min: 0, style: { textAlign: 'center',  }}}>
                     <Box >
-                        <Typography className={classes.title} align='left'>Title:</Typography>
+                        
                         <TextField
                             variant='outlined'
                             value={title}
+                            label='Title'
                             fullWidth
                             autoFocus={false}
-                            style={{}}
                             className={classes.textfield}
-                            inputProps={{min: 0, style: { textAlign: 'center', fontSize: 15 }}}
+                            inputProps={{
+                                min: 0, 
+                                style: { textAlign: 'center', fontSize: 15 },
+                                startAdornment: (<InputAdornment position="start"> <TitleIcon/> </InputAdornment>),
+                            }}
                             onChange={(event) => {setTitle(event.target.value); setIsChanged(true);}}
                             />
                     </Box>
@@ -362,11 +385,11 @@ export default function Offices() {
                                     value={phone}
                                     fullWidth
                                     className={classes.textfield}
-                                    inputProps={{min: 0, style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }}}
+                                    inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon/> }</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' },}}
                                     onChange={(event) => changePhone(index, event.target.value)}
-                                />
-                                        <IconButton  style={{marginLeft: '0.0em'}} onClick={() => removePhone(index)}>
-                                            <RemoveIcon fontSize='small' color='secondary' />
+                                    />
+                                        <IconButton  style={{marginLeft: '0.0em'}} onClick={() => removePhone(index)} disabled={phoneNos.length === 1}>
+                                            <RemoveIcon fontSize='small' color={phoneNos.length === 1 ? 'disabled' : 'secondary'} />
                                         </IconButton>
                             </Box>
                         ))}
