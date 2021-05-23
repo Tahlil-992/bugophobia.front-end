@@ -38,10 +38,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '3%',
         transition: 'all 0.15s linear',
         '&:hover': {
-            width: '100%',
-            marginLeft: '0%',
-            marginRight: '0%',
-            backgroundColor: "#f3f3f3",
+            backgroundColor: "#f9f9f9",
             transition: 'all 0s, width 0s',
         },
     },
