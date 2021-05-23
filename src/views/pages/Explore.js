@@ -610,11 +610,14 @@ function Explore({ signOut }) {
                                                 className={classes.limitedCard} 
                                                 style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
                                                 <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
+                                                    <Grid item xs={4}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
                                                         image={DoctorImage}
                                                         title="Image title"
-                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: 0}} />
+                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: "auto", border: 'none'}} />
+                                                    </Grid>
+                                                    <Grid item xs={8}>
                                                     <CardContent className={classes.limitedCardContent} style={{padding: "1em 0"}}>
                                                         <Typography variant="h6">
                                                             {list.user.username}
@@ -623,6 +626,7 @@ function Explore({ signOut }) {
                                                             {specializationMap(list.filed_of_specialization)}
                                                         </Typography>
                                                     </CardContent>
+                                                    </Grid>
                                                 </Grid>                                       
                                             </Card>
                                             </Button>
