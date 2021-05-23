@@ -225,7 +225,6 @@ export default function Offices() {
         if (index === -1) {
             setOffices([]);
             setPaperElav(1);
-            handlePopoverClose();
         }
         else {
             let newOffices = offices;
@@ -233,6 +232,7 @@ export default function Offices() {
             setOffices(newOffices);
             setPaperElav(offices.length + 1);
         }
+        handlePopoverClose();
     };
 
     const goToOffice = (index) => {
@@ -257,6 +257,7 @@ export default function Offices() {
         setIsChanged(false);
         setAutoFocus(false);
         setPaperElav(paperElav+1);
+        handlePopoverClose();
     };
 
     const cancelChanges = () => {
@@ -266,6 +267,7 @@ export default function Offices() {
         setIsChanged(false);
         setAutoFocus(false);
         setPaperElav(paperElav+1);
+        handlePopoverClose();
     };
 
     const backToList = () => {
@@ -291,6 +293,7 @@ export default function Offices() {
         setIsChanged(true);
         setAutoFocus(true);
         setPaperElav(paperElav+1);
+        handlePopoverClose();
     };
 
     const removePhone = (index) => {
@@ -302,6 +305,7 @@ export default function Offices() {
         setIsChanged(true);
         setAutoFocus(false);
         setPaperElav(paperElav+1);
+        handlePopoverClose();
     };
 
     return ( officeIndex === -1 ? 
@@ -325,7 +329,7 @@ export default function Offices() {
                             onMouseEnter={(event) => handlePopoverOpen(event, 'Remove "' + offices[index][0] + '"')}
                             onMouseLeave={handlePopoverClose}
                             >
-                                <DeleteIcon />
+                                <DeleteIcon style={{color: "#E03030"}} />
                         </IconButton>
                     </Grid>
                 </>
@@ -350,7 +354,7 @@ export default function Offices() {
                     onMouseLeave={handlePopoverClose}
                     disabled={offices.length === 0}
                     >
-                        <DeleteForeverIcon />
+                        <DeleteForeverIcon style={{color: offices.length === 0 ? 'gray' : "#E03030"}} />
                 </IconButton>
             </Grid>
             <Popper
@@ -464,6 +468,7 @@ export default function Offices() {
                         ))}
                         <IconButton 
                             onClick={addPhone}
+                            style={{backgroundColor: '#e0e0e0'}}
                             onMouseEnter={(event) => handlePopoverOpen(event, 'Add a phone number')}
                             onMouseLeave={handlePopoverClose}
                             >
