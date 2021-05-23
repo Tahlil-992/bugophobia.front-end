@@ -85,6 +85,16 @@ const callEditProfileAPI = async (mainUsername, data, is_doctor, isRemembered) =
     }
 }
 
+const callChangePasswordAPI = async ( data, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "PUT", url: `/profile/change_password/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
     try {
         const urlAddress = is_doctor ? "doctor" : "patient";
@@ -246,6 +256,7 @@ const useStyles = makeStyles((theme) => ({
 
 const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
 const userNameRegex = RegExp(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/);
+const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -359,17 +370,21 @@ export default function Profile() {
     const [mainUsername, setMainUsername] = useState("");
     const [mainEmail, setMainEmail] = useState("");
 
-    const [oldPassword, setOldPassword] = useState();
-    const [newPassword, setNewPassword] = useState();
-    const [newPasswordConfirm, setNewPasswordConfirm] = useState();
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 
     const [detailChange, setDetailChange] = useState(false);
 
     const [isEmailValid, setIsEmailValid] = useState(true);
     const [isUsernameValid, setIsUsernameValid] = useState(true);
+    const [oldPasswordError, setOldPasswordError] = useState(false);
+    const [newPasswordError, setNewPasswordError] = useState(false);
+    const [newPasswordConfirmError, setNewPasswordConfirmError] = useState(false);
 
     const [emailhelper, setemailhelper] = useState("");
     const [userhelper, setuserhelper] = useState("");
+    const [passhelper, setpasshelper] = useState("");
 
     useEffect(() => {
         callGetDetailRatingAPI();
@@ -477,6 +492,36 @@ export default function Profile() {
         }
     }, [username]);
 
+    useEffect(() => {
+        if (got) {
+            setOldPasswordError(false);
+        }
+    }, [oldPassword]);
+
+    useEffect(() => {
+        if (got) {
+            if (newPassword && !passwordRegex.test(newPassword)) {
+                setpasshelper("Password should be at least 8 characters including lowercase and uppercase letters and numbers.");
+                setNewPasswordError(true);
+            }
+            else {
+                setpasshelper('');
+                setNewPasswordError(false);
+            }
+        }
+    }, [newPassword]);
+
+    useEffect(() => {
+        if (got) {
+            if (newPasswordConfirm === newPassword) {
+                setNewPasswordConfirmError(false);
+            }
+            else {
+                setNewPasswordConfirmError(true);
+            }
+        }
+    }, [newPasswordConfirm]);
+
     const callEditAPI = async () => {
         if (isEmailValid && isUsernameValid) {
             try {
@@ -539,6 +584,57 @@ export default function Profile() {
             }
         }
         catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const callChangePassword = async () => {
+        try {
+            if (newPassword === newPasswordConfirm && newPassword && newPasswordConfirm) {
+                if (!passwordRegex.test(newPassword)) {
+                    setMessage(passhelper);
+                    setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                    setOpenSnackBar(true);
+                    return;
+                }
+                const data = {
+                    new_password: newPassword,
+                    old_password: oldPassword,
+                }
+                const response = await callChangePasswordAPI(data, isRemembered);
+                if (response.status === 200) {
+                    setMessage('Your password updated successfully!');
+                    setSnackColor([SUCCESS_BACKGROUND, SUCCESS_COLOR]);
+                    setOpenSnackBar(true);
+                    setOldPassword('');
+                    setNewPassword('');
+                    setNewPasswordConfirm('');
+                }
+            }
+            else {
+                if (!newPassword) {
+                    setMessage("New password should not be empty!");
+                    setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                    setNewPasswordError(true);
+                    setOpenSnackBar(true);
+                }
+                else {
+                    setMessage("Confirm password doesn't matches new password!");
+                    setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                    setNewPasswordConfirmError(true);
+                    setOpenSnackBar(true);
+                }
+                
+            }
+        }
+        catch (error) {
+            if (error.status === 400) {
+                setMessage("Current old password is wrong! Please check again.");
+                setSnackColor([ERROR_BACKGROUND, ERROR_COLOR]);
+                setOldPasswordError(true);
+                setOpenSnackBar(true);
+            }
             console.log(error);
 
         }
@@ -831,6 +927,11 @@ export default function Profile() {
                                             oldPassword={oldPassword}                   setOldPassword={setOldPassword}
                                             newPassword={newPassword}                   setNewPassword={setNewPassword}
                                             newPasswordConfirm={newPasswordConfirm}     setNewPasswordConfirm={setNewPasswordConfirm}
+                                            oldPasswordError={oldPasswordError}         
+                                            newPasswordError={newPasswordError}         
+                                            newPasswordConfirmError={newPasswordConfirmError} 
+                                            passhelper={passhelper}  
+                                            callChangePassword={callChangePassword}
                                             />
                                     }
                                 </TabPanel2>
@@ -840,6 +941,11 @@ export default function Profile() {
                                             oldPassword={oldPassword}                   setOldPassword={setOldPassword}
                                             newPassword={newPassword}                   setNewPassword={setNewPassword}
                                             newPasswordConfirm={newPasswordConfirm}     setNewPasswordConfirm={setNewPasswordConfirm}
+                                            oldPasswordError={oldPasswordError}         
+                                            newPasswordError={newPasswordError}         
+                                            newPasswordConfirmError={newPasswordConfirmError} 
+                                            passhelper={passhelper}
+                                            callChangePassword={callChangePassword}
                                             />
                                         :
                                         <Typography>Calendar</Typography>

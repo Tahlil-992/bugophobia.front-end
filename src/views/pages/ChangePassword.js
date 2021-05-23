@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import "../../style.css";
 import Grid from '@material-ui/core/Grid';
-import { Button, makeStyles, withStyles, } from '@material-ui/core';
+import { Button, IconButton, makeStyles, withStyles, } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 const MyTextField = withStyles({
     root: {
@@ -36,10 +38,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '3%',
         transition: 'all 0.15s linear',
         '&:hover': {
-            width: '100%',
-            marginLeft: '0%',
-            marginRight: '0%',
-            backgroundColor: "#f3f3f3",
+            backgroundColor: "#f9f9f9",
             transition: 'all 0s, width 0s',
         },
     },
@@ -66,11 +65,22 @@ const useStyles = makeStyles((theme) => ({
 
 export default function About(props) {
 
-    const [oldPassword, setOldPassword] = [props.oldPassword, props.setOldPassword]
-    const [newPassword, setNewPassword] = [props.newPassword, props.setNewPassword]
-    const [newPasswordConfirm, setNewPasswordConfirm] = [props.newPasswordConfirm, props.setNewPasswordConfirm]
+    const [oldPassword, setOldPassword] = [props.oldPassword, props.setOldPassword];
+    const [newPassword, setNewPassword] = [props.newPassword, props.setNewPassword];
+    const [newPasswordConfirm, setNewPasswordConfirm] = [props.newPasswordConfirm, props.setNewPasswordConfirm];
+    const oldPasswordError = props.oldPasswordError;
+    const newPasswordError = props.newPasswordError;
+    const newPasswordConfirmError = props.newPasswordConfirmError;
+    const passhelper = props.passhelper;
+    const callChangePassword = props.callChangePassword;
 
     const classes = useStyles();
+
+    const [showPassword1, setShowPassword1] = useState(false);
+    const handleClickShowPassword1 = () => setShowPassword1(!showPassword1);
+
+    const [showPassword2, setShowPassword2] = useState(false);
+    const handleClickShowPassword2 = () => setShowPassword2(!showPassword2);
 
     return (
         <Grid container spacing={3} alignItems="center" justify="center" style={{marginTop: '1em'}}>
@@ -78,11 +88,23 @@ export default function About(props) {
                 <MyTextField
                     variant="outlined"
                     className={classes.textfield}
+                    value={oldPassword}
                     label="Old Password"
-                    type="password"
+                    type={showPassword1 ? "text" : "password"}
+                    error={oldPasswordError}
+                    onChange={(event) => setOldPassword(event.target.value)}
                     InputProps={{
-                        startAdornment: (<InputAdornment position="start" > <LockOpenIcon/> </InputAdornment>),
-                        classes: { root: classes.dis }
+                        startAdornment: (<InputAdornment position="start"><LockOpenIcon /></InputAdornment>),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword1}
+                                >
+                                    {showPassword1 ? <Visibility /> : <VisibilityOff />}
+                                </IconButton>
+                            </InputAdornment>
+                        )
                     }}
                 />
             </Grid>
@@ -90,11 +112,24 @@ export default function About(props) {
                 <MyTextField
                     variant="outlined"
                     className={classes.textfield}
+                    value={newPassword}
                     label="New Password"
-                    type="password"
+                    type={showPassword2 ? "text" : "password"}
+                    error={newPasswordError}
+                    onChange={(event) => setNewPassword(event.target.value)}
+                    helperText={passhelper}
                     InputProps={{
-                        startAdornment: (<InputAdornment position="start" ><LockIcon /> </InputAdornment>),
-                        classes: { root: classes.dis }
+                        startAdornment: (<InputAdornment position="start"><LockIcon /></InputAdornment>),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword2}
+                                >
+                                    {showPassword2 ? <Visibility /> : <VisibilityOff />}
+                                </IconButton>
+                            </InputAdornment>
+                        )
                     }}
                 />
             </Grid>
@@ -102,8 +137,11 @@ export default function About(props) {
                 <MyTextField
                     variant="outlined"
                     className={classes.textfield}
+                    value={newPasswordConfirm}
                     label="Confirm New Password"
-                    type="password"
+                    type={showPassword2 ? "text" : "password"}
+                    error={newPasswordConfirmError}
+                    onChange={(event) => setNewPasswordConfirm(event.target.value)}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" ><LockIcon /> </InputAdornment>),
                         classes: { root: classes.dis }
@@ -111,7 +149,13 @@ export default function About(props) {
                 />
             </Grid>
             <Grid item>
-                <Button className={classes.button}>Change Your Password</Button>
+                <Button 
+                    className={classes.button} 
+                    onClick={callChangePassword}
+                    disabled={!oldPassword}
+                    >
+                        Change Your Password
+                    </Button>
             </Grid>
         </Grid>
     );
