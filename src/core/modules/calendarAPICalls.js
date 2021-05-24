@@ -1,5 +1,17 @@
 import {callAPIHandler} from './refreshToken';
 
+export const callChangeVisitDurationTimeAPI = async({visit_duration_time}, isRemembered) => {
+    try
+    {
+        const response = await callAPIHandler({method: "PUT", data: {visit_duration_time: visit_duration_time}, url: "/profile/change_visit_duration/"}, true, isRemembered);
+        return response;
+    }
+    catch (e)
+    {
+        throw e;
+    }
+}
+
 export const callCreateReservationAPI = async ({start_time}, isRemembered) => {
     try
     {
@@ -36,7 +48,17 @@ export const callGetDoctorRerservationsList = async({from_date, to_date}, isReme
     }
 }
 
-// const callGetReservationsPUTPATCH
+export const callGetReservationAPI = async({id}, isRemembered) => {
+    try
+    {
+        const response = await callAPIHandler({method: "PUT", data: {id: id}, url: "schedule/get_reservation/"}, true, isRemembered);
+        return response;
+    }
+    catch (e)
+    {
+        throw e;
+    }
+}
 
 export const callListAllReservationsAvailableToPatients = async({id}, isRemembered) => {
     try
