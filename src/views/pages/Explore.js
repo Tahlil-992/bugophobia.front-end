@@ -114,7 +114,7 @@ const getLimitedSearchCallAPI = async (username, isRemembered) => {
 
 const drawerWidth = 240;
 const collapsedSearchWidth = '12rem';
-const expandedSearchWidth = '24rem';
+const expandedSearchWidth = '18rem';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -259,9 +259,9 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'rgba(255, 247, 155, 0.3)',
+        backgroundColor: '#FFF',
         "&:hover": {
-            backgroundColor: 'rgba(255, 236, 186, 0.5)',
+            backgroundColor: '#EEE',
         },
     },
     limitedPopper: {
@@ -293,7 +293,7 @@ const useStyles = makeStyles((theme) => ({
     limitedCardContent: {
         display: 'center',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center', 
     },
     advancedSearchButton: {
         "&:hover": {
@@ -610,12 +610,15 @@ function Explore({ signOut }) {
                                                 className={classes.limitedCard} 
                                                 style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
                                                 <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
+                                                    <Grid item xs={4}>
                                                     <CardMedia
                                                         className={classes.cardMedia}
                                                         image={DoctorImage}
                                                         title="Image title"
-                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: 0}} />
-                                                    <CardContent className={classes.limitedCardContent} style={{paddingBottom: 0}}>
+                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: "auto", border: 'none'}} />
+                                                    </Grid>
+                                                    <Grid item xs={8}>
+                                                    <CardContent className={classes.limitedCardContent} style={{padding: "1em 0"}}>
                                                         <Typography variant="h6">
                                                             {list.user.username}
                                                         </Typography>
@@ -623,6 +626,7 @@ function Explore({ signOut }) {
                                                             {specializationMap(list.filed_of_specialization)}
                                                         </Typography>
                                                     </CardContent>
+                                                    </Grid>
                                                 </Grid>                                       
                                             </Card>
                                             </Button>
@@ -635,11 +639,11 @@ function Explore({ signOut }) {
                                             </Typography>
                                         </Card>
                                         </Box>}
-                                        {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{backgroundColor: "#73c17f", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px"}}>
+                                        {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px"}}>
                                         <Button
                                             onClick={() => {setOpenFilters(true); setShowLimitedMenu(false);}}
-                                            style={{textTransform: "none", backgroundColor: "#73c17f", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
-                                            <Typography style={{color: "#000", margin: "0.5em 0"}}>
+                                            style={{textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
+                                            <Typography style={{color: "#FFF", margin: "0.5em 0"}}>
                                                 Advanced Search
                                             </Typography>
                                         </Button>
