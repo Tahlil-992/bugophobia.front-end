@@ -37,7 +37,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
- function CalendarPage({ isRemembered }) {
+const ColoredDateCellWrapper = ({ children }) =>
+  React.cloneElement(React.Children.only(children), {
+    style: {
+      backgroundColor: 'lightblue',
+    },
+});
+
+function CalendarPage({ isRemembered }) {
     const classes = useStyles();
     const localizer = momentLocalizer(moment);
     const minTime = new Date();
@@ -76,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
             if (view === calendar_views.month || view === calendar_views.agenda) {
                 setStartDate(range_data.start);
                 setEndDate(range_data.end);
+                console.log(range_data.end.getMonth());
             }
             else if (view === calendar_views.week) {
                 setStartDate(range_data[0]);
@@ -83,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
             }
             else if (view === calendar_views.day) {
                 setStartDate(range_data[0]);
-                setEndDate(moment(range_data[0]).add(1, 'days'));
+                setEndDate(moment(range_data[0]).add(1, 'days').toDate());
             }
         }
     }
@@ -133,43 +141,39 @@ const useStyles = makeStyles((theme) => ({
                                 view={view}
                                 onView={(event) => {setView(event); console.log(event);}}
                                 onRangeChange={(event) => {setRange(event); console.log(event);}}
-                                events={events ? events.map((event) => {
-                                    const start_date_obj = getDateElements(event.start_date);
-                                    const end_date_obj = getDateElements(event.end_date);
+                                events={
+                                    events ? events.map((event) => {
+                                    const start_date_obj = getDateElements(event.start_time);
+                                    const end_date_obj = getDateElements(event.end_time);
                                     return {
                                         'start': new Date(
                                             start_date_obj.year,
-                                            start_date_obj.month,
+                                            start_date_obj.month - 1,
                                             start_date_obj.day,
                                             start_date_obj.hour,
                                             start_date_obj.minute,
                                         ),
                                         'end': new Date(
                                             end_date_obj.year,
-                                            end_date_obj.month,
+                                            end_date_obj.month - 1,
                                             end_date_obj.day,
                                             end_date_obj.hour,
                                             end_date_obj.minute,
                                         ),
                                         'allDay': false,
-                                        'title': `Visit time set for`,
+                                        'title': `Visit time set for ${start_date_obj.hour}:${start_date_obj.minute}-${end_date_obj.hour}:${end_date_obj.minute}`,
                                     }
                                 }) : []
-                                // [
-                                //     {
-                                //         'title': 'visit 1',
-                                //         'allDay': false,
-                                //         'start': new Date(2021, 4, 19, 10, 0),
-                                //         'end': new Date(2021, 4, 19, 11, 0),
-                                //     },
-                                // ]
                                 }
                                 step={60}
                                 showMultiDayTimes
                                 min={minTime}
                                 max={maxTime} 
-                                startAccessor={() => {return new Date();}}
+                                startAccessor="start"
                                 endAccessor="end"
+                                components={{
+                                    timeSlotWrapper: ColoredDateCellWrapper
+                                }}
                             />
                         </div>
                     </Grid>
