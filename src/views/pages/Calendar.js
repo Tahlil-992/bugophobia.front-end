@@ -161,7 +161,7 @@ function CalendarPage({ isRemembered }) {
                                             end_date_obj.minute,
                                         ),
                                         'allDay': false,
-                                        'title': `Visit time set for ${start_date_obj.hour}:${start_date_obj.minute}-${end_date_obj.hour}:${end_date_obj.minute}`,
+                                        'title': `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`,
                                     }
                                 }) : []
                                 }
@@ -173,6 +173,11 @@ function CalendarPage({ isRemembered }) {
                                 endAccessor="end"
                                 components={{
                                     timeSlotWrapper: ColoredDateCellWrapper
+                                }}
+                                tooltipAccessor={(event) => {
+                                    console.log(event);
+                                    console.log(event.start.getFullYear());
+                                    return `${event.title}\nTime: ${event.start.getHours()}:${event.start.getMinutes()}-${event.end.getHours()}:${event.end.getMinutes()}`;                                    
                                 }}
                             />
                         </div>
