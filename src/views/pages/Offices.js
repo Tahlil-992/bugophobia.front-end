@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -18,6 +18,7 @@ import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import "../../style.css";
 import Popper from '@material-ui/core/Popper';
+import { green } from '@material-ui/core/colors';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -151,7 +152,7 @@ const useStyles = makeStyles((theme) => ({
     },
     container: {
         paddingTop: theme.spacing(4),
-    },     
+    },
     popover: {
         pointerEvents: 'none',
         //transition: 'all 0.01s ease',
@@ -182,9 +183,9 @@ export default function Offices() {
     const [title, setTitle] = useState('');
     const [address, setAddress] = useState('');
     const [phoneNos, setPhoneNos] = useState([]);
-    
+
     const [isChanged, setIsChanged] = useState(false);
-    
+
     const [paperElav, setPaperElav] = useState(-1);
     const [officeIndex, setOfficeIndex] = useState(-1);
 
@@ -192,9 +193,9 @@ export default function Offices() {
 
     const localizer = momentLocalizer(moment);
     const minTime = new Date();
-    minTime.setHours(6,0,0);
+    minTime.setHours(6, 0, 0);
     const maxTime = new Date();
-    maxTime.setHours(23,30,0);
+    maxTime.setHours(23, 30, 0);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [arrowRef, setArrowRef] = useState(null);
@@ -216,7 +217,7 @@ export default function Offices() {
     const addOffice = () => {
         const index = offices.length;
         var newOffices = offices;
-        newOffices.push(['Office ' + (index+1), '', ['']]);
+        newOffices.push(['Office ' + (index + 1), '', ['']]);
         setOffices(newOffices);
         goToOffice(index);
     };
@@ -245,8 +246,8 @@ export default function Offices() {
     const saveChanges = () => {
         var newOffices = offices;
         if (!title) {
-            newOffices[officeIndex][0] = 'Office ' + (officeIndex+1);
-            setTitle('Office ' + (officeIndex+1));
+            newOffices[officeIndex][0] = 'Office ' + (officeIndex + 1);
+            setTitle('Office ' + (officeIndex + 1));
         }
         else {
             newOffices[officeIndex][0] = title;
@@ -256,7 +257,7 @@ export default function Offices() {
         setOffices(newOffices);
         setIsChanged(false);
         setAutoFocus(false);
-        setPaperElav(paperElav+1);
+        setPaperElav(paperElav + 1);
         handlePopoverClose();
     };
 
@@ -266,7 +267,7 @@ export default function Offices() {
         setPhoneNos(offices[officeIndex][2]);
         setIsChanged(false);
         setAutoFocus(false);
-        setPaperElav(paperElav+1);
+        setPaperElav(paperElav + 1);
         handlePopoverClose();
     };
 
@@ -283,7 +284,7 @@ export default function Offices() {
         newPhone[index] = phone;
         setPhoneNos(newPhone);
         setIsChanged(true);
-        setPaperElav(paperElav+1);
+        setPaperElav(paperElav + 1);
     };
 
     const addPhone = () => {
@@ -292,7 +293,7 @@ export default function Offices() {
         setPhoneNos(newPhone);
         setIsChanged(true);
         setAutoFocus(true);
-        setPaperElav(paperElav+1);
+        setPaperElav(paperElav + 1);
         handlePopoverClose();
     };
 
@@ -300,21 +301,105 @@ export default function Offices() {
         let newPhone = phoneNos;
         if (index > -1) {
             newPhone.splice(index, 1);
-          }
+        }
         setPhoneNos(newPhone);
         setIsChanged(true);
         setAutoFocus(false);
-        setPaperElav(paperElav+1);
+        setPaperElav(paperElav + 1);
         handlePopoverClose();
     };
 
-    return ( officeIndex === -1 ? 
+    const [events, setEvents] = useState([]);
+    const [monthEvents, setmonthEvents] = useState([]);
+    const eventsColor = () => {
+        var date = new Date();
+        var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
+        for (var j = day; j < day + 10; j++) {
+            var minutes = 0;
+            var hours = 6;
+            for (var i = 0; i < 71; i++) {
+                events.push(
+                    {
+                        'title': 'Available Time ',
+                        'allDay': false,
+                        'start': new Date(year, month, j, hours, minutes),
+                        'end': new Date(year, month, j, hours, minutes + 15),
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                        'AvailableState': true,
+                        'index': j
+                    }
+                )
+                minutes = minutes + 15;
+            }
+        }
+    }
+    const eventsMonthColor = () => {
+        var date = new Date();
+        var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
+        for (var i = 0; i < 365; i++) {
+            monthEvents.push(
+                {
+                    'title': 'Available',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'color': 'lightgreen',
+                    'borderColor': 'green',
+                    'AvailableState': true,
+                    'height': '5em',
+                    'index': i + new Date().getDate(),
+                }
+            )
+            day = day + 1;
+        }
+    }
+    useEffect(() => { eventsColor(); eventsMonthColor(); }, []);
+    const ChangeEventState = (event) => {
+        if (viewCalendar === 'month') {
+            events.map((e) => {
+                if (e.index === event.index) {
+                    if (event.AvailableState) {
+                        e.color = '#fb3640';
+                        e.borderColor = 'red';
+                        e.title = 'Unavailable Time';
+                    }
+                    else {
+                        e.color = 'lightgreen';
+                        e.borderColor = 'green';
+                        e.title = 'Available Time';
+                    }
+                    e.AvailableState = !event.AvailableState
+                }
+            })
+        }
+        if (event.AvailableState) {
+            event.color = '#fb3640';
+            event.borderColor = 'red';
+            if (viewCalendar === 'month')
+                event.title = 'Unavailable';
+            else
+                event.title = 'Unavailable Time';
+        }
+        else {
+            event.color = 'lightgreen';
+            event.borderColor = 'green';
+            if (viewCalendar === 'month')
+                event.title = 'Available';
+            else
+                event.title = 'Available Time';
+        }
+        event.AvailableState = !event.AvailableState;
+    }
+    const [viewCalendar, setviewCalendar] = useState('week');
+
+    return (officeIndex === -1 ?
         <Grid container direction='row' justify='center' alignItems='center'>
             {offices.map((office, index) => (
                 <>
-                    <Grid item xs={11} style={{padding: '0.5em 1em'}}>
-                        <Button  style={{padding: '0em', margin: '0em 0em', textTransform: 'none', width: '100%'}} onClick={() => goToOffice(index)} key={index}>
-                            <Paper className={classes.paper} 
+                    <Grid item xs={11} style={{ padding: '0.5em 1em' }}>
+                        <Button style={{ padding: '0em', margin: '0em 0em', textTransform: 'none', width: '100%' }} onClick={() => goToOffice(index)} key={index}>
+                            <Paper className={classes.paper}
                                 onMouseEnter={() => setPaperElav(index)}
                                 onMouseLeave={() => setPaperElav(-1)}
                                 elevation={paperElav === index ? 10 : 1}
@@ -324,19 +409,19 @@ export default function Offices() {
                         </Button>
                     </Grid>
                     <Grid item xs container justify='center' alignItems='center'>
-                        <IconButton 
-                            onClick={() => removeOffice(index)} 
+                        <IconButton
+                            onClick={() => removeOffice(index)}
                             onMouseEnter={(event) => handlePopoverOpen(event, 'Remove "' + offices[index][0] + '"')}
                             onMouseLeave={handlePopoverClose}
-                            >
-                                <DeleteIcon style={{color: "#E03030"}} />
+                        >
+                            <DeleteIcon style={{ color: "#E03030" }} />
                         </IconButton>
                     </Grid>
                 </>
             ))}
-            <Grid item xs={11} style={{padding: '0.5em 1em'}} className={classes.officegrid}>
-                <Button style={{padding: '0em', margin: '0em 0em', width: '100%', textTransform: 'none'}} onClick={addOffice}>
-                    <Paper className={classes.pluspaper} 
+            <Grid item xs={11} style={{ padding: '0.5em 1em' }} className={classes.officegrid}>
+                <Button style={{ padding: '0em', margin: '0em 0em', width: '100%', textTransform: 'none' }} onClick={addOffice}>
+                    <Paper className={classes.pluspaper}
                         onMouseEnter={() => setPaperElav(offices.length)}
                         onMouseLeave={() => setPaperElav(-1)}
                         elevation={paperElav === offices.length ? 10 : 1}
@@ -348,13 +433,13 @@ export default function Offices() {
                 </Button>
             </Grid>
             <Grid item xs container justify='center' alignItems='center'>
-                <IconButton 
+                <IconButton
                     onClick={() => removeOffice(-1)}
                     onMouseEnter={(event) => handlePopoverOpen(event, 'Remove All')}
                     onMouseLeave={handlePopoverClose}
                     disabled={offices.length === 0}
-                    >
-                        <DeleteForeverIcon style={{color: offices.length === 0 ? 'gray' : "#E03030"}} />
+                >
+                    <DeleteForeverIcon style={{ color: offices.length === 0 ? 'gray' : "#E03030" }} />
                 </IconButton>
             </Grid>
             <Popper
@@ -371,49 +456,49 @@ export default function Offices() {
                 open={popoverOpen}
                 anchorEl={anchorEl}
                 onClose={handlePopoverClose}
-                >
-                    {
-                        true &&
-                        <span className={classes.arrow} ref={handleArrowRef} />
-                    }
-                    <Paper elevation={5} className={classes.popoverpaper}>
-                        <Typography className={classes.text}>{popperText}</Typography>
-                    </Paper>
+            >
+                {
+                    true &&
+                    <span className={classes.arrow} ref={handleArrowRef} />
+                }
+                <Paper elevation={5} className={classes.popoverpaper}>
+                    <Typography className={classes.text}>{popperText}</Typography>
+                </Paper>
             </Popper>
         </Grid>
-        
+
         :
-        <Grid container  spacing={1} direction='row' className={classes.officegrid}>
+        <Grid container spacing={1} direction='row' className={classes.officegrid}>
             <Grid item xs={1} container direction='column' className={classes.sidebar}>
-                <IconButton 
-                    onClick={backToList} 
+                <IconButton
+                    onClick={backToList}
                     className={classes.backicon}
                     onMouseEnter={(event) => handlePopoverOpen(event, 'Back')}
                     onMouseLeave={handlePopoverClose}
-                    >
-                        <ArrowBackIcon />
+                >
+                    <ArrowBackIcon />
                 </IconButton>
-                <IconButton 
-                    onClick={saveChanges} 
-                    className={classes.doneicon} 
+                <IconButton
+                    onClick={saveChanges}
+                    className={classes.doneicon}
                     disabled={!isChanged}
                     onMouseEnter={(event) => handlePopoverOpen(event, 'Save changes')}
                     onMouseLeave={handlePopoverClose}
-                    >
-                        <DoneIcon />
+                >
+                    <DoneIcon />
                 </IconButton>
-                <IconButton 
-                    onClick={cancelChanges} 
-                    className={classes.cancelicon} 
+                <IconButton
+                    onClick={cancelChanges}
+                    className={classes.cancelicon}
                     disabled={!isChanged}
                     onMouseEnter={(event) => handlePopoverOpen(event, 'Cancel changes')}
                     onMouseLeave={handlePopoverClose}
-                    >
-                        <ClearIcon />
+                >
+                    <ClearIcon />
                 </IconButton>
             </Grid>
-            <Grid item xs={11} container direction='row' spacing={2} style={{marginTop: '0em'}}> 
-                <Grid item xs={12} style={{ textAlign: 'center',  }} inputProps={{min: 0, style: { textAlign: 'center',  }}}>
+            <Grid item xs={11} container direction='row' spacing={2} style={{ marginTop: '0em' }}>
+                <Grid item xs={12} style={{ textAlign: 'center', }} inputProps={{ min: 0, style: { textAlign: 'center', } }}>
                     <Box >
                         <TextField
                             variant='outlined'
@@ -424,10 +509,10 @@ export default function Offices() {
                             className={classes.textfield}
                             inputProps={{
                                 style: { textAlign: 'center', fontSize: 15 },
-                                startAdornment: (<InputAdornment position="start"> <TitleIcon/> </InputAdornment>),
+                                startAdornment: (<InputAdornment position="start"> <TitleIcon /> </InputAdornment>),
                             }}
-                            onChange={(event) => {setTitle(event.target.value); setIsChanged(true);}}
-                            />
+                            onChange={(event) => { setTitle(event.target.value); setIsChanged(true); }}
+                        />
                     </Box>
                 </Grid>
                 <Grid item xs={6}>
@@ -437,8 +522,8 @@ export default function Offices() {
                             value={address}
                             label='Address'
                             className={classes.textarea}
-                            onChange={(event) => {setAddress(event.target.value); setIsChanged(true);}}
-                            />
+                            onChange={(event) => { setAddress(event.target.value); setIsChanged(true); }}
+                        />
                     </Box>
                 </Grid>
                 <Grid item xs={6}>
@@ -452,63 +537,69 @@ export default function Offices() {
                                     fullWidth
                                     autoFocus={autoFocus}
                                     className={classes.textfield}
-                                    inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon/> }</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' },}}
+                                    inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon />}</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }, }}
                                     onChange={(event) => changePhone(index, event.target.value)}
-                                    />
-                                <IconButton  
-                                    style={{marginLeft: '0.0em'}} 
-                                    onClick={() => removePhone(index)} 
+                                />
+                                <IconButton
+                                    style={{ marginLeft: '0.0em' }}
+                                    onClick={() => removePhone(index)}
                                     disabled={phoneNos.length === 1}
                                     onMouseEnter={(event) => handlePopoverOpen(event, 'Remove this phone number')}
                                     onMouseLeave={handlePopoverClose}
-                                    >
-                                        <RemoveIcon fontSize='small' color={phoneNos.length === 1 ? 'disabled' : 'secondary'} />
+                                >
+                                    <RemoveIcon fontSize='small' color={phoneNos.length === 1 ? 'disabled' : 'secondary'} />
                                 </IconButton>
                             </Box>
                         ))}
-                        <IconButton 
+                        <IconButton
                             onClick={addPhone}
-                            style={{backgroundColor: '#e0e0e0'}}
+                            style={{ backgroundColor: '#e0e0e0' }}
                             onMouseEnter={(event) => handlePopoverOpen(event, 'Add a phone number')}
                             onMouseLeave={handlePopoverClose}
-                            >
-                                <AddIcon fontSize='small' color='primary' />
+                        >
+                            <AddIcon fontSize='small' color='primary' />
                         </IconButton>
                     </Box>
                 </Grid>
-                <hr width='100%' style={{marginBottom: '1px'}}/>
-                <hr width='100%' style={{marginTop: '1px'}}/>
-                <Grid item xs={12} className={classes.container}>
-                    <Calendar style={{ height : '37rem' }}
-                        localizer={localizer}
-                        events={[
-                            {
-                                'title': 'visit 1',
-                                'allDay': false,
-                                'start': new Date(2021, 4, 19, 10, 0),
-                                'end': new Date(2021, 4, 19, 11, 0),
-                            },
-                            {
-                                'title': 'visit 2',
-                                'allDay': false,
-                                'start': new Date(2021, 4, 19, 18, 0),
-                                'end': new Date(2021, 4, 19, 18, 45),
-                            },
-                            {
-                                'title': 'visit 3',
-                                'allDay': false,
-                                'start': new Date(2021, 4, 21, 17, 0),
-                                'end': new Date(2021, 4, 21, 17, 30),
-                            },
-                        ]}
-                        step={60}
-                        showMultiDayTimes
-                        min={minTime}
-                        max={maxTime} 
-                        startAccessor="start"
-                        endAccessor="end"
-                    />
-                </Grid>
+            </Grid>
+            <hr width='100%' style={{ marginBottom: '1px' }} />
+            <hr width='100%' style={{ marginTop: '1px' }} />
+            <Grid item xs={12} className={classes.container}>
+                <Calendar style={{ height: '37rem' }}
+                    localizer={localizer}
+                    views = {['month', 'week', 'day']}
+                    selectable
+                    popup
+                    onSelectEvent={event => ChangeEventState(event)}
+                    onSelectSlot={slotInfo =>
+                        alert(
+                            `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
+                            `\nend: ${slotInfo.end.toLocaleString()}` +
+                            `\naction: ${slotInfo.action}`
+                        )
+                    }
+                    onView={view => setviewCalendar(view)}
+                    events={viewCalendar === 'month' ? monthEvents : events}
+                    step={15}
+                    timeslots={2}
+                    defaultView='week'
+                    eventPropGetter={event => ({
+                        style: {
+                            backgroundColor: event.color,
+                            borderColor: event.borderColor,
+                            height: event.height,
+                            //border: '2px solid #E0E0E0',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        },
+                    })}
+                    showMultiDayTimes
+                    min={minTime}
+                    max={maxTime}
+                    startAccessor="start"
+                    endAccessor="end"
+                />
+
             </Grid>
             <Popper
                 id="mouse-over-popover"
@@ -524,14 +615,14 @@ export default function Offices() {
                 open={popoverOpen}
                 anchorEl={anchorEl}
                 onClose={handlePopoverClose}
-                >
-                    {
-                        true &&
-                        <span className={classes.arrow} ref={handleArrowRef} />
-                    }
-                    <Paper elevation={5} className={classes.popoverpaper}>
-                        <Typography className={classes.text}>{popperText}</Typography>
-                    </Paper>
+            >
+                {
+                    true &&
+                    <span className={classes.arrow} ref={handleArrowRef} />
+                }
+                <Paper elevation={5} className={classes.popoverpaper}>
+                    <Typography className={classes.text}>{popperText}</Typography>
+                </Paper>
             </Popper>
         </Grid>
     );
