@@ -19,6 +19,7 @@ import getDay from 'date-fns/getDay';
 import "../../style.css";
 import Popper from '@material-ui/core/Popper';
 import { green } from '@material-ui/core/colors';
+import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorRerservationsList } from "../../core/modules/calendarAPICalls";
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -174,8 +175,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Offices() {
+export default function Offices(props) {
 
+    const isRemembered = props.isRemembered;
+    const VisitTimeDuration = props.VisitTimeDuration;
+    const doctorid = props.doctorid;
+    const got = props.got;
     const classes = useStyles();
 
     const [offices, setOffices] = useState([]);
@@ -312,27 +317,32 @@ export default function Offices() {
     const [events, setEvents] = useState([]);
     const [monthEvents, setmonthEvents] = useState([]);
     const eventsColor = () => {
+        var newEvents = [];
         var date = new Date();
         var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
         for (var j = day; j < day + 10; j++) {
             var minutes = 0;
             var hours = 6;
-            for (var i = 0; i < 71; i++) {
-                events.push(
+            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                newEvents.push(
                     {
-                        'title': 'Available Time ',
+                        'title': '✔',
                         'allDay': false,
                         'start': new Date(year, month, j, hours, minutes),
-                        'end': new Date(year, month, j, hours, minutes + 15),
+                        'end': new Date(year, month, j, hours, minutes + VisitTimeDuration),
                         'color': 'lightgreen',
                         'borderColor': 'green',
                         'AvailableState': true,
                         'index': j
                     }
                 )
-                minutes = minutes + 15;
+                minutes = minutes + VisitTimeDuration;
+                const mydate = new Date(year, month, j, hours, minutes)
+
+                //console.log(mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes());
             }
         }
+        setEvents(newEvents);
     }
     const eventsMonthColor = () => {
         var date = new Date();
@@ -340,7 +350,7 @@ export default function Offices() {
         for (var i = 0; i < 365; i++) {
             monthEvents.push(
                 {
-                    'title': 'Available',
+                    'title': '✔',
                     'allDay': false,
                     'start': new Date(year, month, day, 6, 0),
                     'end': new Date(year, month, day, 23, 30),
@@ -354,7 +364,22 @@ export default function Offices() {
             day = day + 1;
         }
     }
-    useEffect(() => { eventsColor(); eventsMonthColor(); }, []);
+    const TwoDigits = (number) => {
+        const str = number.toString();
+        if(str.length === 1)
+            return "0" + str;
+        else
+            return str;
+    }
+    useEffect(() => {
+        eventsColor();
+        eventsMonthColor();
+        if(got) {
+            const mydate = new Date();
+            alert(doctorid);
+            //callGetDoctorRerservationsList({ from_date: mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()), to_date: (mydate.getFullYear()+1) + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()) }, isRemembered)
+        }
+    }, [got]);
     const ChangeEventState = (event) => {
         if (viewCalendar === 'month') {
             events.map((e) => {
@@ -362,12 +387,12 @@ export default function Offices() {
                     if (event.AvailableState) {
                         e.color = '#fb3640';
                         e.borderColor = 'red';
-                        e.title = 'Unavailable Time';
+                        e.title = 'Unavailable';
                     }
                     else {
                         e.color = 'lightgreen';
                         e.borderColor = 'green';
-                        e.title = 'Available Time';
+                        e.title = 'Available';
                     }
                     e.AvailableState = !event.AvailableState
                 }
@@ -376,22 +401,30 @@ export default function Offices() {
         if (event.AvailableState) {
             event.color = '#fb3640';
             event.borderColor = 'red';
-            if (viewCalendar === 'month')
-                event.title = 'Unavailable';
+            if (viewCalendar === "month")
+                event.title = "Unavailable";
             else
-                event.title = 'Unavailable Time';
+                event.title = '✘';
+            const mydate = event.start;
+            callCreateReservationAPI({ start_time: mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes() }, isRemembered);
         }
         else {
             event.color = 'lightgreen';
             event.borderColor = 'green';
-            if (viewCalendar === 'month')
-                event.title = 'Available';
+            if (viewCalendar === "month")
+                event.title = "Available";
             else
-                event.title = 'Available Time';
+                event.title = '✔';
+            callDeleteReservationAPI({ id: doctorid })
         }
         event.AvailableState = !event.AvailableState;
     }
     const [viewCalendar, setviewCalendar] = useState('week');
+    const formats = {
+        eventTimeRangeFormat: () => {
+            return null;
+        },
+    };
 
     return (officeIndex === -1 ?
         <Grid container direction='row' justify='center' alignItems='center'>
@@ -565,9 +598,9 @@ export default function Offices() {
             <hr width='100%' style={{ marginBottom: '1px' }} />
             <hr width='100%' style={{ marginTop: '1px' }} />
             <Grid item xs={12} className={classes.container}>
-                <Calendar style={{ height: '37rem' }}
+                <Calendar style={{ height: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
                     localizer={localizer}
-                    views = {['month', 'week', 'day']}
+                    views={['month', 'week', 'day']}
                     selectable
                     popup
                     onSelectEvent={event => ChangeEventState(event)}
@@ -580,7 +613,7 @@ export default function Offices() {
                     }
                     onView={view => setviewCalendar(view)}
                     events={viewCalendar === 'month' ? monthEvents : events}
-                    step={15}
+                    step={VisitTimeDuration}
                     timeslots={2}
                     defaultView='week'
                     eventPropGetter={event => ({
@@ -590,7 +623,15 @@ export default function Offices() {
                             height: event.height,
                             //border: '2px solid #E0E0E0',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            //paddingRight: '1em'
+                            marginLeft: '33%',
+                            marginRight: '22%',
+                            minWidth: '0%',
+                            width: '40%',
+                            maxWidth: '45%',
+                            alignSelf: 'center',
+                            justifySelf: 'center',
                         },
                     })}
                     showMultiDayTimes
