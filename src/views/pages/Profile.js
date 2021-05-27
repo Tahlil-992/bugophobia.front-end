@@ -19,7 +19,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StarRating from "./RatingComponent/rating";
 import Paper from '@material-ui/core/Paper';
-import Rating from '@material-ui/lab/Rating';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
