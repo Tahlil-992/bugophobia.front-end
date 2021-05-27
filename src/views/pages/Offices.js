@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography } from "@material-ui/core";
+import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -20,10 +20,20 @@ import "../../style.css";
 import Popper from '@material-ui/core/Popper';
 import { green } from '@material-ui/core/colors';
 import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorRerservationsList } from "../../core/modules/calendarAPICalls";
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import ApartmentIcon from '@material-ui/icons/Apartment';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
 }
+
+const MyTextField = withStyles({
+    root: {
+        "& .MuiInputBase-root.Mui-disabled": {
+            color: "rgba(0, 0, 0, 1)" // (default alpha is 0.38)
+        },
+    }
+})(TextField);
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -44,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
-            backgroundColor: 'rgba(36, 128, 36, 1)',
+            backgroundColor: 'rgba(42, 172, 61, 0.6)',
             boxShadow: '0px 10px 10px rgba(36, 128, 36, 0.5)',
             transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
             color: '#fff',
@@ -106,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'sticky',
         top: '0%',
         '&:hover': {
-            backgroundColor: 'rgba(36, 128, 36, 1)',
+            backgroundColor: 'rgba(42, 172, 61, 0.6)',
             boxShadow: '0px 0px 20px rgba(36, 128, 36, 1)',
             color: '#fff',
         },
@@ -172,6 +182,22 @@ const useStyles = makeStyles((theme) => ({
         width: '2em',
         height: '2em',
         fontSize: '7px',
+    },
+    textarea: {
+        width: '100%',
+        marginLeft: "0%",
+        marginRight: '0%',
+        transition: 'all 0.15s linear',
+        '&:hover': {
+            backgroundColor: "#f3f3f3",
+            transition: 'all 0s, width 0s',
+        },
+        "& .MuiInputAdornment-positionStart": {
+            alignSelf: 'flex-start',
+        },
+        "& .MuiInputAdornment-root": {
+            display: 'unset',
+        },
     },
 }));
 
@@ -350,7 +376,7 @@ export default function Offices(props) {
         for (var i = 0; i < 365; i++) {
             monthEvents.push(
                 {
-                    'title': '✔',
+                    'title': 'Available',
                     'allDay': false,
                     'start': new Date(year, month, day, 6, 0),
                     'end': new Date(year, month, day, 23, 30),
@@ -366,7 +392,7 @@ export default function Offices(props) {
     }
     const TwoDigits = (number) => {
         const str = number.toString();
-        if(str.length === 1)
+        if (str.length === 1)
             return "0" + str;
         else
             return str;
@@ -374,9 +400,8 @@ export default function Offices(props) {
     useEffect(() => {
         eventsColor();
         eventsMonthColor();
-        if(got) {
+        if (got) {
             const mydate = new Date();
-            alert(doctorid);
             //callGetDoctorRerservationsList({ from_date: mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()), to_date: (mydate.getFullYear()+1) + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()) }, isRemembered)
         }
     }, [got]);
@@ -387,12 +412,12 @@ export default function Offices(props) {
                     if (event.AvailableState) {
                         e.color = '#fb3640';
                         e.borderColor = 'red';
-                        e.title = 'Unavailable';
+                        e.title = '✘';
                     }
                     else {
                         e.color = 'lightgreen';
                         e.borderColor = 'green';
-                        e.title = 'Available';
+                        e.title = '✔';
                     }
                     e.AvailableState = !event.AvailableState
                 }
@@ -415,7 +440,7 @@ export default function Offices(props) {
                 event.title = "Available";
             else
                 event.title = '✔';
-            callDeleteReservationAPI({ id: doctorid })
+            //callDeleteReservationAPI({ id: doctorid })
         }
         event.AvailableState = !event.AvailableState;
     }
@@ -550,27 +575,43 @@ export default function Offices(props) {
                 </Grid>
                 <Grid item xs={6}>
                     <Box>
-                        <Typography className={classes.text} align='left'>Address:</Typography>
-                        <TextareaAutosize
+                        <MyTextField
+                            variant='outlined'
                             value={address}
                             label='Address'
+                            fullWidth
+                            onChange = {(event) => setAddress(event.target.value)}
+                            multiline
                             className={classes.textarea}
-                            onChange={(event) => { setAddress(event.target.value); setIsChanged(true); }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <ApartmentIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                     </Box>
                 </Grid>
                 <Grid item xs={6}>
                     <Box onMouseLeave={handlePopoverClose}>
-                        <Typography className={classes.text} align='left'>Phone Numbers:</Typography>
                         {phoneNos.map((phone, index) => (
                             <Box display='flex' alignItems='center'>
-                                <TextField
+                                <MyTextField style={{marginBottom:'1em'}}
+                                    label={"Phone No." + (index+1)}
                                     variant='outlined'
                                     value={phone}
                                     fullWidth
                                     autoFocus={autoFocus}
                                     className={classes.textfield}
-                                    inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon />}</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }, }}
+                                    //inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon />}</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }, }}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <PhoneAndroidIcon />
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                     onChange={(event) => changePhone(index, event.target.value)}
                                 />
                                 <IconButton
@@ -616,7 +657,7 @@ export default function Offices(props) {
                     step={VisitTimeDuration}
                     timeslots={2}
                     defaultView='week'
-                    eventPropGetter={event => ({
+                    eventPropGetter={event => (viewCalendar !== 'month' ? {
                         style: {
                             backgroundColor: event.color,
                             borderColor: event.borderColor,
@@ -633,7 +674,22 @@ export default function Offices(props) {
                             alignSelf: 'center',
                             justifySelf: 'center',
                         },
-                    })}
+                    }
+                        :
+                        {
+                            style: {
+                                backgroundColor: event.color,
+                                borderColor: event.borderColor,
+                                height: event.height,
+                                //border: '2px solid #E0E0E0',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                //paddingRight: '1em'
+
+                                alignSelf: 'center',
+                                justifySelf: 'center',
+                            }
+                        })}
                     showMultiDayTimes
                     min={minTime}
                     max={maxTime}
