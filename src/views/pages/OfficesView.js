@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
@@ -12,6 +12,9 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import "../../style.css";
+import { callListAllReservationsAvailableToPatients } from '../../core/modules/calendarAPICalls';
+import { callGetDoctorRerservationsList } from '../../core/modules/calendarAPICalls';
+//import { callGetReservationAPI } from '../../core/modules/calendarAPICalls';
 
 const MyTextField = withStyles({
     root: {
@@ -127,9 +130,17 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+function WeekEvent(props) {
+    return (
+        <div >{props.event.title}</div>
+    );
+}
+
 export default function Offices(props) {
 
     const VisitTimeDuration = props.VisitTimeDuration;
+    const id = props.id;
+    const isRemembered = props.isRemembered;
 
     const classes = useStyles();
 
@@ -169,6 +180,35 @@ export default function Offices(props) {
             setOfficeIndex(-1);
         }
     };
+
+    const getAvailableTimes = () => {
+        try {
+            const response = callListAllReservationsAvailableToPatients({id: id}, isRemembered);
+        }
+        catch(error) {
+
+        }
+    }
+
+    useEffect(() => {
+        getAvailableTimes();
+    }, [])
+
+    const getReservedTimes = () => {
+        try {
+            const td = '20210423';
+            const response = callGetDoctorRerservationsList({from_date: td , to_date: '20210521'}, isRemembered);
+        }
+        catch(error) {
+
+        }
+    }
+
+    useEffect(() => {
+        getReservedTimes();
+    }, [])
+
+    
 
     return ( officeIndex === -1 ? 
         <>
@@ -325,6 +365,12 @@ export default function Offices(props) {
                             max={maxTime} 
                             startAccessor="start"
                             endAccessor="end"
+                            titleAccessor='title'
+                            /* components={{
+                                event: WeekEvent,
+                            }} */
+                            formats={{ eventTimeRangeFormat: () => null }}
+                            /* eventPropGetter={{style: {backgroundColor: '#f00'}}} */
                         />
                     </Grid>
                 </>

@@ -802,7 +802,7 @@ export default function Profile() {
                                         aria-label="full width tabs example"
                                     >
                                         <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Offices" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} style={officetab ? { minWidth: '50%'} : {display: 'none'}} />
+                                        <Tab label="Offices" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} style={officetab ? {minWidth: '50%'} : {display: 'none'}} />
                                         <Tab label="Comments" {...a11yProps(2)} className={(tabValue === 2) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                     :
@@ -843,6 +843,8 @@ export default function Profile() {
                                 <TabPanel value={tabValue} index={1}>
                                     <OfficesView
                                         VisitTimeDuration={VisitTimeDuration}
+                                        id={doctorid}
+                                        isRemembered={isRemembered}
                                     />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={2}>
