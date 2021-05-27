@@ -18,6 +18,7 @@ import "../../style.css";
 import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { connect } from "react-redux";
 import { getDate } from 'date-fns';
+import { setLocalStorage } from '../../core/modules/storageManager';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -37,12 +38,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const ColoredDateCellWrapper = ({ children }) =>
-  React.cloneElement(React.Children.only(children), {
-    style: {
-      backgroundColor: 'lightblue',
-    },
-});
+const ViewProfile = (username) => {
+    setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
+}
+
+const EventButton = ({ children }) => {
+    return (
+    <Button 
+        style={{width: "100%", marginBottom: '0.1em', marginTop: '0.2em', padding: 0}} 
+        component={Link} 
+        to="/view-profile">
+        {children}
+    </Button>)
+}
 
 function CalendarPage({ isRemembered }) {
     const classes = useStyles();
@@ -53,7 +61,7 @@ function CalendarPage({ isRemembered }) {
     maxTime.setHours(23,30,0);  
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [view, setView] = useState(calendar_views.day);
+    const [view, setView] = useState(calendar_views.agenda);
     const [events, setEvents] = useState(null);
     const [range, setRange] = useState(null);
 
@@ -162,6 +170,9 @@ function CalendarPage({ isRemembered }) {
                                         ),
                                         'allDay': false,
                                         'title': `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`,
+                                        'resource': {
+                                            docotor_username: event.doctor.user.username,
+                                        }
                                     }
                                 }) : []
                                 }
@@ -172,12 +183,16 @@ function CalendarPage({ isRemembered }) {
                                 startAccessor="start"
                                 endAccessor="end"
                                 components={{
-                                    timeSlotWrapper: ColoredDateCellWrapper
+                                    eventWrapper: EventButton,
                                 }}
+                                onSelectEvent={(event) => {ViewProfile(event.resource.docotor_username);}}
+                                popup
                                 tooltipAccessor={(event) => {
-                                    console.log(event);
-                                    console.log(event.start.getFullYear());
-                                    return `${event.title}\nTime: ${event.start.getHours()}:${event.start.getMinutes()}-${event.end.getHours()}:${event.end.getMinutes()}`;                                    
+                                    const sh = event.start.getHours();
+                                    const sm = event.start.getMinutes();
+                                    const eh = event.end.getHours();
+                                    const em = event.end.getMinutes();
+                                    return `${event.title}\nTime: ${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`;                                    
                                 }}
                             />
                         </div>
