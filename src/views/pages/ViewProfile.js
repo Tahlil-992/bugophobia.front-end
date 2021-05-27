@@ -33,6 +33,7 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import About from './About'
+import OfficesView from './OfficesView';
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -215,6 +216,7 @@ const useStyles = makeStyles((theme) => ({
         borderBottomRightRadius: "10px",
         borderBottomLeftRadius: "10px",
         marginBottom: "2rem",
+        minHeight: '30em',
     },
     button: {
         backgroundColor: '#40bad5',
@@ -308,6 +310,7 @@ export default function Profile() {
     const [id, setId] = useState(0);
 
     const [tabValue, setTabValue] = useState(0);
+    const [officetab, setOfficetab] = useState(false);
 
     const [onRateSubmit, setOnRateSubmit] = useState(false);
     const [newRateValue, setNewRateValue] = useState(3);
@@ -331,6 +334,12 @@ export default function Profile() {
         }
         setOnReloadRate(false);
     }, [onReloadRate])
+
+    useEffect(() => {
+        if (!officetab && tabValue === 1) {
+            setOfficetab(true);
+        }
+    }, [tabValue])
 
     const handleChange = (event, newValue) => {
         setTabValue(newValue);
@@ -625,7 +634,7 @@ export default function Profile() {
                                         :
                                         <></>
                                     }
-                                    <TextField style={{ width: '100%', marginBottom: '0.5em', marginTop: '1em' }}
+                                    {/* <TextField style={{ width: '100%', marginBottom: '0.5em', marginTop: '1em' }}
                                         className={classes.margin}
                                         id="input-with-icon-textfield"
                                         value={"  " + VisitTimeDuration}
@@ -646,10 +655,16 @@ export default function Profile() {
                                         SelectProps={{
                                             native: true,
                                         }}
-                                    />
+                                    /> */}
                                     {isViewedDoctor && !VisitTimeClick ?
                                         <Grid item xs>
-                                            <Button disabled={isDoctor} onClick={() => setVisitTimeClick(true)} className={classes.button} >Take a Visit Time</Button>
+                                            <Button 
+                                                disabled={isDoctor} 
+                                                onClick={() => setTabValue(1)} 
+                                                className={classes.button} 
+                                                >
+                                                    Take a Visit Time
+                                            </Button>
                                         </Grid>
                                         :
                                         <></>
@@ -787,7 +802,8 @@ export default function Profile() {
                                         aria-label="full width tabs example"
                                     >
                                         <Tab label="About" {...a11yProps(0)} className={(tabValue === 0) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Comments" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} />
+                                        <Tab label="Offices" {...a11yProps(1)} className={(tabValue === 1) ? classes.seltab : classes.onetab} style={officetab ? {minWidth: '50%'} : {display: 'none'}} />
+                                        <Tab label="Comments" {...a11yProps(2)} className={(tabValue === 2) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                     :
                                     <Tabs
@@ -825,6 +841,13 @@ export default function Profile() {
                                         />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={1}>
+                                    <OfficesView
+                                        VisitTimeDuration={VisitTimeDuration}
+                                        id={doctorid}
+                                        isRemembered={isRemembered}
+                                    />
+                                </TabPanel>
+                                <TabPanel value={tabValue} index={2}>
                                     <Box display="flex" flex={1} position="relative">
                                         <CommentSection username={viewedUsername} />
                                     </Box>
