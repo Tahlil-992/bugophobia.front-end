@@ -339,26 +339,7 @@ export default function Offices(props) {
                     <Grid item xs={12} className={classes.container}>
                         <Calendar style={{ height : '37rem' }}
                             localizer={localizer}
-                            events={[
-                                {
-                                    'title': 'visit 1',
-                                    'allDay': false,
-                                    'start': new Date(2021, 4, 19, 10, 0),
-                                    'end': new Date(2021, 4, 19, 11, 0),
-                                },
-                                {
-                                    'title': 'visit 2',
-                                    'allDay': false,
-                                    'start': new Date(2021, 4, 19, 18, 0),
-                                    'end': new Date(2021, 4, 19, 18, 45),
-                                },
-                                {
-                                    'title': 'visit 3',
-                                    'allDay': false,
-                                    'start': new Date(2021, 4, 21, 17, 0),
-                                    'end': new Date(2021, 4, 21, 17, 30),
-                                },
-                            ]}
+                            events={[]}
                             step={60}
                             showMultiDayTimes
                             min={minTime}

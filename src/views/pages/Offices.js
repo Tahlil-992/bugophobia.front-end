@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography } from "@material-ui/core";
+import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -19,10 +19,21 @@ import getDay from 'date-fns/getDay';
 import "../../style.css";
 import Popper from '@material-ui/core/Popper';
 import { green } from '@material-ui/core/colors';
+import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorRerservationsList } from "../../core/modules/calendarAPICalls";
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import ApartmentIcon from '@material-ui/icons/Apartment';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
 }
+
+const MyTextField = withStyles({
+    root: {
+        "& .MuiInputBase-root.Mui-disabled": {
+            color: "rgba(0, 0, 0, 1)" // (default alpha is 0.38)
+        },
+    }
+})(TextField);
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -43,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
-            backgroundColor: 'rgba(36, 128, 36, 1)',
+            backgroundColor: 'rgba(42, 172, 61, 0.6)',
             boxShadow: '0px 10px 10px rgba(36, 128, 36, 0.5)',
             transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
             color: '#fff',
@@ -105,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'sticky',
         top: '0%',
         '&:hover': {
-            backgroundColor: 'rgba(36, 128, 36, 1)',
+            backgroundColor: 'rgba(42, 172, 61, 0.6)',
             boxShadow: '0px 0px 20px rgba(36, 128, 36, 1)',
             color: '#fff',
         },
@@ -172,10 +183,30 @@ const useStyles = makeStyles((theme) => ({
         height: '2em',
         fontSize: '7px',
     },
+    textarea: {
+        width: '100%',
+        marginLeft: "0%",
+        marginRight: '0%',
+        transition: 'all 0.15s linear',
+        '&:hover': {
+            backgroundColor: "#f3f3f3",
+            transition: 'all 0s, width 0s',
+        },
+        "& .MuiInputAdornment-positionStart": {
+            alignSelf: 'flex-start',
+        },
+        "& .MuiInputAdornment-root": {
+            display: 'unset',
+        },
+    },
 }));
 
-export default function Offices() {
+export default function Offices(props) {
 
+    const isRemembered = props.isRemembered;
+    const VisitTimeDuration = props.VisitTimeDuration;
+    const doctorid = props.doctorid;
+    const got = props.got;
     const classes = useStyles();
 
     const [offices, setOffices] = useState([]);
@@ -312,27 +343,32 @@ export default function Offices() {
     const [events, setEvents] = useState([]);
     const [monthEvents, setmonthEvents] = useState([]);
     const eventsColor = () => {
+        var newEvents = [];
         var date = new Date();
         var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
         for (var j = day; j < day + 10; j++) {
             var minutes = 0;
             var hours = 6;
-            for (var i = 0; i < 71; i++) {
-                events.push(
+            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                newEvents.push(
                     {
-                        'title': 'Available Time ',
+                        'title': '✔',
                         'allDay': false,
                         'start': new Date(year, month, j, hours, minutes),
-                        'end': new Date(year, month, j, hours, minutes + 15),
+                        'end': new Date(year, month, j, hours, minutes + VisitTimeDuration),
                         'color': 'lightgreen',
                         'borderColor': 'green',
                         'AvailableState': true,
                         'index': j
                     }
                 )
-                minutes = minutes + 15;
+                minutes = minutes + VisitTimeDuration;
+                const mydate = new Date(year, month, j, hours, minutes)
+
+                //console.log(mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes());
             }
         }
+        setEvents(newEvents);
     }
     const eventsMonthColor = () => {
         var date = new Date();
@@ -354,7 +390,21 @@ export default function Offices() {
             day = day + 1;
         }
     }
-    useEffect(() => { eventsColor(); eventsMonthColor(); }, []);
+    const TwoDigits = (number) => {
+        const str = number.toString();
+        if (str.length === 1)
+            return "0" + str;
+        else
+            return str;
+    }
+    useEffect(() => {
+        eventsColor();
+        eventsMonthColor();
+        if (got) {
+            const mydate = new Date();
+            //callGetDoctorRerservationsList({ from_date: mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()), to_date: (mydate.getFullYear()+1) + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()) }, isRemembered)
+        }
+    }, [got]);
     const ChangeEventState = (event) => {
         if (viewCalendar === 'month') {
             events.map((e) => {
@@ -362,12 +412,12 @@ export default function Offices() {
                     if (event.AvailableState) {
                         e.color = '#fb3640';
                         e.borderColor = 'red';
-                        e.title = 'Unavailable Time';
+                        e.title = '✘';
                     }
                     else {
                         e.color = 'lightgreen';
                         e.borderColor = 'green';
-                        e.title = 'Available Time';
+                        e.title = '✔';
                     }
                     e.AvailableState = !event.AvailableState
                 }
@@ -376,22 +426,30 @@ export default function Offices() {
         if (event.AvailableState) {
             event.color = '#fb3640';
             event.borderColor = 'red';
-            if (viewCalendar === 'month')
-                event.title = 'Unavailable';
+            if (viewCalendar === "month")
+                event.title = "Unavailable";
             else
-                event.title = 'Unavailable Time';
+                event.title = '✘';
+            const mydate = event.start;
+            callCreateReservationAPI({ start_time: mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes() }, isRemembered);
         }
         else {
             event.color = 'lightgreen';
             event.borderColor = 'green';
-            if (viewCalendar === 'month')
-                event.title = 'Available';
+            if (viewCalendar === "month")
+                event.title = "Available";
             else
-                event.title = 'Available Time';
+                event.title = '✔';
+            //callDeleteReservationAPI({ id: doctorid })
         }
         event.AvailableState = !event.AvailableState;
     }
     const [viewCalendar, setviewCalendar] = useState('week');
+    const formats = {
+        eventTimeRangeFormat: () => {
+            return null;
+        },
+    };
 
     return (officeIndex === -1 ?
         <Grid container direction='row' justify='center' alignItems='center'>
@@ -517,27 +575,43 @@ export default function Offices() {
                 </Grid>
                 <Grid item xs={6}>
                     <Box>
-                        <Typography className={classes.text} align='left'>Address:</Typography>
-                        <TextareaAutosize
+                        <MyTextField
+                            variant='outlined'
                             value={address}
                             label='Address'
+                            fullWidth
+                            onChange = {(event) => setAddress(event.target.value)}
+                            multiline
                             className={classes.textarea}
-                            onChange={(event) => { setAddress(event.target.value); setIsChanged(true); }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <ApartmentIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                     </Box>
                 </Grid>
                 <Grid item xs={6}>
                     <Box onMouseLeave={handlePopoverClose}>
-                        <Typography className={classes.text} align='left'>Phone Numbers:</Typography>
                         {phoneNos.map((phone, index) => (
                             <Box display='flex' alignItems='center'>
-                                <TextField
+                                <MyTextField style={{marginBottom:'1em'}}
+                                    label={"Phone No." + (index+1)}
                                     variant='outlined'
                                     value={phone}
                                     fullWidth
                                     autoFocus={autoFocus}
                                     className={classes.textfield}
-                                    inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon />}</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }, }}
+                                    //inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon />}</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }, }}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <PhoneAndroidIcon />
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                     onChange={(event) => changePhone(index, event.target.value)}
                                 />
                                 <IconButton
@@ -565,9 +639,9 @@ export default function Offices() {
             <hr width='100%' style={{ marginBottom: '1px' }} />
             <hr width='100%' style={{ marginTop: '1px' }} />
             <Grid item xs={12} className={classes.container}>
-                <Calendar style={{ height: '37rem' }}
+                <Calendar style={{ height: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
                     localizer={localizer}
-                    views = {['month', 'week', 'day']}
+                    views={['month', 'week', 'day']}
                     selectable
                     popup
                     onSelectEvent={event => ChangeEventState(event)}
@@ -580,19 +654,42 @@ export default function Offices() {
                     }
                     onView={view => setviewCalendar(view)}
                     events={viewCalendar === 'month' ? monthEvents : events}
-                    step={15}
+                    step={VisitTimeDuration}
                     timeslots={2}
                     defaultView='week'
-                    eventPropGetter={event => ({
+                    eventPropGetter={event => (viewCalendar !== 'month' ? {
                         style: {
                             backgroundColor: event.color,
                             borderColor: event.borderColor,
                             height: event.height,
                             //border: '2px solid #E0E0E0',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            //paddingRight: '1em'
+                            marginLeft: '33%',
+                            marginRight: '22%',
+                            minWidth: '0%',
+                            width: '40%',
+                            maxWidth: '45%',
+                            alignSelf: 'center',
+                            justifySelf: 'center',
                         },
-                    })}
+                    }
+                        :
+                        {
+                            style: {
+                                backgroundColor: event.color,
+                                borderColor: event.borderColor,
+                                height: event.height,
+                                //border: '2px solid #E0E0E0',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                //paddingRight: '1em'
+
+                                alignSelf: 'center',
+                                justifySelf: 'center',
+                            }
+                        })}
                     showMultiDayTimes
                     min={minTime}
                     max={maxTime}

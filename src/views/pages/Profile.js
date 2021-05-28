@@ -19,16 +19,16 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StarRating from "./RatingComponent/rating";
 import Paper from '@material-ui/core/Paper';
-import Rating from '@material-ui/lab/Rating';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-
 import About from './About';
 import ChangePassword from './ChangePassword';
 import Offices from './Offices';
+import { callChangeVisitDurationTimeAPI } from "../../core/modules/calendarAPICalls";
+import { callCreateReservationAPI } from "../../core/modules/calendarAPICalls";
 
 function TabPanel2(props) {
     const { children, value, index, ...other } = props;
@@ -85,7 +85,7 @@ const callEditProfileAPI = async (mainUsername, data, is_doctor, isRemembered) =
     }
 }
 
-const callChangePasswordAPI = async ( data, isRemembered) => {
+const callChangePasswordAPI = async (data, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "PUT", url: `/profile/change_password/`, data: data }, true, isRemembered);
         return response;
@@ -417,6 +417,7 @@ export default function Profile() {
                     setGmcNumber(nullCheck(payload.gmc_number));
                     setSpecialization((payload.filed_of_specialization));
                     setExperience(nullCheck(payload.work_experience));
+                    setVisitTimeDuration(payload.visit_duration_time);
                 }
                 else {
                     setInsurance((payload.insurance_type));
@@ -580,7 +581,7 @@ export default function Profile() {
         try {
             const response = await callProfilePictureEditAPI(mainUsername, data, isDoctor, isRemembered);
             if (response.status === 200) {
-                
+
             }
         }
         catch (error) {
@@ -625,7 +626,7 @@ export default function Profile() {
                     setNewPasswordConfirmError(true);
                     setOpenSnackBar(true);
                 }
-                
+
             }
         }
         catch (error) {
@@ -775,7 +776,7 @@ export default function Profile() {
                                     <Grid item xs={9}>
                                         <TextField value={"Visit Time: " + VisitTimeDuration + " minutes"} style={{ width: '73%', height: '1em' }} size="small"
                                             InputProps={{
-                                                className : classes.underline,
+                                                className: classes.underline,
                                                 readOnly: true,
                                                 startAdornment: (
                                                     <InputAdornment position="start">
@@ -784,7 +785,7 @@ export default function Profile() {
                                                 ),
                                             }}
                                         />
-                                        <ButtonGroup style={{ width: '25%', height:'90%', paddingTop:'1%' }}>
+                                        <ButtonGroup style={{ width: '25%', height: '90%', paddingTop: '1%' }}>
                                             <Button
                                                 onClick={() => {
                                                     setVisitTimeDuration(Math.max(VisitTimeDuration - 5, 0));
@@ -804,12 +805,18 @@ export default function Profile() {
                                 }
                                 {isDoctor &&
                                     <Grid item xs={9} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
-                                        <Button className={classes.applyButton} style={{ width: '49%', marginRight:'1%' }}
+                                        <Button className={classes.applyButton} style={{ width: '49%', marginRight: '1%' }}
                                             disabled={!ChangeVisitTimeDuration}
-                                            onClick={() => { setChangeVisitTimeDuration(false); }}>
+                                            onClick={() => {
+                                                setChangeVisitTimeDuration(false);
+                                                callChangeVisitDurationTimeAPI({ visit_duration_time: VisitTimeDuration }, isRemembered);
+                                                setMessage("Visit duration time changed successfully!");
+                                                setSnackColor([SUCCESS_BACKGROUND, SUCCESS_COLOR]);
+                                                setOpenSnackBar(true);
+                                            }}>
                                             Apply Changes
                                         </Button>
-                                        <Button className={classes.cancelButton} style={{ width: '49%', marginLeft:'1%' }}
+                                        <Button className={classes.cancelButton} style={{ width: '49%', marginLeft: '1%' }}
                                             disabled={!ChangeVisitTimeDuration}
                                             onClick={() => { setChangeVisitTimeDuration(false); }}>
                                             Cancel
@@ -896,26 +903,26 @@ export default function Profile() {
                             </Grid>
                             <Grid item className={classes.tabpanel}>
                                 <TabPanel2 value={tabValue2} index={0} >
-                                    <About 
-                                        isDoctor={isDoctor} 
-                                        callEditAPI={callEditAPI} 
+                                    <About
+                                        isDoctor={isDoctor}
+                                        callEditAPI={callEditAPI}
                                         setSent={setSent}
-                                        firstName={firstName}               setFirstName={setFirstName}
-                                        lastName={lastName}                 setLastName={setLastName}
-                                        email={email}                       setEmail={setEmail}
-                                        username={username}                 setUsername={setUsername}
-                                        gender={gender}                     setGender={setGender}
-                                        age={age}                           setAge={setAge}
-                                        phoneNumber={phoneNumber}           setPhoneNumber={setPhoneNumber}
-                                        city={city}                         setCity={setCity}
-                                        gmcNumber={gmcNumber}               setGmcNumber={setGmcNumber}
-                                        specialization={specialization}     setSpecialization={setSpecialization}
-                                        experience={experience}             setExperience={setExperience}
-                                        insurance={insurance}               setInsurance={setInsurance}
-                                        detailChange={detailChange}         setDetailChange={setDetailChange}
-                                        isEmailValid={isEmailValid}         emailhelper={emailhelper}
-                                        isUsernameValid={isUsernameValid}   userhelper={userhelper}
-                                        />
+                                        firstName={firstName} setFirstName={setFirstName}
+                                        lastName={lastName} setLastName={setLastName}
+                                        email={email} setEmail={setEmail}
+                                        username={username} setUsername={setUsername}
+                                        gender={gender} setGender={setGender}
+                                        age={age} setAge={setAge}
+                                        phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber}
+                                        city={city} setCity={setCity}
+                                        gmcNumber={gmcNumber} setGmcNumber={setGmcNumber}
+                                        specialization={specialization} setSpecialization={setSpecialization}
+                                        experience={experience} setExperience={setExperience}
+                                        insurance={insurance} setInsurance={setInsurance}
+                                        detailChange={detailChange} setDetailChange={setDetailChange}
+                                        isEmailValid={isEmailValid} emailhelper={emailhelper}
+                                        isUsernameValid={isUsernameValid} userhelper={userhelper}
+                                    />
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={1} width="100%">
                                     {isDoctor ?
@@ -924,36 +931,36 @@ export default function Profile() {
                                         </Box>
                                         :
                                         <ChangePassword
-                                            oldPassword={oldPassword}                   setOldPassword={setOldPassword}
-                                            newPassword={newPassword}                   setNewPassword={setNewPassword}
-                                            newPasswordConfirm={newPasswordConfirm}     setNewPasswordConfirm={setNewPasswordConfirm}
-                                            oldPasswordError={oldPasswordError}         
-                                            newPasswordError={newPasswordError}         
-                                            newPasswordConfirmError={newPasswordConfirmError} 
-                                            passhelper={passhelper}  
+                                            oldPassword={oldPassword} setOldPassword={setOldPassword}
+                                            newPassword={newPassword} setNewPassword={setNewPassword}
+                                            newPasswordConfirm={newPasswordConfirm} setNewPasswordConfirm={setNewPasswordConfirm}
+                                            oldPasswordError={oldPasswordError}
+                                            newPasswordError={newPasswordError}
+                                            newPasswordConfirmError={newPasswordConfirmError}
+                                            passhelper={passhelper}
                                             callChangePassword={callChangePassword}
-                                            />
+                                        />
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={2}>
                                     {isDoctor ?
                                         <ChangePassword
-                                            oldPassword={oldPassword}                   setOldPassword={setOldPassword}
-                                            newPassword={newPassword}                   setNewPassword={setNewPassword}
-                                            newPasswordConfirm={newPasswordConfirm}     setNewPasswordConfirm={setNewPasswordConfirm}
-                                            oldPasswordError={oldPasswordError}         
-                                            newPasswordError={newPasswordError}         
-                                            newPasswordConfirmError={newPasswordConfirmError} 
+                                            oldPassword={oldPassword} setOldPassword={setOldPassword}
+                                            newPassword={newPassword} setNewPassword={setNewPassword}
+                                            newPasswordConfirm={newPasswordConfirm} setNewPasswordConfirm={setNewPasswordConfirm}
+                                            oldPasswordError={oldPasswordError}
+                                            newPasswordError={newPasswordError}
+                                            newPasswordConfirmError={newPasswordConfirmError}
                                             passhelper={passhelper}
                                             callChangePassword={callChangePassword}
-                                            />
+                                        />
                                         :
                                         <Typography>Calendar</Typography>
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={3}>
                                     {isDoctor ?
-                                        <Offices/>
+                                        <Offices isRemembered={isRemembered} VisitTimeDuration={VisitTimeDuration} doctorid={doctorid} got={got}/>
                                         :
                                         <Typography>Notifications</Typography>
                                     }
