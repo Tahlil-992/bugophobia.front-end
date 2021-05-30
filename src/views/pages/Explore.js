@@ -26,6 +26,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
+import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
@@ -50,6 +51,14 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import StarRating from "./RatingComponent/rating";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Avatar } from '@material-ui/core';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import LabelImportantIcon from '@material-ui/icons/LabelImportant';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -302,7 +311,18 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'nowrap',
         transform: 'translateZ(0)',
     },
+    list: {
+        width: 250,
+    },
+    fullList: {
+        width: 'auto',
+    },
 }));
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function Explore({ signOut }) {
 
     const [showLimitedMenu, setShowLimitedMenu] = useState(false);
@@ -541,6 +561,67 @@ function Explore({ signOut }) {
         isRemembered = true;
     }
     const theme = useTheme();
+
+    const [Drawerstate, setDrawerstate] = React.useState({ right: false });
+    const toggleDrawer = (anchor, open) => (event) => {
+        if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) { return; }
+        setDrawerstate({ ...Drawerstate, [anchor]: open });
+    };
+    const list = (anchor) => (
+        <div style={{ backgroundColor: 'rgba(138, 182, 214, 0.57)' }}
+            className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom', })}
+            role="presentation"
+            onClick={toggleDrawer(anchor, false)}
+            onKeyDown={toggleDrawer(anchor, false)}>
+            <List style={{ width: '100%', minHeight: '100vh' }}>
+                <ListItem>
+                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                        <CardContent ><ListItemText primary='notification 1' /></CardContent>
+                        <Box display="flex" flexDirection="row-reverse">
+                            <CardActions>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white' }}>View</Button>
+                            </CardActions>
+                        </Box>
+                    </Card>
+                </ListItem>
+                <ListItem>
+                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                        <CardContent><ListItemText primary='notification 2' /></CardContent>
+                        <Box display="flex" flexDirection="row-reverse">
+                            <CardActions>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white' }}>View</Button>
+                            </CardActions>
+                        </Box>
+                    </Card>
+                </ListItem>
+                <ListItem>
+                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                        <CardContent><ListItemText primary='notification 3' /></CardContent>
+                        <Box display="flex" flexDirection="row-reverse">
+                            <CardActions>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white' }}>View</Button>
+                            </CardActions>
+                        </Box>
+                    </Card>
+                </ListItem>
+            </List>
+        </div>
+    );
+    const [SignoutOpen, setSignoutOpen] = useState(false);
+    const handleClickSignoutOpen = () => {
+        setSignoutOpen(true);
+    };
+    const handleSignoutClose = () => {
+        setSignoutOpen(false);
+    };
+    const [DelAccountOpen, setDelAccountOpen] = useState(false);
+    const handleDelAccountOpen = () => {
+        setDelAccountOpen(true);
+    };
+    const handleDelAccountClose = () => {
+        setDelAccountOpen(false);
+    };
+
     return (
         <div className={classes.root}>
             <CssBaseline />
@@ -594,8 +675,7 @@ function Explore({ signOut }) {
                                                 style={{
                                                     transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
                                                     width: "100%"
-                                                }}
-                                            >
+                                                }}>
                                                 <Paper style={{ borderRadius: "5px" }}>
                                                     <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
                                                         <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0 }}>
@@ -631,7 +711,7 @@ function Explore({ signOut }) {
                                                                 <Card style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
                                                                     <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
                                                                         Record Not found
-                                            </Typography>
+                                                                    </Typography>
                                                                 </Card>
                                                             </Box>}
                                                             {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{ backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px" }}>
@@ -640,7 +720,7 @@ function Explore({ signOut }) {
                                                                     style={{ textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": { backgroundColor: "#10217d" } }}>
                                                                     <Typography style={{ color: "#FFF", margin: "0.5em 0" }}>
                                                                         Advanced Search
-                                            </Typography>
+                                                                    </Typography>
                                                                 </Button>
                                                             </Box>}
                                                         </MenuList>
@@ -652,11 +732,22 @@ function Explore({ signOut }) {
                             </Box>
                         </div>
                     </div>
-                    <IconButton color="inherit">
-                        <Badge badgeContent={1} color="secondary">
-                            <NotificationsIcon/>
-                        </Badge>
-                    </IconButton>
+                    <div>
+                        <React.Fragment key={'right'}>
+                            <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
+                                <Badge badgeContent={1} color="secondary">
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                            <SwipeableDrawer
+                                anchor='right'
+                                open={Drawerstate['right']}
+                                onClose={toggleDrawer('right', false)}
+                                onOpen={toggleDrawer('right', true)}>
+                                {list('right')}
+                            </SwipeableDrawer>
+                        </React.Fragment>
+                    </div>
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent"
@@ -701,18 +792,42 @@ function Explore({ signOut }) {
                 <List>
                     <div>
                         <Divider style={{ marginTop: '55vh' }} />
-                        <ListItem button onClick={handleSignOut} >
+                        <ListItem button onClick={handleClickSignoutOpen}>
                             <ListItemIcon>
                                 <ExitToAppIcon />
                             </ListItemIcon>
                             <ListItemText primary="Sign out" />
                         </ListItem>
-                        <ListItem button>
+                        <Dialog fullWidth open={SignoutOpen} TransitionComponent={Transition} keepMounted onClose={handleSignoutClose}>
+                            <DialogTitle>{"Sign out"}</DialogTitle>
+                            <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginBottom:'0.5em' }}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginRight:'1em',marginBottom:'0.5em' }}>
+                                    Confirm
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        <ListItem button onClick={handleDelAccountOpen}>
                             <ListItemIcon>
                                 <DeleteIcon />
                             </ListItemIcon>
                             <ListItemText primary="Delete Account" />
                         </ListItem>
+                        <Dialog fullWidth open={DelAccountOpen} TransitionComponent={Transition} keepMounted onClose={handleDelAccountClose}>
+                            <DialogTitle>{"Delete Account"}</DialogTitle>
+                            <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginBottom:'0.5em' }}>
+                                    Cancel
+                                </Button>
+                                <Button /*onClick={}*/ style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginRight:'1em',marginBottom:'0.5em' }}>
+                                    Confirm
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </div>
                 </List>
             </Drawer>
