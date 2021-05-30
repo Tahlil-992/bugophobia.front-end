@@ -27,7 +27,10 @@ const useStyles = makeStyles((theme) => ({
     },
     footer: {
         display: "flex",
-        marginTop: "1em",
+        marginTop: "5em",
+        marginRight: "8%",
+        marginLeft: "8%",
+        borderRadius: "100px 100px 0 0",
     },
     Btn: {
         backgroundColor: '#40bad5',
@@ -108,15 +111,15 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                 <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '1.25em' }}>about us</Link> */}
                 <Grid container>
                 <Grid item sm={3}>
-                    <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
+                    <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
                 </Grid>
                 <Grid container item sm={9}>
                     <Grid item sm={4} justifyContent="center"style={{ padding: "0 1.5em"}}>
                         <Grid>
-                            <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }}>ABOUT US</Typography>
+                            <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>ABOUT US</Typography>
                         </Grid>
                         <Grid>
-                            <Typography>
+                            <Typography style={{ color: "#C0C0C0", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
@@ -131,10 +134,10 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Grid>
                     <Grid item sm={4} style={{ padding: "0 1.5em"}}>
                         <Grid>
-                            <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
+                            <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
                         </Grid>
                         <Grid>
-                            <Typography>
+                            <Typography style={{ color: "#C0C0C0", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
@@ -144,10 +147,10 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Grid>
                     <Grid item sm={4} style={{ padding: "0 1.5em"}}>
                         <Grid>
-                            <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }}>PRIVACY POLICY</Typography>
+                            <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>PRIVACY POLICY</Typography>
                         </Grid>
                         <Grid>
-                            <Typography>
+                            <Typography style={{ color: "#C0C0C0", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
