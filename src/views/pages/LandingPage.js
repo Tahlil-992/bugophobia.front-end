@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import DoctorImg from "../../assets/images/DoctorUser.png";
 import PatientImg from "../../assets/images/PatientUser.png";
 import OnlineDoctor from "../../assets/images/OnlineDoctor.jpg";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -25,6 +26,8 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(4),
     },
     footer: {
+        display: "flex",
+        marginTop: "1em",
     },
     Btn: {
         backgroundColor: '#40bad5',
@@ -99,11 +102,61 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Container>
                 </div>
             </Grid>
-            <footer className={classes.footer} style={{ backgroundColor: '#8ab6d6' }}>
-                <Typography style={{ color: '#8ab6d6' }}>footer block</Typography>
-                <Typography variant="h6" align="center" gutterBottom>Footer</Typography>
+            <footer className={classes.footer} style={{ backgroundColor: 'rgba(16,33,125, 0.3)', padding: "2em 0" }}>
+                {/* <Typography variant="h6" align="center" gutterBottom>Footer</Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Something here to give the footer a purpose!</Typography>
-                <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '1.25em' }}>about us</Link>
+                <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '1.25em' }}>about us</Link> */}
+                <Grid container>
+                <Grid item sm={3}>
+                    <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
+                </Grid>
+                <Grid container item sm={9}>
+                    <Grid item sm={4} justifyContent="center"style={{ padding: "0 1.5em"}}>
+                        <Grid>
+                            <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }}>ABOUT US</Typography>
+                        </Grid>
+                        <Grid>
+                            <Typography>
+                                Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
+                                Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
+                                toen een onbekende drukker een zethaak met letters nam en ze 
+                                door elkaar husselde om een font-catalogus te maken. 
+                                Het heeft niet alleen vijf eeuwen overleefd maar is ook, 
+                                vrijwel onveranderd, overgenomen in elektronische letterzetting. 
+                                Het is in de jaren '60 populair geworden met de introductie van Letraset vellen 
+                                met Lorem Ipsum passages en meer recentelijk door desktop publishing software zoals 
+                                Aldus PageMaker die versies van Lorem Ipsum bevatten.
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                    <Grid item sm={4} style={{ padding: "0 1.5em"}}>
+                        <Grid>
+                            <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
+                        </Grid>
+                        <Grid>
+                            <Typography>
+                                Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
+                                Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
+                                toen een onbekende drukker een zethaak met letters nam en ze 
+                                door elkaar husselde om een font-catalogus te maken. 
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                    <Grid item sm={4} style={{ padding: "0 1.5em"}}>
+                        <Grid>
+                            <Typography style={{ color:"#E0E0E0", fontWeight: 900, fontSize: "1.5em" }}>PRIVACY POLICY</Typography>
+                        </Grid>
+                        <Grid>
+                            <Typography>
+                                Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
+                                Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
+                                toen een onbekende drukker een zethaak met letters nam en ze 
+                                door elkaar husselde om een font-catalogus te maken. 
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </Grid>                    
+                </Grid>
             </footer>
         </React.Fragment>
     );
