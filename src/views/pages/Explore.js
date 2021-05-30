@@ -26,6 +26,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
+import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
@@ -50,6 +51,14 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import StarRating from "./RatingComponent/rating";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Avatar } from '@material-ui/core';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import LabelImportantIcon from '@material-ui/icons/LabelImportant';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -105,6 +114,16 @@ const getAllSearchCallAPI = async (params, isRemembered) => {
 const getLimitedSearchCallAPI = async (username, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "GET", url: "/search/limited/", params: { q: username } }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callDeleteAccountAPI = async (username, isdoctor, isRemembered) => {
+    try {
+        const response = await callAPIHandler({ method: "DELETE", url: (isdoctor ? `/profile/doctor/update/${username}/` : `/profile/patient/update/${username}/`) }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -249,10 +268,8 @@ const useStyles = makeStyles((theme) => ({
         color: '#222',
         "&:hover": {
             transform: "scale3d(1.1, 1.1, 1)",
-            backgroundColor: 'rgba(36, 36, 128, 1)',
-            boxShadow: '0px 0px 20px rgba(36, 36, 128, 1)',
+            backgroundColor: '#f3f3f3',
             transition: 'all 0.3s ease',
-            color: '#fff',
         },
     },
     limitedCard: {
@@ -270,12 +287,12 @@ const useStyles = makeStyles((theme) => ({
     cardGrid: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
-        
+
     },
     cardMedia: {
         height: '15vh',
         width: '15vh',
-        marginLeft:'0.5em',
+        marginLeft: '0.5em',
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex',
@@ -293,7 +310,7 @@ const useStyles = makeStyles((theme) => ({
     limitedCardContent: {
         display: 'center',
         justifyContent: 'center',
-        alignItems: 'center', 
+        alignItems: 'center',
     },
     advancedSearchButton: {
         "&:hover": {
@@ -304,7 +321,18 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'nowrap',
         transform: 'translateZ(0)',
     },
+    list: {
+        width: 300,
+    },
+    fullList: {
+        width: 'auto',
+    },
 }));
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function Explore({ signOut }) {
 
     const [showLimitedMenu, setShowLimitedMenu] = useState(false);
@@ -334,16 +362,14 @@ function Explore({ signOut }) {
     // }, [showLimitedMenu])
 
     useEffect(() => {
-        if (limitedSearchInput)
-        {
+        if (limitedSearchInput) {
             if (limitedSearchInput !== "" && limitedSearchInput !== null)
                 callSearchLimitedAPI();
             else {
                 setLimitedSearchResults(null);
             }
         }
-        else
-        {
+        else {
             setLimitedSearchResults(null);
         }
     }, [limitedSearchInput])
@@ -352,8 +378,7 @@ function Explore({ signOut }) {
         if (allSearchParams !== null) {
             callSearchAllAPI();
         }
-        else
-        {
+        else {
             setTitle("Top Doctors");
             setSent(false);
         }
@@ -374,20 +399,27 @@ function Explore({ signOut }) {
 
     const handleCloseLimitedPopper = (event) => {
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
-          return;
+            return;
         }
-    
+
         setShowLimitedMenu(false);
     };
 
     function handleListKeyDown(event) {
         if (event.key === 'Tab') {
-          event.preventDefault();
-          setShowLimitedMenu(false);
+            event.preventDefault();
+            setShowLimitedMenu(false);
         }
     }
 
     const handleSignOut = () => {
+        resetLocalStorage();
+        resetSessionStorage();
+        signOut();
+        document.location.reload();
+    }
+    const handeDeleteAccount = () => {
+        callDeleteAccountAPI(username, isDoctor, isRemembered);
         resetLocalStorage();
         resetSessionStorage();
         signOut();
@@ -433,7 +465,7 @@ function Explore({ signOut }) {
 
     const callProfilePictureGetAPI = async () => {
         try {
-            cards.map( async (card, index) => {
+            cards.map(async (card, index) => {
                 const uname = card.user.username;
                 const response = await callProfilePictureAPI(uname, card.user.is_doctor, isRemembered);
                 if (response.status === 200) {
@@ -456,7 +488,7 @@ function Explore({ signOut }) {
 
     const callGetDetailRatingAPI = async () => {
         try {
-            cards.map( async (card, index) => {
+            cards.map(async (card, index) => {
                 const response = await getRatingDetailCallAPI({ doctor_id: card.user.id });
                 // console.log(response);
                 if (response.status == 200) {
@@ -499,11 +531,10 @@ function Explore({ signOut }) {
         setOpen(true);
     };
 
-    const callSearchAllAPI = async () => {        
+    const callSearchAllAPI = async () => {
         try {
             const response = await getAllSearchCallAPI({ ...allSearchParams }, isRemembered);
-            if (response.status === 200)
-            {
+            if (response.status === 200) {
                 setcards(response.payload.results);
                 setSearchPage(allSearchParams.page ? allSearchParams.page : 1);
                 setSearchPageCount(Math.ceil(response.payload.count !== 0 ? response.payload.count / 10 : 1));
@@ -515,11 +546,10 @@ function Explore({ signOut }) {
         }
     }
 
-    const callSearchLimitedAPI = async () => {        
+    const callSearchLimitedAPI = async () => {
         try {
             const response = await getLimitedSearchCallAPI(limitedSearchInput, isRemembered);
-            if (response.status === 200)
-            {
+            if (response.status === 200) {
                 setLimitedSearchResults(response.payload);
                 if (!showLimitedMenu)
                     setShowLimitedMenu(true);
@@ -548,6 +578,67 @@ function Explore({ signOut }) {
         isRemembered = true;
     }
     const theme = useTheme();
+
+    const [Drawerstate, setDrawerstate] = React.useState({ right: false });
+    const toggleDrawer = (anchor, open) => (event) => {
+        if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) { return; }
+        setDrawerstate({ ...Drawerstate, [anchor]: open });
+    };
+    const list = (anchor) => (
+        <div style={{ backgroundColor: 'rgba(138, 182, 214, 0.57)' }}
+            className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom', })}
+            role="presentation"
+            onClick={toggleDrawer(anchor, false)}
+            onKeyDown={toggleDrawer(anchor, false)}>
+            <List style={{ width: '100%', minHeight: '100vh' }}>
+                <ListItem>
+                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                        <CardContent ><ListItemText primary='notification 1' /></CardContent>
+                        <Box display="flex" flexDirection="row-reverse">
+                            <CardActions>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
+                            </CardActions>
+                        </Box>
+                    </Card>
+                </ListItem>
+                <ListItem>
+                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                        <CardContent><ListItemText primary='notification 2' /></CardContent>
+                        <Box display="flex" flexDirection="row-reverse">
+                            <CardActions>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
+                            </CardActions>
+                        </Box>
+                    </Card>
+                </ListItem>
+                <ListItem>
+                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                        <CardContent><ListItemText primary='notification 3' /></CardContent>
+                        <Box display="flex" flexDirection="row-reverse">
+                            <CardActions>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
+                            </CardActions>
+                        </Box>
+                    </Card>
+                </ListItem>
+            </List>
+        </div>
+    );
+    const [SignoutOpen, setSignoutOpen] = useState(false);
+    const handleClickSignoutOpen = () => {
+        setSignoutOpen(true);
+    };
+    const handleSignoutClose = () => {
+        setSignoutOpen(false);
+    };
+    const [DelAccountOpen, setDelAccountOpen] = useState(false);
+    const handleDelAccountOpen = () => {
+        setDelAccountOpen(true);
+    };
+    const handleDelAccountClose = () => {
+        setDelAccountOpen(false);
+    };
+
     return (
         <div className={classes.root}>
             <CssBaseline />
@@ -568,100 +659,112 @@ function Explore({ signOut }) {
                         </div>
                         <div>
                             <div ref={anchorRef}>
-                                <ClickAwayListener onClickAway={(event) => {handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth)}}>
-                                <InputBase
-                                    placeholder="Search…"
-                                    classes={{
-                                        root: classes.inputRoot,
-                                        input: classes.inputInput,
-                                    }}
-                                    inputProps={{ 'aria-label': 'search' }}
-                                    onClick={(event) => {handleClickListItem(event); setLimitedWidth(expandedSearchWidth)}}
-                                    value={limitedSearchInput}
-                                    onChange={handleOnLimitedSearchInputChange}
-                                    onFocus={onFocus}
-                                    onBlur={onBlur}
+                                <ClickAwayListener onClickAway={(event) => { handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth) }}>
+                                    <InputBase
+                                        placeholder="Search…"
+                                        classes={{
+                                            root: classes.inputRoot,
+                                            input: classes.inputInput,
+                                        }}
+                                        inputProps={{ 'aria-label': 'search' }}
+                                        onClick={(event) => { handleClickListItem(event); setLimitedWidth(expandedSearchWidth) }}
+                                        value={limitedSearchInput}
+                                        onChange={handleOnLimitedSearchInputChange}
+                                        onFocus={onFocus}
+                                        onBlur={onBlur}
                                     />
                                 </ClickAwayListener>
                             </div>
                             <Box style={{ display: "flex" }}>
-                            <Container maxWidth={false} disableGutters style={{width: focused ? expandedSearchWidth : collapsedSearchWidth}}>
-                                <Popper 
-                                open={showLimitedMenu} 
-                                anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
-                                className={classes.limitedPopper}
-                                role={undefined} 
-                                transition 
-                                disablePortal 
-                                placement="bottom-start"
-                                style={{width: "100%"}}>                                                                
-                                {({ TransitionProps, placement }) => (
-                                <Grow
-                                {...TransitionProps}
-                                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-                                width: "100%" }}
-                                >                                        
-                                <Paper style={{borderRadius: "5px"}}>
-                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
-                                    <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{padding: 0}}>
-                                        {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{padding: 0}}>
-                                            <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
-                                            <Card 
-                                                className={classes.limitedCard} 
-                                                style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
-                                                <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
-                                                    <Grid item xs={4}>
-                                                    <CardMedia
-                                                        className={classes.cardMedia}
-                                                        image={DoctorImage}
-                                                        title="Image title"
-                                                        style={{paddingBottom: 0, height: "4em", width: "4em", margin: "auto", border: 'none'}} />
-                                                    </Grid>
-                                                    <Grid item xs={8}>
-                                                    <CardContent className={classes.limitedCardContent} style={{padding: "1em 0"}}>
-                                                        <Typography variant="h6">
-                                                            {list.user.username}
-                                                        </Typography>
-                                                        <Typography>
-                                                            {specializationMap(list.filed_of_specialization)}
-                                                        </Typography>
-                                                    </CardContent>
-                                                    </Grid>
-                                                </Grid>                                       
-                                            </Card>
-                                            </Button>
-                                        </MenuItem>
-                                        ))}
-                                        {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0"}}>
-                                        <Card style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
-                                            <Typography style={{color: "#611a15", margin: "0.5em 0"}}>
-                                                Record Not found
-                                            </Typography>
-                                        </Card>
-                                        </Box>}
-                                        {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px"}}>
-                                        <Button
-                                            onClick={() => {setOpenFilters(true); setShowLimitedMenu(false);}}
-                                            style={{textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": {backgroundColor: "#10217d"}}}>
-                                            <Typography style={{color: "#FFF", margin: "0.5em 0"}}>
-                                                Advanced Search
-                                            </Typography>
-                                        </Button>
-                                        </Box>}
-                                    </MenuList>
-                                    </ClickAwayListener>
-                                </Paper>                                
-                                </Grow>)}
-                                </Popper>
+                                <Container maxWidth={false} disableGutters style={{ width: focused ? expandedSearchWidth : collapsedSearchWidth }}>
+                                    <Popper
+                                        open={showLimitedMenu}
+                                        anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
+                                        className={classes.limitedPopper}
+                                        role={undefined}
+                                        transition
+                                        disablePortal
+                                        placement="bottom-start"
+                                        style={{ width: "100%" }}>
+                                        {({ TransitionProps, placement }) => (
+                                            <Grow
+                                                {...TransitionProps}
+                                                style={{
+                                                    transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                                                    width: "100%"
+                                                }}>
+                                                <Paper style={{ borderRadius: "5px" }}>
+                                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
+                                                        <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0 }}>
+                                                            {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{ padding: 0 }}>
+                                                                <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
+                                                                    <Card
+                                                                        className={classes.limitedCard}
+                                                                        style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
+                                                                        <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
+                                                                            <Grid item xs={4}>
+                                                                                <CardMedia
+                                                                                    className={classes.cardMedia}
+                                                                                    image={DoctorImage}
+                                                                                    title="Image title"
+                                                                                    style={{ paddingBottom: 0, height: "4em", width: "4em", margin: "auto", border: 'none' }} />
+                                                                            </Grid>
+                                                                            <Grid item xs={8}>
+                                                                                <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
+                                                                                    <Typography variant="h6">
+                                                                                        {list.user.username}
+                                                                                    </Typography>
+                                                                                    <Typography>
+                                                                                        {specializationMap(list.filed_of_specialization)}
+                                                                                    </Typography>
+                                                                                </CardContent>
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    </Card>
+                                                                </Button>
+                                                            </MenuItem>
+                                                            ))}
+                                                            {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{ padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0" }}>
+                                                                <Card style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
+                                                                    <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
+                                                                        Record Not found
+                                                                    </Typography>
+                                                                </Card>
+                                                            </Box>}
+                                                            {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{ backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px" }}>
+                                                                <Button
+                                                                    onClick={() => { setOpenFilters(true); setShowLimitedMenu(false); }}
+                                                                    style={{ textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": { backgroundColor: "#10217d" } }}>
+                                                                    <Typography style={{ color: "#FFF", margin: "0.5em 0" }}>
+                                                                        Advanced Search
+                                                                    </Typography>
+                                                                </Button>
+                                                            </Box>}
+                                                        </MenuList>
+                                                    </ClickAwayListener>
+                                                </Paper>
+                                            </Grow>)}
+                                    </Popper>
                                 </Container>
                             </Box>
                         </div>
                     </div>
-                    <IconButton color="inherit">
-                        <Badge badgeContent={1} color="secondary">
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
+                    <div>
+                        <React.Fragment key={'right'}>
+                            <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
+                                <Badge badgeContent={1} color="secondary">
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                            <SwipeableDrawer
+                                anchor='right'
+                                open={Drawerstate['right']}
+                                onClose={toggleDrawer('right', false)}
+                                onOpen={toggleDrawer('right', true)}>
+                                {list('right')}
+                            </SwipeableDrawer>
+                        </React.Fragment>
+                    </div>
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent"
@@ -701,54 +804,85 @@ function Explore({ signOut }) {
                                 <ListItemText primary="Saved accounts" />
                             </ListItem>
                         </Link>
-                        <ListItem button onClick={handleSignOut}>
+                    </div>
+                </List>
+                <List>
+                    <div>
+                        <Divider style={{ marginTop: '55vh' }} />
+                        <ListItem button onClick={handleClickSignoutOpen}>
                             <ListItemIcon>
                                 <ExitToAppIcon />
                             </ListItemIcon>
                             <ListItemText primary="Sign out" />
                         </ListItem>
-                        <ListItem button>
+                        <Dialog fullWidth open={SignoutOpen} TransitionComponent={Transition} keepMounted onClose={handleSignoutClose}>
+                            <DialogTitle>{"Sign out"}</DialogTitle>
+                            <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                    Confirm
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        <ListItem button onClick={handleDelAccountOpen}>
                             <ListItemIcon>
                                 <DeleteIcon />
                             </ListItemIcon>
                             <ListItemText primary="Delete Account" />
                         </ListItem>
+                        <Dialog fullWidth open={DelAccountOpen} TransitionComponent={Transition} keepMounted onClose={handleDelAccountClose}>
+                            <DialogTitle>{"Delete Account"}</DialogTitle>
+                            <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                    Cancel
+                                </Button>
+                                <Link style={{textDecoration:'none'}} to="/">
+                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                        Confirm
+                                    </Button>
+                                </Link>
+                            </DialogActions>
+                        </Dialog>
                     </div>
                 </List>
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                <SearchFiltersFragment anchorEl={filterAnchorRef} setOnFilters={(value) => {setAllSearchParams(value);}} open={openFilters} setOpen={(value) => setOpenFilters(value)}/>
+                <SearchFiltersFragment anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container>
                         <Grid item xs={12}>
-                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius:'50px', borderTopRightRadius:'50px' }}>
+                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px' }}>
                                 <React.Fragment>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
                                         <Box flex={1}>
-                                        <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
-                                            {title}
-                                        </Typography>
+                                            <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
+                                                {title}
+                                            </Typography>
                                         </Box>
                                         <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end" paddingRight="4em">
-                                        {title === "Search Results" && <Pagination
-                                            page={searchPage}
-                                            pageCount={searchPageCount}
-                                            onBackwardFirstPage={() => setAllSearchParams({...allSearchParams, page: 1})}
-                                            onBackwardPage={() => setAllSearchParams({...allSearchParams, page: searchPage - 1})}
-                                            onForwardLastPage={() => setAllSearchParams({...allSearchParams, page: searchPageCount})}
-                                            onForwardPage={() => setAllSearchParams({...allSearchParams, page: searchPage + 1})}/>}   
-                                        </Box>                                 
+                                            {title === "Search Results" && <Pagination
+                                                page={searchPage}
+                                                pageCount={searchPageCount}
+                                                onBackwardFirstPage={() => setAllSearchParams({ ...allSearchParams, page: 1 })}
+                                                onBackwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage - 1 })}
+                                                onForwardLastPage={() => setAllSearchParams({ ...allSearchParams, page: searchPageCount })}
+                                                onForwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage + 1 })} />}
+                                        </Box>
                                     </Box>
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card, index) => (
-                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0',  }}>
-                                                    <Button style={{ textTransform: 'none', textAlign: 'center',  }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
+                                                    <Button style={{ textTransform: 'none', textAlign: 'center', }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
                                                         <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                               
-                                                                <Avatar className={classes.cardMedia} src={proPictures[index]}/>
+
+                                                                <Avatar className={classes.cardMedia} src={proPictures[index]} />
                                                                 <CardContent className={classes.cardContent}>
                                                                     <Typography gutterBottom variant="h5" component="h2">
                                                                         {card.user.username}
@@ -760,7 +894,7 @@ function Explore({ signOut }) {
                                                                         <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
                                                                             <StarRating val={rateAvg[index]} />
                                                                             <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
-                                                                            <Typography style={{color: 'inherit'}}>{rateCount[index]}</Typography>
+                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[index]}</Typography>
                                                                         </Paper>
                                                                     </Box>
                                                                 </CardContent>
