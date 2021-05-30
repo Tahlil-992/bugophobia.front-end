@@ -541,7 +541,7 @@ export default function Profile() {
     const callSubmitNewRateAPI = async () => {
         try {
             const response = await newRateCallAPI({ doctor_id: doctorid, amount: Number(newRateValue) }, isRemembered);
-            if (response.status === 201) {
+            if (response.status === 201 || response.status === 200) {
                 setMessage({ type: Severity.SUCCESS, text: "Your given score was successfully submitted!" });
                 setOnVote(false);
                 setOnReloadRate(true);
