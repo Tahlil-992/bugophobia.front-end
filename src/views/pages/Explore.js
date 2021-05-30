@@ -296,8 +296,8 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex',
-        marginTop: '1em',
-        marginBottom: '1em',
+        marginTop: '0.6em',
+        marginBottom: '0.6em',
         border: '3px solid #ebebeb'
     },
     cardContent: {
@@ -596,7 +596,7 @@ function Explore({ signOut }) {
                         <CardContent ><ListItemText primary='notification 1' /></CardContent>
                         <Box display="flex" flexDirection="row-reverse">
                             <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8' , color: 'white' }}>View</Button>
                             </CardActions>
                         </Box>
                     </Card>
@@ -819,10 +819,10 @@ function Explore({ signOut }) {
                             <DialogTitle>{"Sign out"}</DialogTitle>
                             <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
                             <DialogActions>
-                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42, 172, 61, 0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                     Confirm
                                 </Button>
                             </DialogActions>
@@ -837,11 +837,11 @@ function Explore({ signOut }) {
                             <DialogTitle>{"Delete Account"}</DialogTitle>
                             <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
                             <DialogActions>
-                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                                     Cancel
                                 </Button>
                                 <Link style={{textDecoration:'none'}} to="/">
-                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42, 172, 61, 0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm
                                     </Button>
                                 </Link>
@@ -878,10 +878,9 @@ function Explore({ signOut }) {
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card, index) => (
                                                 <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
-                                                    <Button style={{ textTransform: 'none', textAlign: 'center', }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                    <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
                                                         <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-
                                                                 <Avatar className={classes.cardMedia} src={proPictures[index]} />
                                                                 <CardContent className={classes.cardContent}>
                                                                     <Typography gutterBottom variant="h5" component="h2">
