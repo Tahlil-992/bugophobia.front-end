@@ -121,6 +121,16 @@ const getLimitedSearchCallAPI = async (username, isRemembered) => {
     }
 }
 
+const callDeleteAccountAPI = async (username, isdoctor, isRemembered) => {
+    try {
+        const response = await callAPIHandler({ method: "DELETE", url: (isdoctor ? `/profile/doctor/update/${username}/` : `/profile/patient/update/${username}/`) }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const drawerWidth = 240;
 const collapsedSearchWidth = '12rem';
 const expandedSearchWidth = '18rem';
@@ -312,7 +322,7 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateZ(0)',
     },
     list: {
-        width: 250,
+        width: 300,
     },
     fullList: {
         width: 'auto',
@@ -403,6 +413,13 @@ function Explore({ signOut }) {
     }
 
     const handleSignOut = () => {
+        resetLocalStorage();
+        resetSessionStorage();
+        signOut();
+        document.location.reload();
+    }
+    const handeDeleteAccount = () => {
+        callDeleteAccountAPI(username, isDoctor, isRemembered);
         resetLocalStorage();
         resetSessionStorage();
         signOut();
@@ -579,7 +596,7 @@ function Explore({ signOut }) {
                         <CardContent ><ListItemText primary='notification 1' /></CardContent>
                         <Box display="flex" flexDirection="row-reverse">
                             <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white' }}>View</Button>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
                             </CardActions>
                         </Box>
                     </Card>
@@ -589,7 +606,7 @@ function Explore({ signOut }) {
                         <CardContent><ListItemText primary='notification 2' /></CardContent>
                         <Box display="flex" flexDirection="row-reverse">
                             <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white' }}>View</Button>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
                             </CardActions>
                         </Box>
                     </Card>
@@ -599,7 +616,7 @@ function Explore({ signOut }) {
                         <CardContent><ListItemText primary='notification 3' /></CardContent>
                         <Box display="flex" flexDirection="row-reverse">
                             <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white' }}>View</Button>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
                             </CardActions>
                         </Box>
                     </Card>
@@ -802,10 +819,10 @@ function Explore({ signOut }) {
                             <DialogTitle>{"Sign out"}</DialogTitle>
                             <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
                             <DialogActions>
-                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginBottom:'0.5em' }}>
+                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginRight:'1em',marginBottom:'0.5em' }}>
+                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                     Confirm
                                 </Button>
                             </DialogActions>
@@ -820,12 +837,14 @@ function Explore({ signOut }) {
                             <DialogTitle>{"Delete Account"}</DialogTitle>
                             <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
                             <DialogActions>
-                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginBottom:'0.5em' }}>
+                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                                     Cancel
                                 </Button>
-                                <Button /*onClick={}*/ style={{ textTransform: 'none', backgroundColor:'#3d84b8', color:'white', paddingLeft:'2em', paddingRight:'2em',marginRight:'1em',marginBottom:'0.5em' }}>
-                                    Confirm
-                                </Button>
+                                <Link style={{textDecoration:'none'}} to="/">
+                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                        Confirm
+                                    </Button>
+                                </Link>
                             </DialogActions>
                         </Dialog>
                     </div>
