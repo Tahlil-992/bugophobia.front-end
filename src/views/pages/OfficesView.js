@@ -15,6 +15,7 @@ import "../../style.css";
 import { callListAllReservationsAvailableToPatients } from '../../core/modules/calendarAPICalls';
 import { callGetDoctorRerservationsList } from '../../core/modules/calendarAPICalls';
 //import { callGetReservationAPI } from '../../core/modules/calendarAPICalls';
+import { callAPIHandler } from "../../core/modules/refreshToken";
 
 const MyTextField = withStyles({
     root: {
@@ -23,6 +24,16 @@ const MyTextField = withStyles({
         },
     }
 })(TextField);
+
+const callGetOfficeAPI = async (doctorid, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/auth/office-list/${doctorid}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -35,10 +46,10 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#f6f6f6',
         transition: 'all 0.3s ease',
         '&:hover': {
-            backgroundColor: 'rgba(36, 36, 128, 1)',
-            boxShadow: '0px 10px 10px rgba(36, 36, 128, 0.5)',
+            backgroundColor: '#fff',
+            //boxShadow: '0px 10px 10px rgba(36, 36, 36, 0.3)',
             transition: 'all 0.3s ease',
-            color: '#fff',
+            color: '#000',
         },
     },
     cardbutton: {
@@ -82,9 +93,12 @@ const useStyles = makeStyles((theme) => ({
     },
     sidebar: {
         borderRight: '1px solid #aaa',
+        borderLeft: '1px solid #aaa',
         borderBottom: '1px solid #aaa',
+        borderTop: '1px solid #aaa',
         borderBottomRightRadius: '10px',
-        marginRight: '1em',
+        borderBottomLeftRadius: '10px',
+        //marginLeft: '1em',
         marginBottom: '1em',
     },
     textfield: {
@@ -139,16 +153,47 @@ function WeekEvent(props) {
 export default function Offices(props) {
 
     const VisitTimeDuration = props.VisitTimeDuration;
-    const id = props.id;
+    const doctorid = props.doctorid;
     const isRemembered = props.isRemembered;
+    const got = props.got;
 
     const classes = useStyles();
 
-    const offices = [['office 1', 'address 1', ['09120001111']],
-                     ['office 2', 'address 2', ['09120002222']],
-                     ['office 3', 'address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3address 3', ['09120003333','09120003333','09120003333','09120003333']],
-                     ['office 4', 'address 4', ['09120004444']],
-                    ];
+    const [offices, setOffices] = useState([]);
+
+    const callGetOffice = async () => {
+        try {
+            const response = await callGetOfficeAPI(doctorid, isRemembered);
+            if (response.status === 200) {
+                const payload = response.payload;
+                var newOffices = [];
+                payload.map((office, index) => {
+                    var newOffice = {};
+                    newOffice.id = office.id;
+                    newOffice.title = office.title;
+                    newOffice.address = office.address;
+                    var newPhone = [];
+                    office.phone.map((phone, index) => {
+                        newPhone.push(phone.phone);
+                    });
+                    newOffice.phone = newPhone;
+                    newOffices.push(newOffice);
+                });
+                setOffices(newOffices);
+                setPaperElav(paperElav - 1);
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    useEffect(() => {
+        if (got) {
+            callGetOffice();
+        }
+    }, [got]);
 
     const [title, setTitle] = useState('');
     const [address, setAddress] = useState('');
@@ -165,9 +210,9 @@ export default function Offices(props) {
     maxTime.setHours(23,30,0);
 
     const goToOffice = (index) => {
-        setTitle(offices[index][0]);
-        setAddress(offices[index][1]);
-        setPhoneNos(offices[index][2]);
+        setTitle(offices[index].title);
+        setAddress(offices[index].address);
+        setPhoneNos(offices[index].phone);
         setOfficeIndex(index);
     };
 
@@ -183,7 +228,7 @@ export default function Offices(props) {
 
     const getAvailableTimes = () => {
         try {
-            const response = callListAllReservationsAvailableToPatients({id: id}, isRemembered);
+            const response = callListAllReservationsAvailableToPatients({id: doctorid}, isRemembered);
         }
         catch(error) {
 
@@ -217,7 +262,7 @@ export default function Offices(props) {
                 style={{margin: '1em 0em'}} 
                 align='center'
                 >
-                    Please choose the office you want to take visit time
+                    {offices.length !== 0 ? 'Please choose the office you want to take visit time' : 'There is no office to choose'}
                 </Typography>
             <Grid container direction='row' justify='center' alignItems='center'>
                 {offices.map((office, index) => (
@@ -228,7 +273,7 @@ export default function Offices(props) {
                                 onMouseLeave={() => setPaperElav(-1)}
                                 elevation={paperElav === index ? 10 : 1}
                             >
-                                <Typography className={classes.title} align='center'>{office[0]}</Typography>
+                                <Typography className={classes.title} align='center'>{office.title}</Typography>
                             </Paper>
                         </Button>
                     </Grid>
@@ -236,17 +281,19 @@ export default function Offices(props) {
             </Grid>
         </>
         :
-        <Grid container  spacing={1} direction='row' className={classes.officegrid}>
-            <Grid item xs={12} md={2} lg={1} container direction='column' className={classes.sidebar} justify='flex-start' alignItems='center' spacing={1}>
-                <IconButton 
-                    onClick={backToList} 
-                    className={classes.backicon}
-                    >
-                        <ArrowBackIcon />
-                </IconButton>
+        <Grid container  spacing={1} direction='row' className={classes.officegrid} justify='center'>
+            <Grid item xs={12} container direction='row' className={classes.sidebar} justify='flex-start' alignItems='center' spacing={1}>
+                <Grid item>
+                    <IconButton 
+                        onClick={backToList} 
+                        className={classes.backicon}
+                        >
+                            <ArrowBackIcon />
+                    </IconButton>
+                </Grid>
             </Grid>
             {!calendarMode ?
-                <Grid item xs={12} md={10} lg={11} container direction='row' spacing={2} style={{marginTop: '0em'}}> 
+                <Grid item xs={11} container direction='row' spacing={2} style={{marginTop: '0em'}}> 
                     <Grid item xs={12}>
                         <Box >
                             <MyTextField
@@ -270,6 +317,7 @@ export default function Offices(props) {
                             fullWidth
                             disabled
                             multiline
+                            rows={6}
                             className={classes.textarea}
                             InputProps={{
                                 startAdornment: (

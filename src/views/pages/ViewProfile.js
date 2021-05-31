@@ -405,6 +405,8 @@ export default function Profile() {
     const [experience, setExperience] = useState("");
     const [insurance, setInsurance] = useState("");
 
+    const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
+
     useEffect(() => {
         callGetDetailRatingAPI();
     }, [doctorid])
@@ -430,6 +432,12 @@ export default function Profile() {
                     setGmcNumber(nullCheck(payload.gmc_number));
                     setSpecialization((payload.filed_of_specialization));
                     setExperience(nullCheck(payload.work_experience));
+                    if (!payload.visit_duration_time) {
+                        setVisitTimeDuration(30);
+                    }
+                    else {
+                        setVisitTimeDuration(payload.visit_duration_time);
+                    }
                 }
                 else {
                     setInsurance((payload.insurance_type));
@@ -588,7 +596,7 @@ export default function Profile() {
             primary: blue,
         },
     });
-    const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
+    
 
     return (
         <div style={{ backgroundColor: '#8ab6d6' }}>
@@ -843,8 +851,9 @@ export default function Profile() {
                                 <TabPanel value={tabValue} index={1}>
                                     <OfficesView
                                         VisitTimeDuration={VisitTimeDuration}
-                                        id={doctorid}
+                                        doctorid={doctorid}
                                         isRemembered={isRemembered}
+                                        got={got}
                                     />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={2}>

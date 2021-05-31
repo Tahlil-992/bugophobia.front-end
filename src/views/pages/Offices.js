@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
+import { Box, Button, Grid, IconButton, makeStyles, MenuItem, Paper, Popover, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -9,6 +9,8 @@ import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
 import TitleIcon from '@material-ui/icons/Title';
 import DeleteIcon from '@material-ui/icons/Delete';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -22,6 +24,8 @@ import { green } from '@material-ui/core/colors';
 import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorRerservationsList } from "../../core/modules/calendarAPICalls";
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import ApartmentIcon from '@material-ui/icons/Apartment';
+import { callAPIHandler } from "../../core/modules/refreshToken";
+import { ViewArrayRounded } from '@material-ui/icons';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -35,6 +39,36 @@ const MyTextField = withStyles({
     }
 })(TextField);
 
+const callAddOfficeAPI = async (data, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "POST", url: `/auth/office-list/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callGetOfficeAPI = async (doctorid, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/auth/office-list/${doctorid}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callEditOfficeAPI = async (data, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "PUT", url: `/auth/office-list/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const useStyles = makeStyles((theme) => ({
     paper: {
         width: '100%',
@@ -42,22 +76,22 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#f6f6f6',
         transition: 'all 0.3s ease',
         '&:hover': {
-            backgroundColor: 'rgba(36, 36, 128, 1)',
-            boxShadow: '0px 10px 10px rgba(36, 36, 128, 0.5)',
+            backgroundColor: '#fff',
+            //boxShadow: '0px 10px 10px rgba(36, 36, 36, 0.3)',
             transition: 'all 0.3s ease',
-            color: '#fff',
+            color: '#000',
         },
     },
     pluspaper: {
         width: '100%',
         padding: '1em',
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
         transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
-            backgroundColor: 'rgba(42, 172, 61, 0.6)',
-            boxShadow: '0px 10px 10px rgba(36, 128, 36, 0.5)',
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
+            //boxShadow: '0px 10px 10px rgba(19, 145, 34, 0.4)',
             transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
-            color: '#fff',
+            color: '#000',
         },
     },
     title: {
@@ -95,15 +129,18 @@ const useStyles = makeStyles((theme) => ({
     },
     officegrid: {
         width: '100%',
+        //minHeight: '30em',
         marginLeft: '0%',
         marginRight: '0%',
+        borderBottom: '1px solid #aaa',
+        marginBottom: '1em',
+        marginTop: '1em',
     },
     backicon: {
-        marginBottom: '0.5em',
+        //margin: '0.5em',
         backgroundColor: 'rgba(36, 36, 128, 0.3)',
         position: 'sticky',
         top: '0%',
-        alignSelf: 'flex-start',
         '&:hover': {
             backgroundColor: 'rgba(36, 36, 128, 1)',
             boxShadow: '0px 0px 20px rgba(36, 36, 128, 1)',
@@ -111,18 +148,18 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     doneicon: {
-        marginBottom: '0.5em',
+        //margin: '0.5em',
         backgroundColor: 'rgba(36, 128, 36, 0.3)',
         position: 'sticky',
         top: '0%',
         '&:hover': {
-            backgroundColor: 'rgba(42, 172, 61, 0.6)',
+            backgroundColor: 'rgba(36, 128, 36, 1)',
             boxShadow: '0px 0px 20px rgba(36, 128, 36, 1)',
             color: '#fff',
         },
     },
     cancelicon: {
-        marginBottom: '0.5em',
+        //margin: '0.5em',
         backgroundColor: 'rgba(128, 36, 36, 0.3)',
         position: 'sticky',
         top: '0%',
@@ -132,9 +169,26 @@ const useStyles = makeStyles((theme) => ({
             color: '#fff',
         },
     },
+    fullscreenicon: {
+        //margin: '0.5em',
+        backgroundColor: 'rgba(128, 36, 128, 0.3)',
+        position: 'sticky',
+        top: '0%',
+        '&:hover': {
+            backgroundColor: 'rgba(128, 36, 128, 1)',
+            boxShadow: '0px 0px 20px rgba(128, 36, 128, 1)',
+            color: '#fff',
+        },
+    },
     sidebar: {
         borderRight: '1px solid #aaa',
-        marginRight: '1em',
+        borderLeft: '1px solid #aaa',
+        borderBottom: '1px solid #aaa',
+        borderTop: '1px solid #aaa',
+        borderBottomRightRadius: '10px',
+        borderBottomLeftRadius: '10px',
+        //marginLeft: '1em',
+        marginBottom: '1em',
     },
     textfield: {
         width: '100%',
@@ -173,6 +227,7 @@ const useStyles = makeStyles((theme) => ({
     popoverpaper: {
         padding: '0.5em 1em',
         //transition: 'all 0.3s ease',
+        zIndex: -5000,
     },
     arrow: {
         backgroundColor: '#fff',
@@ -199,6 +254,18 @@ const useStyles = makeStyles((theme) => ({
             display: 'unset',
         },
     },
+    button2: {
+        backgroundColor: '#40bad5',
+        padding: '2em 4em 2em 4em',
+        margin: '1em 0em 1em 0em',
+        textAlign: 'center',
+        borderRadius: '5px',
+        textTransform: 'none',
+        height: '2.5em',
+        '&:hover': {
+            backgroundColor: '#5f939a',
+        },
+    },
 }));
 
 export default function Offices(props) {
@@ -207,18 +274,88 @@ export default function Offices(props) {
     const VisitTimeDuration = props.VisitTimeDuration;
     const doctorid = props.doctorid;
     const got = props.got;
+    const mainUsername = props.mainUsername;
+    const [fullscreenMode, setFullscreenMode] = [props.fullscreenMode, props.setFullscreenMode];
+    const [officeIndex, setOfficeIndex] = [props.officeIndex, props.setOfficeIndex];
+    const [calendarMode, setCalendarMode] = [props.calendarMode, props.setCalendarMode];
+    const [viewCalendar, setViewCalendar] = [props.viewCalendar, props.setViewCalendar];
+    const [date, setDate] = [props.date, props.setDate];
+    const [title, setTitle] = [props.title, props.setTitle];
+    const [address, setAddress] = [props.address, props.setAddress];
+    const [phoneNos, setPhoneNos] = [props.phoneNos, props.setPhoneNos];
+    const [isChanged, setIsChanged] = [props.isChanged, props.setIsChanged];
+    const [paperElav, setPaperElav] = [props.paperElav, props.setPaperElav];
+    const [monthEvents, setMonthEvents] = [props.monthEvents, props.setMonthEvents];
+    const [monthEventsMapper, setMonthEventsMapper] = [props.monthEventsMapper, props.setMonthEventsMapper];
+    const [currentEvents, setCurrentEvents] = [props.currentEvents, props.setCurrentEvents];
+
     const classes = useStyles();
 
     const [offices, setOffices] = useState([]);
 
-    const [title, setTitle] = useState('');
-    const [address, setAddress] = useState('');
-    const [phoneNos, setPhoneNos] = useState([]);
+    const callAddOffice = async (data) => {
+        try {
+            const response = await callAddOfficeAPI( data, isRemembered);
+            if (response.status === 201) {
 
-    const [isChanged, setIsChanged] = useState(false);
+            }
+        }
+        catch (error) {
+            console.log(error);
 
-    const [paperElav, setPaperElav] = useState(-1);
-    const [officeIndex, setOfficeIndex] = useState(-1);
+        }
+    }
+
+    const callGetOffice = async () => {
+        try {
+            const response = await callGetOfficeAPI(doctorid, isRemembered);
+            if (response.status === 200) {
+                const payload = response.payload;
+                var newOffices = [];
+                payload.map((office, index) => {
+                    var newOffice = {};
+                    newOffice.id = office.id;
+                    newOffice.title = office.title;
+                    newOffice.address = office.address;
+                    var newPhone = [];
+                    office.phone.map((phone, index) => {
+                        newPhone.push(phone.phone);
+                    });
+                    newOffice.phone = newPhone;
+                    newOffices.push(newOffice);
+                });
+                setOffices(newOffices);
+                setPaperElav(paperElav - 1);
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const callEditOffice = async (data) => {
+        try {
+            const response = await callEditOfficeAPI( data, isRemembered);
+            if (response.status === 201) {
+                alert('11100');
+            }
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    useEffect(() => {
+        if (got) {
+            callGetOffice();
+        }
+    }, [got]);
+
+    
+    
+    
 
     const [autoFocus, setAutoFocus] = useState(false);
 
@@ -227,6 +364,212 @@ export default function Offices(props) {
     minTime.setHours(6, 0, 0);
     const maxTime = new Date();
     maxTime.setHours(23, 30, 0);
+
+    const [events, setEvents] = useState([]);
+    
+    
+
+    const TwoDigits = (number) => {
+        //if (number > 31) number = 30;
+        const str = number.toString();
+        if (str.length === 1)
+            return "0" + str;
+        else
+            return str;
+    }
+
+    const callCreateReserve = async (year, month, day, hours, minutes) => {
+        const mydate1 = new Date(year, month, day, hours, minutes);
+        try {
+            const response = await callCreateReservationAPI({ start_time: mydate1.getFullYear() + " " + mydate1.getMonth() + " " + mydate1.getDate() + " " + mydate1.getHours() + " " + mydate1.getMinutes()}, isRemembered);
+            if (response.status === 201) {
+                var reserveid = response.payload.id;
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    const callGetDoctorRerserve = async () => {
+            var newMonthEvents = [];
+            var newMonthEventsMapper = {};
+            var date = new Date();
+            var year = date.getFullYear(); 
+            var month = date.getMonth();
+            var day = date.getDate();
+            for (var j = 0; j < 7; j++) {
+                var newEvents = [];
+                var hours = 6;
+                var minutes = 0;
+                try {
+                    const DAY = new Date(year, month, day);
+                    const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth()) + TwoDigits(DAY.getDate());
+                    const DAY2 = new Date(year, month, day+1);
+                    const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth()) + TwoDigits(DAY2.getDate());
+                    const response = await callGetDoctorRerservationsList({ from_date: from_date, to_date: to_date }, isRemembered)
+                    if (response.status === 200) {
+                        //alert(response.payload[0].start_time)
+                        response.payload.map((reserve, index) => {
+                            newEvents.push(
+                                {
+                                    'title': '✔',
+                                    'allDay': false,
+                                    'start': new Date(reserve.start_time),
+                                    'end': new Date(reserve.end_time),
+                                    'AvailableState': true,
+                                    'id': reserve.id,
+                                    'events': [],
+                                    'color': 'lightgreen',
+                                    'borderColor': 'green',
+                                }
+                            );
+                        });
+                        //alert(newEvents[0].start);
+                    }
+                }
+                catch (error) {
+                    console.log(error);
+                }
+                const mydate = new Date(year, month, day, 6, 0);
+                const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+                newMonthEvents.push(
+                    {
+                        'title': 'Available',
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': true,
+                        'events': newEvents,
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                        'height': '5em',
+                    }
+                );
+                //alert(index);
+                newMonthEventsMapper[index] = j;
+                day += 1;
+            }
+            setMonthEvents(newMonthEvents);
+            setMonthEventsMapper(newMonthEventsMapper);
+            setCurrentEvents(newMonthEvents);
+        
+        
+    }
+    
+    const eventsMonthColor = () => {
+        var date = new Date();
+        var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
+        for (var i = 0; i < 10; i++) {
+            monthEvents.push(
+                {
+                    'title': 'Available',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'color': 'lightgreen',
+                    'borderColor': 'green',
+                    'AvailableState': true,
+                    'height': '5em',
+                    'index': i + new Date().getDate(),
+                }
+            )
+            day = day + 1;
+        }
+    }
+
+    const callCreateReservation = () => {
+        /* var newMonthEvents = [];
+        var newMonthEventsMapper = {}; */
+        var date = new Date();
+        var year = date.getFullYear(); 
+        var month = date.getMonth();
+        var day = date.getDate();
+        for (var j = 0; j < 1; j++) {
+            // var newEvents = [];
+            var hours = 6;
+            var minutes = 0;
+            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                callCreateReserve(year, month, day, hours, minutes);
+                /* newEvents.push(
+                    {
+                        'title': '✔',
+                        'allDay': false,
+                        'start': new Date(year, month, day, hours, minutes),
+                        'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
+                        'AvailableState': true,
+                        'id': reserveid,
+                        'events': [],
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                    }
+                );*/
+                minutes += VisitTimeDuration; 
+                
+                
+                //const mydate = new Date(year, month, j, hours, minutes)
+
+                //console.log(mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes());
+            }
+            /* const mydate = new Date(year, month, day, 6, 0);
+            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+            newMonthEvents.push(
+                {
+                    'title': 'Available',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'AvailableState': true,
+                    'events': newEvents,
+                    'color': 'lightgreen',
+                    'borderColor': 'green',
+                    'height': '5em',
+                }
+            );
+            newMonthEventsMapper[index] = j;*/
+            day += 1; 
+        }
+        /* setMonthEvents(newMonthEvents);
+        setMonthEventsMapper(newMonthEventsMapper);
+        setCurrentEvents(newMonthEvents); */
+    }
+
+    const ChangeEventState = (event) => {
+        if (event.AvailableState) {
+            event.title = viewCalendar === 'month' ? 'Unavailable' : '✘';
+            event.color = '#fb3640';
+            event.borderColor = 'red';
+            event.events.map((e, index) => {
+                e.title = '✘';
+                e.color = '#fb3640';
+                e.borderColor = 'red';
+                e.AvailableState = false;
+            });
+            //const mydate = event.start;
+            //callCreateReservationAPI({ start_time: mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes() }, isRemembered);
+        }
+        else {
+            event.title = viewCalendar === 'month' ? 'Available' : '✔';
+            event.color = 'lightgreen';
+            event.borderColor = 'green';
+            event.events.map((e, index) => {
+                e.title = '✔';
+                e.color = 'lightgreen';
+                e.borderColor = 'green';
+                e.AvailableState = true;
+            });
+            /* event.color = 'lightgreen';
+            event.borderColor = 'green';
+            if (viewCalendar === "month")
+                event.title = "Available";
+            else
+                event.title = '✔'; */
+            //callDeleteReservationAPI({ id: doctorid })
+        }
+        event.AvailableState = !event.AvailableState;
+    }
+
+    
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [arrowRef, setArrowRef] = useState(null);
@@ -248,8 +591,24 @@ export default function Offices(props) {
     const addOffice = () => {
         const index = offices.length;
         var newOffices = offices;
-        newOffices.push(['Office ' + (index + 1), '', ['']]);
+        newOffices.push({
+            id: 0,
+            title: 'Office ' + (index + 1),
+            address: 'Address',
+            phone: ['0'],
+        });
         setOffices(newOffices);
+        const data = {
+            doctor: doctorid,
+            title: 'Office ' + (index + 1),
+            address: 'Address',
+            location: 0,
+            phone: [
+                {phone: '0'},
+            ]
+        }
+        callAddOffice(data);
+        callCreateReservation();
         goToOffice(index);
     };
 
@@ -268,34 +627,49 @@ export default function Offices(props) {
     };
 
     const goToOffice = (index) => {
-        setTitle(offices[index][0]);
-        setAddress(offices[index][1]);
-        setPhoneNos(offices[index][2]);
+        setTitle(offices[index].title);
+        setAddress(offices[index].address);
+        setPhoneNos(offices[index].phone);
         setOfficeIndex(index);
+        callGetDoctorRerserve();
     };
 
     const saveChanges = () => {
         var newOffices = offices;
         if (!title) {
-            newOffices[officeIndex][0] = 'Office ' + (officeIndex + 1);
+            newOffices[officeIndex].title = 'Office ' + (officeIndex + 1);
             setTitle('Office ' + (officeIndex + 1));
         }
         else {
-            newOffices[officeIndex][0] = title;
+            newOffices[officeIndex].title = title;
         }
-        newOffices[officeIndex][1] = address;
-        newOffices[officeIndex][2] = phoneNos;
+        newOffices[officeIndex].address = address;
+        newOffices[officeIndex].phone = phoneNos;
         setOffices(newOffices);
         setIsChanged(false);
         setAutoFocus(false);
         setPaperElav(paperElav + 1);
         handlePopoverClose();
+        var phone = [];
+        phoneNos.map((ph, index) => {
+            phone.push({phone: ph});
+        });
+        const data = {
+            id: offices[officeIndex].id,
+            doctor: doctorid,
+            title: title,
+            address: address,
+            location: 0,
+            phone: phone,
+        }
+        alert(data.id + data.title);
+        callEditOffice(data);
     };
 
     const cancelChanges = () => {
-        setTitle(offices[officeIndex][0]);
-        setAddress(offices[officeIndex][1]);
-        setPhoneNos(offices[officeIndex][2]);
+        setTitle(offices[officeIndex].title);
+        setAddress(offices[officeIndex].address);
+        setPhoneNos(offices[officeIndex].phone);
         setIsChanged(false);
         setAutoFocus(false);
         setPaperElav(paperElav + 1);
@@ -303,11 +677,18 @@ export default function Offices(props) {
     };
 
     const backToList = () => {
-        setIsChanged(false);
-        setAutoFocus(false);
-        setPaperElav(-1);
-        setOfficeIndex(-1);
-        handlePopoverClose();
+        if (calendarMode) {
+            setFullscreenMode(false);
+            setCalendarMode(false);
+            setViewCalendar('month');
+        }
+        else {
+            setIsChanged(false);
+            setAutoFocus(false);
+            setPaperElav(-1);
+            setOfficeIndex(-1);
+            handlePopoverClose();
+        }
     };
 
     const changePhone = (index, phone) => {
@@ -340,119 +721,116 @@ export default function Offices(props) {
         handlePopoverClose();
     };
 
-    const [events, setEvents] = useState([]);
-    const [monthEvents, setmonthEvents] = useState([]);
-    const eventsColor = () => {
-        var newEvents = [];
-        var date = new Date();
-        var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
-        for (var j = day; j < day + 10; j++) {
-            var minutes = 0;
-            var hours = 6;
-            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
-                newEvents.push(
-                    {
-                        'title': '✔',
-                        'allDay': false,
-                        'start': new Date(year, month, j, hours, minutes),
-                        'end': new Date(year, month, j, hours, minutes + VisitTimeDuration),
-                        'color': 'lightgreen',
-                        'borderColor': 'green',
-                        'AvailableState': true,
-                        'index': j
-                    }
-                )
-                minutes = minutes + VisitTimeDuration;
-                const mydate = new Date(year, month, j, hours, minutes)
-
-                //console.log(mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes());
-            }
-        }
-        setEvents(newEvents);
-    }
-    const eventsMonthColor = () => {
-        var date = new Date();
-        var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
-        for (var i = 0; i < 365; i++) {
-            monthEvents.push(
-                {
-                    'title': 'Available',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'color': 'lightgreen',
-                    'borderColor': 'green',
-                    'AvailableState': true,
-                    'height': '5em',
-                    'index': i + new Date().getDate(),
-                }
-            )
-            day = day + 1;
-        }
-    }
-    const TwoDigits = (number) => {
-        const str = number.toString();
-        if (str.length === 1)
-            return "0" + str;
-        else
-            return str;
-    }
+    
+    
+    
     useEffect(() => {
-        eventsColor();
-        eventsMonthColor();
+        //eventsColor();
+        //eventsMonthColor();
         if (got) {
             const mydate = new Date();
             //callGetDoctorRerservationsList({ from_date: mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()), to_date: (mydate.getFullYear()+1) + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()) }, isRemembered)
         }
     }, [got]);
-    const ChangeEventState = (event) => {
-        if (viewCalendar === 'month') {
-            events.map((e) => {
-                if (e.index === event.index) {
-                    if (event.AvailableState) {
-                        e.color = '#fb3640';
-                        e.borderColor = 'red';
-                        e.title = '✘';
-                    }
-                    else {
-                        e.color = 'lightgreen';
-                        e.borderColor = 'green';
-                        e.title = '✔';
-                    }
-                    e.AvailableState = !event.AvailableState
-                }
-            })
-        }
-        if (event.AvailableState) {
-            event.color = '#fb3640';
-            event.borderColor = 'red';
-            if (viewCalendar === "month")
-                event.title = "Unavailable";
-            else
-                event.title = '✘';
-            const mydate = event.start;
-            callCreateReservationAPI({ start_time: mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes() }, isRemembered);
-        }
-        else {
-            event.color = 'lightgreen';
-            event.borderColor = 'green';
-            if (viewCalendar === "month")
-                event.title = "Available";
-            else
-                event.title = '✔';
-            //callDeleteReservationAPI({ id: doctorid })
-        }
-        event.AvailableState = !event.AvailableState;
-    }
-    const [viewCalendar, setviewCalendar] = useState('week');
+    
+    
     const formats = {
         eventTimeRangeFormat: () => {
             return null;
         },
     };
 
+    const handleOnView = (view) => {
+        setViewCalendar(view);
+    }
+
+    const handleOnNavigate = (date, view) => {
+        setDate(date);
+    }
+
+    const handleOnDrilldown = (date, view) => {
+        handleOnView(view);
+        handleOnRangeChange([date]);
+        setDate(date);
+    }
+
+    const handleOnRangeChange = (dates) => {
+        if (!dates.length) {
+            setCurrentEvents(monthEvents);
+        }
+        else if (dates.length === 1) {
+            const index = monthEventsMapper['' + dates[0].getFullYear() + TwoDigits(dates[0].getMonth()) + TwoDigits(dates[0].getDate())];
+            //alert('... ' + index);
+            if (index !== undefined) {
+                setCurrentEvents(monthEvents[index].events);
+                //alert('... ' + monthEvents[index].events[0].start);
+            }
+            else {
+                 setCurrentEvents([]);
+            }
+        }
+        else if (dates.length === 7) {
+            var newEvents = [];
+            for (var i = 0; i < 7; i++) {
+                let index = monthEventsMapper['' + dates[i].getFullYear() + TwoDigits(dates[i].getMonth()) + TwoDigits(dates[i].getDate())];
+                if (index !== undefined) {
+                    //newEvents = [...newEvents, ...monthEvents[index].events];
+                    newEvents = newEvents.concat(monthEvents[index].events)
+                }
+            }
+            setCurrentEvents(newEvents);
+        }
+    }
+
+    const handleOnSelect = (slotInfo) => {
+        if (viewCalendar === 'month') {
+
+        }
+        else {
+            const length = slotInfo.slots.length;
+            const startDate = slotInfo.slots[0];
+            const endDate = slotInfo.slots.pop();
+            const start = (startDate.getHours()*60) + startDate.getMinutes();
+            const end = (endDate.getHours()*60) + endDate.getMinutes();
+            const base = (6*60) + 0;
+            const startIndex = (start - base) / VisitTimeDuration;
+            const endIndex = startIndex + length - 1;
+            //alert(slotInfo.bounds.top);
+        }
+    }
+
+    const handleEventProp = (event) => {
+        if (viewCalendar === 'month') return(
+            {style: {
+                backgroundColor: event.color,
+                borderColor: event.borderColor,
+                height: event.height,
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignSelf: 'center',
+                justifySelf: 'center',
+            }}
+        );
+        else if (viewCalendar === 'week' || viewCalendar === 'day') return(
+            {style: {
+                backgroundColor: event.color,
+                borderColor: event.borderColor,
+                height: event.height,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: '33%',
+                marginRight: '22%',
+                minWidth: '0%',
+                width: '40%',
+                maxWidth: '45%',
+                alignSelf: 'center',
+                justifySelf: 'center',
+            }}
+        );
+    }
+
     return (officeIndex === -1 ?
-        <Grid container direction='row' justify='center' alignItems='center'>
+        <Grid container direction='row' justify='center' alignItems='center' style={{marginTop: '1em'}}>
             {offices.map((office, index) => (
                 <>
                     <Grid item xs={11} style={{ padding: '0.5em 1em' }}>
@@ -462,14 +840,14 @@ export default function Offices(props) {
                                 onMouseLeave={() => setPaperElav(-1)}
                                 elevation={paperElav === index ? 10 : 1}
                             >
-                                <Typography className={classes.title} align='center'>{office[0]}</Typography>
+                                <Typography className={classes.title} align='center'>{office.title}</Typography>
                             </Paper>
                         </Button>
                     </Grid>
                     <Grid item xs container justify='center' alignItems='center'>
                         <IconButton
                             onClick={() => removeOffice(index)}
-                            onMouseEnter={(event) => handlePopoverOpen(event, 'Remove "' + offices[index][0] + '"')}
+                            onMouseEnter={(event) => handlePopoverOpen(event, 'Remove "' + offices[index].title + '"')}
                             onMouseLeave={handlePopoverClose}
                         >
                             <DeleteIcon style={{ color: "#E03030" }} />
@@ -477,7 +855,7 @@ export default function Offices(props) {
                     </Grid>
                 </>
             ))}
-            <Grid item xs={11} style={{ padding: '0.5em 1em' }} className={classes.officegrid}>
+            <Grid item xs={11} style={{ padding: '0.5em 1em', borderBottom: '0px' }} >
                 <Button style={{ padding: '0em', margin: '0em 0em', width: '100%', textTransform: 'none' }} onClick={addOffice}>
                     <Paper className={classes.pluspaper}
                         onMouseEnter={() => setPaperElav(offices.length)}
@@ -526,8 +904,9 @@ export default function Offices(props) {
         </Grid>
 
         :
-        <Grid container spacing={1} direction='row' className={classes.officegrid}>
-            <Grid item xs={1} container direction='column' className={classes.sidebar}>
+        <Grid container spacing={1} direction='row' className={classes.officegrid} justify='center'>
+            <Grid item xs={12} container direction='row' className={classes.sidebar} justify='flex-start' alignItems='baseline' spacing={1}>
+                <Grid item>
                 <IconButton
                     onClick={backToList}
                     className={classes.backicon}
@@ -536,6 +915,8 @@ export default function Offices(props) {
                 >
                     <ArrowBackIcon />
                 </IconButton>
+                </Grid>
+                <Grid item>
                 <IconButton
                     onClick={saveChanges}
                     className={classes.doneicon}
@@ -545,6 +926,8 @@ export default function Offices(props) {
                 >
                     <DoneIcon />
                 </IconButton>
+                </Grid>
+                <Grid item>
                 <IconButton
                     onClick={cancelChanges}
                     className={classes.cancelicon}
@@ -554,8 +937,34 @@ export default function Offices(props) {
                 >
                     <ClearIcon />
                 </IconButton>
+                </Grid>
+                {calendarMode ?
+                    <Grid item>
+                        <IconButton
+                            onClick={() => setFullscreenMode(!fullscreenMode)}
+                            className={classes.fullscreenicon}
+                            onMouseEnter={
+                                (event) => {
+                                    if (fullscreenMode) {
+                                        handlePopoverOpen(event, 'Exit Fullscreen')
+                                    }
+                                    else {
+                                        handlePopoverOpen(event, 'Fullscreen');
+                                    }
+                                    
+                                }
+                            }
+                            onMouseLeave={handlePopoverClose}
+                        >
+                            {fullscreenMode ? <FullscreenExitIcon/> : <FullscreenIcon/>}
+                        </IconButton>
+                    </Grid> 
+                    :
+                    <></>
+                }
             </Grid>
-            <Grid item xs={11} container direction='row' spacing={2} style={{ marginTop: '0em' }}>
+            {!calendarMode ?
+            <Grid item xs={12} md={11} container direction='row' spacing={2}>
                 <Grid item xs={12} style={{ textAlign: 'center', }} inputProps={{ min: 0, style: { textAlign: 'center', } }}>
                     <Box >
                         <TextField
@@ -573,15 +982,16 @@ export default function Offices(props) {
                         />
                     </Box>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} >
                     <Box>
                         <MyTextField
                             variant='outlined'
                             value={address}
                             label='Address'
                             fullWidth
-                            onChange = {(event) => setAddress(event.target.value)}
+                            onChange = {(event) => {setAddress(event.target.value); setIsChanged(true);}}
                             multiline
+                            rows={6}
                             className={classes.textarea}
                             InputProps={{
                                 startAdornment: (
@@ -593,38 +1003,43 @@ export default function Offices(props) {
                         />
                     </Box>
                 </Grid>
-                <Grid item xs={6}>
-                    <Box onMouseLeave={handlePopoverClose}>
+                
                         {phoneNos.map((phone, index) => (
+                            <Grid item xs={12} md={6}>
                             <Box display='flex' alignItems='center'>
-                                <MyTextField style={{marginBottom:'1em'}}
+                                <MyTextField
                                     label={"Phone No." + (index+1)}
                                     variant='outlined'
                                     value={phone}
                                     fullWidth
                                     autoFocus={autoFocus}
                                     className={classes.textfield}
-                                    //inputProps={{ startAdornment: (<InputAdornment position="start" > {<PhoneAndroidIcon />}</InputAdornment>), style: { textAlign: 'left', fontSize: 12, marginLeft: '1em' }, }}
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
                                                 <PhoneAndroidIcon />
                                             </InputAdornment>
                                         ),
+                                        endAdornment: (
+                                            <IconButton
+                                                style={{ marginLeft: '0.0em' }}
+                                                onClick={() => removePhone(index)}
+                                                disabled={phoneNos.length === 1}
+                                                onMouseEnter={(event) => handlePopoverOpen(event, 'Remove this phone number')}
+                                                onMouseLeave={handlePopoverClose}
+                                            >
+                                                <RemoveIcon fontSize='small' color={phoneNos.length === 1 ? 'disabled' : 'secondary'} />
+                                            </IconButton>
+                                        ),
                                     }}
                                     onChange={(event) => changePhone(index, event.target.value)}
                                 />
-                                <IconButton
-                                    style={{ marginLeft: '0.0em' }}
-                                    onClick={() => removePhone(index)}
-                                    disabled={phoneNos.length === 1}
-                                    onMouseEnter={(event) => handlePopoverOpen(event, 'Remove this phone number')}
-                                    onMouseLeave={handlePopoverClose}
-                                >
-                                    <RemoveIcon fontSize='small' color={phoneNos.length === 1 ? 'disabled' : 'secondary'} />
-                                </IconButton>
+                                
                             </Box>
+                            
+                </Grid>
                         ))}
+                        <Grid item xs={12} md={6}>
                         <IconButton
                             onClick={addPhone}
                             style={{ backgroundColor: '#e0e0e0' }}
@@ -633,71 +1048,50 @@ export default function Offices(props) {
                         >
                             <AddIcon fontSize='small' color='primary' />
                         </IconButton>
-                    </Box>
-                </Grid>
+                        </Grid>
+                        <Grid item xs={12} container justify='center'>
+                        <Button 
+                            className={classes.button2}
+                            onClick={() => {setCalendarMode(true); setViewCalendar('month');}}
+                            >
+                                Office's Calendar
+                        </Button>
+                    </Grid>
+                        
             </Grid>
-            <hr width='100%' style={{ marginBottom: '1px' }} />
-            <hr width='100%' style={{ marginTop: '1px' }} />
+            :
+            
             <Grid item xs={12} className={classes.container}>
-                <Calendar style={{ height: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
+                <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
                     localizer={localizer}
+                    id='clndr'
                     views={['month', 'week', 'day']}
+                    view={viewCalendar}
+                    date={date}
                     selectable
                     popup
                     onSelectEvent={event => ChangeEventState(event)}
-                    onSelectSlot={slotInfo =>
-                        alert(
-                            `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
-                            `\nend: ${slotInfo.end.toLocaleString()}` +
-                            `\naction: ${slotInfo.action}`
-                        )
-                    }
-                    onView={view => setviewCalendar(view)}
-                    events={viewCalendar === 'month' ? monthEvents : events}
+                    onSelectSlot={handleOnSelect}
+                    onView={handleOnView}
+                    onNavigate={handleOnNavigate}
+                    events={currentEvents}
                     step={VisitTimeDuration}
                     timeslots={2}
-                    defaultView='week'
-                    eventPropGetter={event => (viewCalendar !== 'month' ? {
-                        style: {
-                            backgroundColor: event.color,
-                            borderColor: event.borderColor,
-                            height: event.height,
-                            //border: '2px solid #E0E0E0',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            //paddingRight: '1em'
-                            marginLeft: '33%',
-                            marginRight: '22%',
-                            minWidth: '0%',
-                            width: '40%',
-                            maxWidth: '45%',
-                            alignSelf: 'center',
-                            justifySelf: 'center',
-                        },
-                    }
-                        :
-                        {
-                            style: {
-                                backgroundColor: event.color,
-                                borderColor: event.borderColor,
-                                height: event.height,
-                                //border: '2px solid #E0E0E0',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                //paddingRight: '1em'
-
-                                alignSelf: 'center',
-                                justifySelf: 'center',
-                            }
-                        })}
+                    defaultView='month'
+                    eventPropGetter={handleEventProp}
                     showMultiDayTimes
                     min={minTime}
                     max={maxTime}
                     startAccessor="start"
                     endAccessor="end"
+                    onDrillDown={handleOnDrilldown}
+                    //drilldownView='day'
+                    onRangeChange={handleOnRangeChange}
+                    onMouseUp={(e) => {}}
                 />
 
             </Grid>
+            }
             <Popper
                 id="mouse-over-popover"
                 className={classes.popover}
