@@ -182,6 +182,7 @@ const useStyles = makeStyles((theme) => ({
         borderBottomRightRadius: "10px",
         borderBottomLeftRadius: "10px",
         marginBottom: "2rem",
+        minHeight: '30em',
     },
     grid: {
         marginTop: "0rem",
@@ -417,7 +418,13 @@ export default function Profile() {
                     setGmcNumber(nullCheck(payload.gmc_number));
                     setSpecialization((payload.filed_of_specialization));
                     setExperience(nullCheck(payload.work_experience));
-                    setVisitTimeDuration(payload.visit_duration_time);
+                    if (!payload.visit_duration_time) {
+                        callChangeVisitDurationTimeAPI({ visit_duration_time: 30 }, isRemembered);
+                        setVisitTimeDuration(30);
+                    }
+                    else {
+                        setVisitTimeDuration(payload.visit_duration_time);
+                    }
                 }
                 else {
                     setInsurance((payload.insurance_type));
@@ -713,6 +720,20 @@ export default function Profile() {
         setMessage("");
     }
 
+    const [fullscreenMode, setFullscreenMode] = useState(false);
+    const [officeIndex, setOfficeIndex] = useState(-1);
+    const [calendarMode, setCalendarMode] = useState(false);
+    const [viewCalendar, setViewCalendar] = useState('month');
+    const [date, setDate] = useState(new Date());
+    const [title, setTitle] = useState('');
+    const [address, setAddress] = useState('');
+    const [phoneNos, setPhoneNos] = useState([]);
+    const [isChanged, setIsChanged] = useState(false);
+    const [paperElav, setPaperElav] = useState(-1);
+    const [monthEvents, setMonthEvents] = useState([]);
+    const [monthEventsMapper, setMonthEventsMapper] = useState({});
+    const [currentEvents, setCurrentEvents] = useState([]);
+
     return (
         <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
             <AppBar position="relative">
@@ -721,6 +742,32 @@ export default function Profile() {
                     <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
                 </Toolbar>
             </AppBar>
+            {fullscreenMode ? 
+            <Container maxWidth="lg" className={classes.container}>
+            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
+                <Offices 
+                    isRemembered={isRemembered} 
+                    VisitTimeDuration={VisitTimeDuration} 
+                    doctorid={doctorid} 
+                    got={got}
+                    mainUsername={mainUsername}
+                    fullscreenMode={fullscreenMode}             setFullscreenMode={setFullscreenMode}
+                    officeIndex={officeIndex}                   setOfficeIndex={setOfficeIndex}
+                    calendarMode={calendarMode}                 setCalendarMode={setCalendarMode}
+                    viewCalendar={viewCalendar}                 setViewCalendar={setViewCalendar}
+                    date={date}                                 setDate={setDate}
+                    title={title}                               setTitle={setTitle}
+                    address={address}                           setAddress={setAddress}
+                    phoneNos={phoneNos}                         setPhoneNos={setPhoneNos}
+                    isChanged={isChanged}                       setIsChanged={setIsChanged}
+                    paperElav={paperElav}                       setPaperElav={setPaperElav}
+                    monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
+                    monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
+                    currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                />
+            </div>
+            </Container>
+            :
             <Container maxWidth="lg" className={classes.container}>
                 <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                     <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
@@ -960,7 +1007,26 @@ export default function Profile() {
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={3}>
                                     {isDoctor ?
-                                        <Offices isRemembered={isRemembered} VisitTimeDuration={VisitTimeDuration} doctorid={doctorid} got={got}/>
+                                        <Offices 
+                                            isRemembered={isRemembered} 
+                                            VisitTimeDuration={VisitTimeDuration} 
+                                            doctorid={doctorid} 
+                                            got={got}
+                                            mainUsername={mainUsername}
+                                            fullscreenMode={fullscreenMode}             setFullscreenMode={setFullscreenMode}
+                                            officeIndex={officeIndex}                   setOfficeIndex={setOfficeIndex}
+                                            calendarMode={calendarMode}                 setCalendarMode={setCalendarMode}
+                                            viewCalendar={viewCalendar}                 setViewCalendar={setViewCalendar}
+                                            date={date}                                 setDate={setDate}
+                                            title={title}                               setTitle={setTitle}
+                                            address={address}                           setAddress={setAddress}
+                                            phoneNos={phoneNos}                         setPhoneNos={setPhoneNos}
+                                            isChanged={isChanged}                       setIsChanged={setIsChanged}
+                                            paperElav={paperElav}                       setPaperElav={setPaperElav}
+                                            monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
+                                            monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
+                                            currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                                            />
                                         :
                                         <Typography>Notifications</Typography>
                                     }
@@ -976,7 +1042,7 @@ export default function Profile() {
                         </Grid>
                     </Grid>
                 </div>
-            </Container>
+            </Container>}
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={openSnackBar}
