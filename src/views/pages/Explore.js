@@ -808,7 +808,7 @@ function Explore({ signOut }) {
                 </List>
                 <List>
                     <div>
-                        <Divider style={{ marginTop: '55vh' }} />
+                        <Divider style={{ marginTop: '26rem' }} />
                         <ListItem button onClick={handleClickSignoutOpen}>
                             <ListItemIcon>
                                 <ExitToAppIcon />
@@ -822,7 +822,7 @@ function Explore({ signOut }) {
                                 <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42, 172, 61, 0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                     Confirm
                                 </Button>
                             </DialogActions>
@@ -841,7 +841,7 @@ function Explore({ signOut }) {
                                     Cancel
                                 </Button>
                                 <Link style={{textDecoration:'none'}} to="/">
-                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42, 172, 61, 0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm
                                     </Button>
                                 </Link>
