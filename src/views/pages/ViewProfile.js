@@ -554,6 +554,8 @@ export default function Profile() {
     }
 
     const callGetDetailRatingAPI = async () => {
+        const temp = rateAvg;
+        setRateAvg(newRateValue);
         try {
             const response = await getRatingDetailCallAPI({ doctor_id: doctorid });
             // console.log(response);
@@ -564,6 +566,7 @@ export default function Profile() {
             }
         }
         catch (e) {
+            setRateAvg(temp);
             console.log(e);
         }
     }
