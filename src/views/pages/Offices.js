@@ -398,7 +398,7 @@ export default function Offices(props) {
     }
 
     const callCreateReserve = async (year, month, day, hours, minutes) => {
-        const mydate1 = new Date(year, month, day, hours, minutes);
+        const mydate1 = new Date(year, month+1, day, hours, minutes);
         try {
             const response = await callCreateReservationAPI({ start_time: mydate1.getFullYear() + " " + mydate1.getMonth() + " " + mydate1.getDate() + " " + mydate1.getHours() + " " + mydate1.getMinutes()}, isRemembered);
             if (response.status === 201) {
@@ -436,9 +436,9 @@ export default function Offices(props) {
                 var allred = true;
                 try {
                     const DAY = new Date(year, month, day);
-                    const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth()) + TwoDigits(DAY.getDate());
+                    const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth()+1) + TwoDigits(DAY.getDate());
                     const DAY2 = new Date(year, month, day+1);
-                    const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth()) + TwoDigits(DAY2.getDate());
+                    const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth()+1) + TwoDigits(DAY2.getDate());
                     const response = await callGetDoctorRerservationsList({ from_date: from_date, to_date: to_date }, isRemembered)
                     if (response.status === 200) {
                         const length = Math.floor((18 * 60) / VisitTimeDuration) - 1;
@@ -464,13 +464,13 @@ export default function Offices(props) {
                         response.payload.map((reserve, index) => {
                             allred = false;
                             var sd0 = getDateElements(reserve.start_time);
-                            var sd = new Date(sd0.year, sd0.month, sd0.day, sd0.hour, sd0.minute);
+                            var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
                             const startDate = sd;
                             const start = (startDate.getHours()*60) + startDate.getMinutes();
                             const startIndex = (start - base) / VisitTimeDuration;
                             //sd.setMonth(sd.getMonth() + 1);
                             var ed0 = getDateElements(reserve.end_time);
-                            var ed = new Date(ed0.year, ed0.month, ed0.day, ed0.hour, ed0.minute);
+                            var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
                             //ed.setMonth(ed.getMonth() + 1);
                             console.log(sd + ' ' + ed);
                             newEvents[startIndex] = (
@@ -642,9 +642,9 @@ export default function Offices(props) {
 
                 callCreateReserve(e.start.getFullYear(), e.start.getMonth(), e.start.getDate(), e.start.getHours(), e.start.getMinutes());
             });
-            if (event.id !== -1) {
+            
                 callCreateReserve(event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours(), event.start.getMinutes());
-            }
+            
             /* event.color = 'lightgreen';
             event.borderColor = 'green';
             if (viewCalendar === "month")

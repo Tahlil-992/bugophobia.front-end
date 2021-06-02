@@ -599,6 +599,21 @@ export default function Profile() {
             primary: blue,
         },
     });
+
+    const [fullscreenMode, setFullscreenMode] = useState(false);
+    const [officeIndex, setOfficeIndex] = useState(-1);
+    const [calendarMode, setCalendarMode] = useState(false);
+    const [viewCalendar, setViewCalendar] = useState('month');
+    const [date, setDate] = useState(new Date());
+    const [officeid, setOfficeid] = useState(0);
+    const [title, setTitle] = useState('');
+    const [address, setAddress] = useState('');
+    const [phoneNos, setPhoneNos] = useState([]);
+    const [isChanged, setIsChanged] = useState(false);
+    const [paperElav, setPaperElav] = useState(-1);
+    const [monthEvents, setMonthEvents] = useState([]);
+    const [monthEventsMapper, setMonthEventsMapper] = useState({});
+    const [currentEvents, setCurrentEvents] = useState([]);
     
 
     return (
@@ -609,6 +624,33 @@ export default function Profile() {
                     <Typography variant="h6" color="inherit" noWrap>View Profile</Typography>
                 </Toolbar>
             </AppBar>
+            {fullscreenMode ? 
+            <Container maxWidth="lg" className={classes.container}>
+            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit', padding: '2em' }}>
+                <OfficesView 
+                    isRemembered={isRemembered} 
+                    VisitTimeDuration={VisitTimeDuration} 
+                    doctorid={doctorid} 
+                    got={got}
+                    mainUsername={viewedUsername}
+                    fullscreenMode={fullscreenMode}             setFullscreenMode={setFullscreenMode}
+                    officeIndex={officeIndex}                   setOfficeIndex={setOfficeIndex}
+                    calendarMode={calendarMode}                 setCalendarMode={setCalendarMode}
+                    viewCalendar={viewCalendar}                 setViewCalendar={setViewCalendar}
+                    date={date}                                 setDate={setDate}
+                    officeid={officeid}                         setOfficeid={setOfficeid}
+                    title={title}                               setTitle={setTitle}
+                    address={address}                           setAddress={setAddress}
+                    phoneNos={phoneNos}                         setPhoneNos={setPhoneNos}
+                    isChanged={isChanged}                       setIsChanged={setIsChanged}
+                    paperElav={paperElav}                       setPaperElav={setPaperElav}
+                    monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
+                    monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
+                    currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                />
+            </div>
+            </Container>
+            :
             <Container maxWidth="lg" className={classes.container}>
                 <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                     <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
@@ -852,12 +894,27 @@ export default function Profile() {
                                         />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={1}>
-                                    <OfficesView
-                                        VisitTimeDuration={VisitTimeDuration}
-                                        doctorid={doctorid}
-                                        isRemembered={isRemembered}
+                                    <OfficesView 
+                                        isRemembered={isRemembered} 
+                                        VisitTimeDuration={VisitTimeDuration} 
+                                        doctorid={doctorid} 
                                         got={got}
-                                    />
+                                        mainUsername={viewedUsername}
+                                        fullscreenMode={fullscreenMode}             setFullscreenMode={setFullscreenMode}
+                                        officeIndex={officeIndex}                   setOfficeIndex={setOfficeIndex}
+                                        calendarMode={calendarMode}                 setCalendarMode={setCalendarMode}
+                                        viewCalendar={viewCalendar}                 setViewCalendar={setViewCalendar}
+                                        date={date}                                 setDate={setDate}
+                                        officeid={officeid}                         setOfficeid={setOfficeid}
+                                        title={title}                               setTitle={setTitle}
+                                        address={address}                           setAddress={setAddress}
+                                        phoneNos={phoneNos}                         setPhoneNos={setPhoneNos}
+                                        isChanged={isChanged}                       setIsChanged={setIsChanged}
+                                        paperElav={paperElav}                       setPaperElav={setPaperElav}
+                                        monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
+                                        monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
+                                        currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                                        />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={2}>
                                     <Box display="flex" flex={1} position="relative">
@@ -868,7 +925,7 @@ export default function Profile() {
                         </Grid>
                     </Grid>
                 </div>
-            </Container>
+            </Container>}
             {
                 openSnackBar && <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
