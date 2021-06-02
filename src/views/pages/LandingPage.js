@@ -37,8 +37,6 @@ const useStyles = makeStyles((theme) => ({
     footer: {
         display: "flex",
         marginTop: "5em",
-        marginRight: "8%",
-        marginLeft: "8%",
         borderRadius: "100px 100px 0 0",
     },
     Btn: {
@@ -52,10 +50,6 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
-    divider: {
-        color: "#ec426b",
-        backgroundColor: "#ec426b",
-    }
 }));
 
 const LandingPage = ({ isdoctor, setIsDoctor }) => {
@@ -83,8 +77,9 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     <Typography variant="h6" color="inherit" noWrap>Let's Get Started</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid style={{ backgroundColor: '#8ab6d6', height:'60%', justifyContent:'center', alignItems:'center' }}>
-                <div className={classes.heroContent} style={{ backgroundColor: '#E0E0E0', display: 'flex', flexDirection: 'row', marginLeft: '8%', marginRight: '8%', borderBottomLeftRadius: '100px', borderBottomRightRadius: '100px' }}>
+            <Grid container style={{backgroundColor: "rgba(16,33,125, 0.3)", width: "84%", margin: "auto"}}>
+            <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center' }}>
+                <div className={classes.heroContent} style={{ backgroundColor: '#E0E0E0', display: 'flex', flexDirection: 'row', borderBottomLeftRadius: '100px', borderBottomRightRadius: '100px' }}>
                     <Container>
                         <Grid style={{ display: 'flex', flexDirection: 'row' }}>
                             <Grid item style={{ width: '55%', borderRadius: '10px' }}>
@@ -128,21 +123,18 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Container>
                 </div>
             </Grid>
-            <Grid style={{ backgroundColor: '#8ab6d6', height:'60%', justifyContent:'center', alignItems:'center' }}>
+            <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center' }}>
                 <div 
                     className={classes.heroContent} 
                     style={{ 
-                        backgroundColor: '#E0E0E0', 
                         display: 'flex', 
                         flexDirection: 'row', 
-                        marginLeft: '8%', 
-                        marginRight: '8%', 
                         marginTop: "5em", 
                         borderRadius: '100px' }}>
                     <Grid container>
                         <Grid item xs={12}>
                             <Box width='60%' margin="auto">
-                                <Typography style={{ color: "#ec426b", fontFamily: "cursive" }} component="h1" variant="h4" align="left" color="textPrimary" gutterBottom>
+                                <Typography style={{ color: "white", fontFamily: "cursive" }} component="h1" variant="h4" align="left" color="textPrimary" gutterBottom>
                                     ABOUT US
                                 </Typography>
                             </Box>   
@@ -155,7 +147,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                     You search for a magic pill to make you whole again.
                                 </Typography>
                                 <Collapse in={whyUsReadMore} timeout={1000} unmountOnExit>
-                                    <Typography style={{ fontFamily: "cursive", color: "#ec426b" }}>
+                                    <Typography style={{ fontFamily: "cursive", color: "white" }}>
                                         <br/>
                                         A better way is possible.
                                     </Typography>
@@ -165,7 +157,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                         <br/>
                                         <br/>
                                     </Typography>
-                                    <Typography style={{ fontFamily: "cursive", color: "#ec426b"  }}>
+                                    <Typography style={{ fontFamily: "cursive", color: "white"  }}>
                                         We are all in this together.
                                     </Typography>
                                     <Typography style={{ fontFamily: "cursive" }}>
@@ -188,13 +180,11 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                             </Box>
                         </Grid> 
                         <Grid item xs={12}>
-                            <Box width="60%" margin="auto">
-                                <Divider classes={{root: classes.divider}}/>
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Box width='60%' margin="auto">
-                                <Typography style={{ color: "#ec426b", fontFamily: "cursive" }} component="h1" variant="h4" align="left" color="textPrimary" gutterBottom>
+                            <Box width='60%' margin="auto" display="flex" alignItems="center">
+                                <Typography style={{ color: "white", fontFamily: "cursive", marginRight: "0.25em" }} variant="h4" align="left" color="textPrimary" gutterBottom>
+                                    {'\u2022'}
+                                </Typography>
+                                <Typography style={{ color: "white", fontFamily: "cursive" }} align="left" color="textPrimary" gutterBottom>
                                     WHY US ?
                                 </Typography>
                             </Box>
@@ -249,21 +239,21 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Grid>
                 </div>
             </Grid>
-            <footer className={classes.footer} style={{ backgroundColor: 'rgba(16,33,125, 0.3)', padding: "2em 0" }}>
+            <footer className={classes.footer} style={{ backgroundColor: '#E0E0E0', padding: "2em 0" }}>
                 {/* <Typography variant="h6" align="center" gutterBottom>Footer</Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Something here to give the footer a purpose!</Typography>
                 <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '1.25em' }}>about us</Link> */}
                 <Grid container>
                 <Grid item sm={3}>
-                    <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
+                    <Typography style={{ color:"#444444", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
                 </Grid>
                 <Grid container item sm={9}>
                     <Grid item sm={6} style={{ padding: "0 1.5em"}}>
                         <Grid>
-                            <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
+                            <Typography style={{ color:"black", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
                         </Grid>
                         <Grid>
-                            <Typography style={{ color: "#E0E0E0", marginTop: "1em" }}>
+                            <Typography style={{ color: "#333333", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
@@ -273,10 +263,10 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Grid>
                     <Grid item sm={6} style={{ padding: "0 1.5em"}}>
                         <Grid>
-                            <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>PRIVACY POLICY</Typography>
+                            <Typography style={{ color:"black", fontWeight: 900, fontSize: "1.5em" }}>PRIVACY POLICY</Typography>
                         </Grid>
                         <Grid>
-                            <Typography style={{ color: "#E0E0E0", marginTop: "1em" }}>
+                            <Typography style={{ color: "#333333", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
@@ -287,6 +277,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                 </Grid>                    
                 </Grid>
             </footer>
+            </Grid>
         </React.Fragment>
     );
 }
