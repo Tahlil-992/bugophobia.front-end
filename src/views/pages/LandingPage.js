@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import "../../style.css";
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
@@ -14,6 +14,15 @@ import DoctorImg from "../../assets/images/DoctorUser.png";
 import PatientImg from "../../assets/images/PatientUser.png";
 import OnlineDoctor from "../../assets/images/OnlineDoctor.jpg";
 import Box from "@material-ui/core/Box";
+import SpeedIcon from '@material-ui/icons/Speed';
+import Collapse from '@material-ui/core/Collapse';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import IconButton from '@material-ui/core/IconButton';
+import Divider from '@material-ui/core/Divider';
+import EventAvailableIcon from '@material-ui/icons/EventAvailable';
+import SearchIcon from '@material-ui/icons/Search';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -43,6 +52,10 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
+    divider: {
+        color: "#ec426b",
+        backgroundColor: "#ec426b",
+    }
 }));
 
 const LandingPage = ({ isdoctor, setIsDoctor }) => {
@@ -53,6 +66,16 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
         setIsDoctor(true);
     }
     const classes = useStyles();
+    const [whyUsReadMore, setWhyUsReadMore] = useState(false);
+
+    const expandWhyUsReadMore = () => {
+        setWhyUsReadMore(true);
+    }
+
+    const collpaseWhyUsReadMore = () => {
+        setWhyUsReadMore(false);
+    }
+
     return (
         <React.Fragment>
             <AppBar position="relative" style={{height:'5%'}}>
@@ -105,6 +128,127 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Container>
                 </div>
             </Grid>
+            <Grid style={{ backgroundColor: '#8ab6d6', height:'60%', justifyContent:'center', alignItems:'center' }}>
+                <div 
+                    className={classes.heroContent} 
+                    style={{ 
+                        backgroundColor: '#E0E0E0', 
+                        display: 'flex', 
+                        flexDirection: 'row', 
+                        marginLeft: '8%', 
+                        marginRight: '8%', 
+                        marginTop: "5em", 
+                        borderRadius: '100px' }}>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <Box width='60%' margin="auto">
+                                <Typography style={{ color: "#ec426b", fontFamily: "cursive" }} component="h1" variant="h4" align="left" color="textPrimary" gutterBottom>
+                                    ABOUT US
+                                </Typography>
+                            </Box>   
+                            <Box display="flex" flexDirection="column" width='60%' margin="auto">
+                                <Typography style={{ fontFamily: "cursive" }}>
+                                    When you’re diagnosed with a chronic condition, your whole life changes. 
+                                    You go from feeling in control of your destiny to feeling like you have no control at all. 
+                                    A doctor has taken over managing your health, yet you only see them a few minutes a year. 
+                                    The rest of the time, you try to navigate on your own. A healthy life feels impossible. 
+                                    You search for a magic pill to make you whole again.
+                                </Typography>
+                                <Collapse in={whyUsReadMore} timeout={1000} unmountOnExit>
+                                    <Typography style={{ fontFamily: "cursive", color: "#ec426b" }}>
+                                        <br/>
+                                        A better way is possible.
+                                    </Typography>
+                                    <Typography style={{ fontFamily: "cursive" }}>
+                                        Reimagine your health, your limits, and your life.
+                                        We are with you during the thousands of hours per year when you’re not at the doctor’s office.
+                                        <br/>
+                                        <br/>
+                                    </Typography>
+                                    <Typography style={{ fontFamily: "cursive", color: "#ec426b"  }}>
+                                        We are all in this together.
+                                    </Typography>
+                                    <Typography style={{ fontFamily: "cursive" }}>
+                                        We give you back your time, your power, and your life. 
+                                        And when we give back this time and power to millions of people around the world, 
+                                        we have the potential to solve the problems facing our planet. We can change the future. 
+                                        And together, we can create new possibilities for humanity. It all starts with you. 
+                                    </Typography>
+                                </Collapse>
+                                {!whyUsReadMore && <Box>
+                                    <IconButton onClick={expandWhyUsReadMore}>
+                                        <ArrowRightIcon/>
+                                    </IconButton>
+                                </Box>}
+                                {whyUsReadMore && <Box>
+                                    <IconButton onClick={collpaseWhyUsReadMore}>
+                                        <ArrowDropUpIcon/>
+                                    </IconButton>
+                                </Box>}
+                            </Box>
+                        </Grid> 
+                        <Grid item xs={12}>
+                            <Box width="60%" margin="auto">
+                                <Divider classes={{root: classes.divider}}/>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box width='60%' margin="auto">
+                                <Typography style={{ color: "#ec426b", fontFamily: "cursive" }} component="h1" variant="h4" align="left" color="textPrimary" gutterBottom>
+                                    WHY US ?
+                                </Typography>
+                            </Box>
+                            <Box width='60%' margin="auto">
+                                <Box display="flex">
+                                    <EventAvailableIcon/>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                        Using our calendars you can always keep track of your reservations.
+                                    </Typography>
+                                </Box>
+                                <br/>
+                                <Box display="flex">
+                                    <AssignmentIcon/>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                        Doctors can keep track of their reservation times.
+                                    </Typography>
+                                </Box>
+                                <br/>
+                                <Box display="flex">
+                                    <SearchIcon/>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                        Our advanced search lets you find your desired doctor easily.
+                                    </Typography>
+                                </Box>
+                                <br/>
+                                <Box display="flex">
+                                    <SpeedIcon/>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                        Finally, don't waste time behind a phone for a visit time. Pick your most desired.
+                                    </Typography>
+                                </Box>
+                            </Box>
+                                {/* <Box display="flex" justifyContent="center">
+                                    <SpeedIcon style={{margin: "0 0.5em"}}/>
+                                    <Typography align="center" style={{margin: "0 0.5em"}}>
+                                        Fast
+                                    </Typography> 
+                                </Box>
+                                <Box display="flex" justifyContent="center">
+                                    <SpeedIcon style={{margin: "0 0.5em"}}/>
+                                    <Typography align="center" style={{margin: "0 0.5em"}}>
+                                        Secure
+                                    </Typography> 
+                                </Box>
+                                <Box display="flex" justifyContent="center">
+                                    <SpeedIcon style={{margin: "0 0.5em"}}/>
+                                    <Typography align="center" style={{margin: "0 0.5em"}}>
+                                        Professional
+                                    </Typography> 
+                                </Box> */} 
+                        </Grid>                                              
+                    </Grid>
+                </div>
+            </Grid>
             <footer className={classes.footer} style={{ backgroundColor: 'rgba(16,33,125, 0.3)', padding: "2em 0" }}>
                 {/* <Typography variant="h6" align="center" gutterBottom>Footer</Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Something here to give the footer a purpose!</Typography>
@@ -114,30 +258,12 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
                 </Grid>
                 <Grid container item sm={9}>
-                    <Grid item sm={4} justifyContent="center"style={{ padding: "0 1.5em"}}>
-                        <Grid>
-                            <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>ABOUT US</Typography>
-                        </Grid>
-                        <Grid>
-                            <Typography style={{ color: "#C0C0C0", marginTop: "1em" }}>
-                                Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
-                                Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
-                                toen een onbekende drukker een zethaak met letters nam en ze 
-                                door elkaar husselde om een font-catalogus te maken. 
-                                Het heeft niet alleen vijf eeuwen overleefd maar is ook, 
-                                vrijwel onveranderd, overgenomen in elektronische letterzetting. 
-                                Het is in de jaren '60 populair geworden met de introductie van Letraset vellen 
-                                met Lorem Ipsum passages en meer recentelijk door desktop publishing software zoals 
-                                Aldus PageMaker die versies van Lorem Ipsum bevatten.
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                    <Grid item sm={4} style={{ padding: "0 1.5em"}}>
+                    <Grid item sm={6} style={{ padding: "0 1.5em"}}>
                         <Grid>
                             <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
                         </Grid>
                         <Grid>
-                            <Typography style={{ color: "#C0C0C0", marginTop: "1em" }}>
+                            <Typography style={{ color: "#E0E0E0", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
@@ -145,12 +271,12 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                             </Typography>
                         </Grid>
                     </Grid>
-                    <Grid item sm={4} style={{ padding: "0 1.5em"}}>
+                    <Grid item sm={6} style={{ padding: "0 1.5em"}}>
                         <Grid>
                             <Typography style={{ color:"#FFFFFF", fontWeight: 900, fontSize: "1.5em" }}>PRIVACY POLICY</Typography>
                         </Grid>
                         <Grid>
-                            <Typography style={{ color: "#C0C0C0", marginTop: "1em" }}>
+                            <Typography style={{ color: "#E0E0E0", marginTop: "1em" }}>
                                 Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
                                 Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
                                 toen een onbekende drukker een zethaak met letters nam en ze 
