@@ -268,7 +268,7 @@ export default function OfficesView(props) {
         }
     }
 
-    const callGetDoctorRerserve = async () => {
+    const callGetDoctorRerserve = async (officeid) => {
         const dayTo = 10;
         var newMonthEvents = new Array(dayTo);
         var newMonthEventsMapper = {};
@@ -278,7 +278,7 @@ export default function OfficesView(props) {
         var year = date.getFullYear(); 
         var month = date.getMonth();
         var day = date.getDate();
-        const response = await callListAllReservationsAvailableToPatients({id: doctorid});
+        const response = await callListAllReservationsAvailableToPatients({office_id: officeid});
         response.payload.map((reserve, inx) => {
             let st = getDateElements(reserve.start_time);
             let start_time = new Date(st.year, st.month-1, st.day, st.hour, st.minute);
@@ -307,23 +307,25 @@ export default function OfficesView(props) {
         for (var j = 0; j < dayTo; j++) {
             const mydate = new Date(year, month, day, 6, 0);
             const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = Greens[index] === 0 ? 
-            ({
-                'title': 'Unavailable',
-                'allDay': false,
-                'start': new Date(year, month, day, 6, 0),
-                'end': new Date(year, month, day, 23, 30),
-                'AvailableState': false,
-                'id': -1,
-                'events': [],
-                'color': '#fb3640',
-                'borderColor': 'red',
-                'height': '5em',
-            }) 
+            newMonthEvents[j] = !Greens[index] ? 
+            (
+                {
+                    'title': 'Unavailable',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'AvailableState': false,
+                    'id': -1,
+                    'events': [],
+                    'color': '#fb3640',
+                    'borderColor': 'red',
+                    'height': '5em',
+                }
+            ) 
             : 
             (
                 {
-                    'title': 'Available',
+                    'title': `Available(${Greens[index]})`,
                     'allDay': false,
                     'start': new Date(year, month, day, 6, 0),
                     'end': new Date(year, month, day, 23, 30),
@@ -444,8 +446,8 @@ export default function OfficesView(props) {
 }
 
 const ChangeEventState = (event) => {
-    if (event.AvailableState) {
-        if (viewCalendar !== 'month') {
+    if (viewCalendar !== 'month') {
+        if (event.AvailableState) {
             event.title = viewCalendar === 'day' ? 'Reserved' : '✘';
             event.color = '#8ab6d6';
             event.borderColor = 'blue';
@@ -454,34 +456,12 @@ const ChangeEventState = (event) => {
                 callTakeReserve(event.id);
             }
         }
-        
-        //const mydate = event.start;
-        //callCreateReservationAPI({ start_time: mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes() }, isRemembered);
+    } 
+    if (viewCalendar === 'month') {
+        handleOnView('day');
+        handleOnNavigate(event.start);
+        handleOnRangeChange([event.start]);
     }
-    /* else {
-        event.title = viewCalendar === 'month' ? 'Available' : '✔';
-        event.color = 'lightgreen';
-        event.borderColor = 'green';
-        event.events.map((e, index) => {
-            e.title = '✔';
-            e.color = 'lightgreen';
-            e.borderColor = 'green';
-            e.AvailableState = true;
-
-            callCreateReserve(e.start.getFullYear(), e.start.getMonth(), e.start.getDate(), e.start.getHours(), e.start.getMinutes());
-        });
-        
-            callCreateReserve(event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours(), event.start.getMinutes());
-        
-        /* event.color = 'lightgreen';
-        event.borderColor = 'green';
-        if (viewCalendar === "month")
-            event.title = "Available";
-        else
-            event.title = '✔'; */
-        //callDeleteReservationAPI({ id: doctorid })
-    //}
-    //event.AvailableState = !event.AvailableState; 
 }
 
 
@@ -497,7 +477,7 @@ const ChangeEventState = (event) => {
         setAddress(offices[index].address);
         setPhoneNos(offices[index].phone);
         setOfficeIndex(index);
-        callGetDoctorRerserve();
+        callGetDoctorRerserve(offices[index].id);
     };
 
     const backToList = () => {
@@ -604,6 +584,7 @@ const ChangeEventState = (event) => {
                 justifyContent: 'center',
                 alignSelf: 'center',
                 justifySelf: 'center',
+                fontSize: '0.9em',
             }}
         );
         else if (viewCalendar === 'week' || viewCalendar === 'day') return(
@@ -789,6 +770,7 @@ const ChangeEventState = (event) => {
                             showMultiDayTimes
                             startAccessor="start"
                             endAccessor="end"
+                            //titleAccessor={(event) => {return event.title + '\n' + event.color}}
                             //drilldownView='day'
                         />
                     </Grid>
