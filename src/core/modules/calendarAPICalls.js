@@ -12,10 +12,10 @@ export const callChangeVisitDurationTimeAPI = async({visit_duration_time}, isRem
     }
 }
 
-export const callCreateReservationAPI = async ({start_time}, isRemembered) => {
+export const callCreateReservationAPI = async ({start_time, office}, isRemembered) => {
     try
     {
-        const response = await callAPIHandler({method: "POST", data: {start_time: start_time}, url: "/schedule/create_reservation/"}, true, isRemembered);
+        const response = await callAPIHandler({method: "POST", data: {start_time: start_time, office: office}, url: "/schedule/create_reservation/"}, true, isRemembered);
         return response;
     }
     catch (e)
@@ -48,6 +48,18 @@ export const callGetDoctorRerservationsList = async({from_date, to_date}, isReme
     }
 }
 
+export const callGetDoctorOfficeRerservationsList = async({office_id, from_date, to_date}, isRemembered) => {
+    try
+    {
+        const response = await callAPIHandler({method: "GET", url: `/schedule/office_reservations/${office_id}/${from_date}/${to_date}/`}, true, isRemembered);
+        return response;
+    }
+    catch (e)
+    {
+        throw e;
+    }
+}
+
 export const callGetReservationAPI = async({id}, isRemembered) => {
     try
     {
@@ -60,10 +72,10 @@ export const callGetReservationAPI = async({id}, isRemembered) => {
     }
 }
 
-export const callListAllReservationsAvailableToPatients = async({id}, isRemembered) => {
+export const callListAllReservationsAvailableToPatients = async({office_id}, isRemembered) => {
     try
     {
-        const response = await callAPIHandler({method: "GET", url: `schedule/list_reservations/${id}/`}, true, isRemembered);
+        const response = await callAPIHandler({method: "GET", url: `schedule/list_reservations/${office_id}/`}, true, isRemembered);
         return response;
     }
     catch (e)

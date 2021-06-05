@@ -9,10 +9,6 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import getDay from 'date-fns/getDay';
 import "../../style.css";
 import { callListAllReservationsAvailableToPatients } from '../../core/modules/calendarAPICalls';
 import { callGetDoctorRerservationsList, callGetReservationAPI } from '../../core/modules/calendarAPICalls';
@@ -268,7 +264,7 @@ export default function OfficesView(props) {
         }
     }
 
-    const callGetDoctorRerserve = async () => {
+    const callGetDoctorRerserve = async (officeid) => {
         const dayTo = 10;
         var newMonthEvents = new Array(dayTo);
         var newMonthEventsMapper = {};
@@ -278,7 +274,7 @@ export default function OfficesView(props) {
         var year = date.getFullYear(); 
         var month = date.getMonth();
         var day = date.getDate();
-        const response = await callListAllReservationsAvailableToPatients({id: doctorid});
+        const response = await callListAllReservationsAvailableToPatients({office_id: officeid});
         response.payload.map((reserve, inx) => {
             let st = getDateElements(reserve.start_time);
             let start_time = new Date(st.year, st.month-1, st.day, st.hour, st.minute);
@@ -307,23 +303,25 @@ export default function OfficesView(props) {
         for (var j = 0; j < dayTo; j++) {
             const mydate = new Date(year, month, day, 6, 0);
             const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = Greens[index] === 0 ? 
-            ({
-                'title': 'Unavailable',
-                'allDay': false,
-                'start': new Date(year, month, day, 6, 0),
-                'end': new Date(year, month, day, 23, 30),
-                'AvailableState': false,
-                'id': -1,
-                'events': [],
-                'color': '#fb3640',
-                'borderColor': 'red',
-                'height': '5em',
-            }) 
+            newMonthEvents[j] = !Greens[index] ? 
+            (
+                {
+                    'title': 'Unavailable',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'AvailableState': false,
+                    'id': -1,
+                    'events': [],
+                    'color': '#fb3640',
+                    'borderColor': 'red',
+                    'height': '5em',
+                }
+            ) 
             : 
             (
                 {
-                    'title': 'Available',
+                    'title': `Available(${Greens[index]})`,
                     'allDay': false,
                     'start': new Date(year, month, day, 6, 0),
                     'end': new Date(year, month, day, 23, 30),
@@ -339,113 +337,14 @@ export default function OfficesView(props) {
             newMonthEventsMapper[index] = j;
             setCurrentEvents(newMonthEvents);
         }
-        /* for (var j = 0; j < 10; j++) {
-            var newEvents = [];
-            var hours = 6;
-            var minutes = 0;
-            var allred = true;
-            try {
-                const DAY = new Date(year, month, day);
-                const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth()) + TwoDigits(DAY.getDate());
-                const DAY2 = new Date(year, month, day+1);
-                const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth()) + TwoDigits(DAY2.getDate());
-                const response = await callGetDoctorRerservationsList({ from_date: from_date, to_date: to_date }, isRemembered)
-                if (response.status === 200) {
-                    const length = Math.floor((18 * 60) / VisitTimeDuration) - 1;
-                    const base = (6*60) + 0;
-                    for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
-                        newEvents.push(
-                            {
-                                'title': '✘',
-                                'allDay': false,
-                                'start': new Date(year, month, day, hours, minutes),
-                                'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
-                                'AvailableState': false,
-                                'id': -1,
-                                'events': [],
-                                'color': '#fb3640',
-                                'borderColor': 'red',
-                            }
-                        );
-                        minutes += VisitTimeDuration; 
-                    }
-                    
-                    var minutes = 0;
-                    response.payload.map((reserve, index) => {
-                        allred = false;
-                        var sd0 = getDateElements(reserve.start_time);
-                        var sd = new Date(sd0.year, sd0.month, sd0.day, sd0.hour, sd0.minute);
-                        const startDate = sd;
-                        const start = (startDate.getHours()*60) + startDate.getMinutes();
-                        const startIndex = (start - base) / VisitTimeDuration;
-                        //sd.setMonth(sd.getMonth() + 1);
-                        var ed0 = getDateElements(reserve.end_time);
-                        var ed = new Date(ed0.year, ed0.month, ed0.day, ed0.hour, ed0.minute);
-                        //ed.setMonth(ed.getMonth() + 1);
-                        console.log(sd + ' ' + ed);
-                        newEvents[startIndex] = (
-                            {
-                                'title': '✔',
-                                'allDay': false,
-                                'start': sd,
-                                'end': ed,
-                                'AvailableState': true,
-                                'id': reserve.id,
-                                'events': [],
-                                'color': 'lightgreen',
-                                'borderColor': 'green',
-                            }
-                        );
-                    });
-                    //alert(newEvents[0].start);
-                }
-            }
-            catch (error) {
-                console.log(error);
-            }
-            const mydate = new Date(year, month, day, 6, 0);
-            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = allred ? 
-            ({
-                'title': 'Unavailable',
-                'allDay': false,
-                'start': new Date(year, month, day, 6, 0),
-                'end': new Date(year, month, day, 23, 30),
-                'AvailableState': false,
-                'id': -1,
-                'events': newEvents,
-                'color': '#fb3640',
-                'borderColor': 'red',
-                'height': '5em',
-            }) 
-            : 
-            (
-                {
-                    'title': 'Available',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'AvailableState': true,
-                    'id': -1,
-                    'events': newEvents,
-                    'color': 'lightgreen',
-                    'borderColor': 'green',
-                    'height': '5em',
-                }
-            );
-            //alert(j + ' ' + newEvents.length);
-            newMonthEventsMapper[index] = j;
-            day += 1;
-            setCurrentEvents(newMonthEvents);
-        } */
         setMonthEvents(newMonthEvents);
         setMonthEventsMapper(newMonthEventsMapper);
         setCurrentEvents(newMonthEvents);
 }
 
 const ChangeEventState = (event) => {
-    if (event.AvailableState) {
-        if (viewCalendar !== 'month') {
+    if (viewCalendar !== 'month') {
+        if (event.AvailableState) {
             event.title = viewCalendar === 'day' ? 'Reserved' : '✘';
             event.color = '#8ab6d6';
             event.borderColor = 'blue';
@@ -454,34 +353,12 @@ const ChangeEventState = (event) => {
                 callTakeReserve(event.id);
             }
         }
-        
-        //const mydate = event.start;
-        //callCreateReservationAPI({ start_time: mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes() }, isRemembered);
+    } 
+    if (viewCalendar === 'month') {
+        handleOnView('day');
+        handleOnNavigate(event.start);
+        handleOnRangeChange([event.start]);
     }
-    /* else {
-        event.title = viewCalendar === 'month' ? 'Available' : '✔';
-        event.color = 'lightgreen';
-        event.borderColor = 'green';
-        event.events.map((e, index) => {
-            e.title = '✔';
-            e.color = 'lightgreen';
-            e.borderColor = 'green';
-            e.AvailableState = true;
-
-            callCreateReserve(e.start.getFullYear(), e.start.getMonth(), e.start.getDate(), e.start.getHours(), e.start.getMinutes());
-        });
-        
-            callCreateReserve(event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours(), event.start.getMinutes());
-        
-        /* event.color = 'lightgreen';
-        event.borderColor = 'green';
-        if (viewCalendar === "month")
-            event.title = "Available";
-        else
-            event.title = '✔'; */
-        //callDeleteReservationAPI({ id: doctorid })
-    //}
-    //event.AvailableState = !event.AvailableState; 
 }
 
 
@@ -497,7 +374,7 @@ const ChangeEventState = (event) => {
         setAddress(offices[index].address);
         setPhoneNos(offices[index].phone);
         setOfficeIndex(index);
-        callGetDoctorRerserve();
+        callGetDoctorRerserve(offices[index].id);
     };
 
     const backToList = () => {
@@ -604,6 +481,7 @@ const ChangeEventState = (event) => {
                 justifyContent: 'center',
                 alignSelf: 'center',
                 justifySelf: 'center',
+                fontSize: '0.9em',
             }}
         );
         else if (viewCalendar === 'week' || viewCalendar === 'day') return(
@@ -789,6 +667,7 @@ const ChangeEventState = (event) => {
                             showMultiDayTimes
                             startAccessor="start"
                             endAccessor="end"
+                            //titleAccessor={(event) => {return event.title + '\n' + event.color}}
                             //drilldownView='day'
                         />
                     </Grid>
