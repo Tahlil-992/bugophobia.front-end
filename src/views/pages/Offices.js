@@ -359,7 +359,6 @@ export default function Offices(props) {
     maxTime.setHours(23, 30, 0);
 
     const TwoDigits = (number) => {
-        //if (number > 31) number = 30;
         const str = number.toString();
         if (str.length === 1)
             return "0" + str;
