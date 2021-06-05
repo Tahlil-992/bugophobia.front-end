@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Grid, IconButton, Link, makeStyles, MenuItem, Paper, Popover, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
+import { Box, Button, Grid, IconButton, Link, makeStyles, Paper, TextField, Typography, withStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -14,18 +14,11 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import getDay from 'date-fns/getDay';
 import "../../style.css";
 import Popper from '@material-ui/core/Popper';
-import { green } from '@material-ui/core/colors';
 import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorOfficeRerservationsList } from "../../core/modules/calendarAPICalls";
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import { callAPIHandler } from "../../core/modules/refreshToken";
-import { ViewArrayRounded } from '@material-ui/icons';
 import { setLocalStorage } from '../../core/modules/storageManager';
 import  { Redirect } from 'react-router-dom'
 
@@ -343,7 +336,6 @@ export default function Offices(props) {
         try {
             const response = await callEditOfficeAPI( data, isRemembered);
             if (response.status === 201) {
-                //alert('11100');
             }
         }
         catch (error) {
@@ -358,10 +350,6 @@ export default function Offices(props) {
         }
     }, [got]);
 
-    
-    
-    
-
     const [autoFocus, setAutoFocus] = useState(false);
 
     const localizer = momentLocalizer(moment);
@@ -369,10 +357,6 @@ export default function Offices(props) {
     minTime.setHours(6, 0, 0);
     const maxTime = new Date();
     maxTime.setHours(23, 30, 0);
-
-    const [events, setEvents] = useState([]);
-    
-    
 
     const TwoDigits = (number) => {
         //if (number > 31) number = 30;
@@ -437,7 +421,6 @@ export default function Offices(props) {
         }
         catch (error) {
             console.log(error);
-            //throw error;
             if (event) {
                 event.title = viewCalendar === 'month' ? 'Available' : '✔';
                 event.color = 'lightgreen';
@@ -527,7 +510,6 @@ export default function Offices(props) {
                                 }
                             );
                         });
-                        //alert(newEvents[0].start);
                     }
                 }
                 catch (error) {
@@ -615,10 +597,8 @@ export default function Offices(props) {
                     const startDate = sd;
                     const start = (startDate.getHours()*60) + startDate.getMinutes();
                     const startIndex = (start - base) / VisitTimeDuration;
-                    //sd.setMonth(sd.getMonth() + 1);
                     var ed0 = getDateElements(reserve.end_time);
                     var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
-                    //ed.setMonth(ed.getMonth() + 1);
                     console.log(sd + ' ' + ed);
                     newEvents[startIndex] = (
                         {
@@ -634,7 +614,6 @@ export default function Offices(props) {
                         }
                     );
                 });
-                //alert(newEvents[0].start);
             }
         }
         catch (error) {
@@ -703,38 +682,14 @@ export default function Offices(props) {
                 }
             );
         }
-}
-    
-    const eventsMonthColor = () => {
-        var date = new Date();
-        var year = date.getFullYear(), month = date.getMonth(), day = date.getDate();
-        for (var i = 0; i < 10; i++) {
-            monthEvents.push(
-                {
-                    'title': 'Available',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'color': 'lightgreen',
-                    'borderColor': 'green',
-                    'AvailableState': true,
-                    'height': '5em',
-                    'index': i + new Date().getDate(),
-                }
-            )
-            day = day + 1;
-        }
     }
 
     const callCreateReservation = async (officeid) => {
-        /* var newMonthEvents = [];
-        var newMonthEventsMapper = {}; */
         var date = new Date();
         var year = date.getFullYear(); 
         var month = date.getMonth();
         var day = date.getDate();
         for (var j = 0; j < 7; j++) {
-            // var newEvents = [];
             var hours = 6;
             var minutes = 0;
             for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
@@ -744,54 +699,16 @@ export default function Offices(props) {
                 catch(error) {
 
                 }
-                /* newEvents.push(
-                    {
-                        'title': '✔',
-                        'allDay': false,
-                        'start': new Date(year, month, day, hours, minutes),
-                        'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
-                        'AvailableState': true,
-                        'id': reserveid,
-                        'events': [],
-                        'color': 'lightgreen',
-                        'borderColor': 'green',
-                    }
-                );*/
                 minutes += VisitTimeDuration; 
-                
-                
-                //const mydate = new Date(year, month, j, hours, minutes)
-
-                //console.log(mydate.getFullYear() + " " + mydate.getMonth() + " " + mydate.getDate() + " " + mydate.getHours() + " " + mydate.getMinutes());
             }
-            /* const mydate = new Date(year, month, day, 6, 0);
-            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents.push(
-                {
-                    'title': 'Available',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'AvailableState': true,
-                    'events': newEvents,
-                    'color': 'lightgreen',
-                    'borderColor': 'green',
-                    'height': '5em',
-                }
-            );
-            newMonthEventsMapper[index] = j;*/
             day += 1; 
             callUpdateDoctorRerserve(officeid, new Date(year, month, day));
         }
-        /* setMonthEvents(newMonthEvents);
-        setMonthEventsMapper(newMonthEventsMapper);
-        setCurrentEvents(newMonthEvents); */
     }
 
     const ChangeEventState = (event) => {
         if (event.AvailableState === null) {
             ViewProfile(event.username);
-            
             return;
         }
         if (event.AvailableState) {
@@ -834,8 +751,6 @@ export default function Offices(props) {
             }
         }
     }
-
-    
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [arrowRef, setArrowRef] = useState(null);
@@ -930,7 +845,6 @@ export default function Offices(props) {
             location: 0,
             phone: phone,
         }
-        //alert(data.id + data.title);
         callEditOffice(data);
     };
 
@@ -994,17 +908,13 @@ export default function Offices(props) {
     
     
     useEffect(() => {
-        //eventsColor();
-        //eventsMonthColor();
         if (got) {
             const mydate = new Date();
-            //callGetDoctorRerservationsList({ from_date: mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()), to_date: (mydate.getFullYear()+1) + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate()) }, isRemembered)
         }
     }, [got]);
     
     
     const formats = {
-        //if (viewCalendar === 'week')
         eventTimeRangeFormat: () => {
             return null;
         }
@@ -1033,13 +943,9 @@ export default function Offices(props) {
         else if (dates.length === 1) {
             
             const index = monthEventsMapper['' + dates[0].getFullYear() + TwoDigits(dates[0].getMonth()) + TwoDigits(dates[0].getDate())];
-            //alert('... ' + index);
             if (index !== undefined) {
-                //alert(monthEvents[index].events[0].start + ' ' + monthEvents[index].events[0].end);
                 setCurrentEvents(monthEvents[index].events);
                 monthEvents[index].events.map((event)=>console.log(event.start.toLocaleString()));
-                //alert(monthEvents[index].events[0].start.toString());
-                //alert('... ' + monthEvents[index].events[0].start);
             }
             else {
                  setCurrentEvents([]);
@@ -1050,7 +956,6 @@ export default function Offices(props) {
             for (var i = 0; i < 7; i++) {
                 let index = monthEventsMapper['' + dates[i].getFullYear() + TwoDigits(dates[i].getMonth()) + TwoDigits(dates[i].getDate())];
                 if (index !== undefined) {
-                    //newEvents = [...newEvents, ...monthEvents[index].events];
                     newEvents = newEvents.concat(monthEvents[index].events)
                 }
             }
@@ -1081,7 +986,6 @@ export default function Offices(props) {
             for (var i = startIndex; i < endIndex; i++) {
                 ChangeEventState( monthEvents[index].events[i]);
             }
-            //alert(slotInfo.bounds.top);
         }
     }
 
