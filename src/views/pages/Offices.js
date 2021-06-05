@@ -475,7 +475,7 @@ export default function Offices(props) {
                             console.log(sd + ' ' + ed);
                             newEvents[startIndex] = (
                                 {
-                                    'title': '✔',
+                                    'title': viewCalendar === 'day' ? ' ' : '✔',
                                     'allDay': false,
                                     'start': sd,
                                     'end': ed,
@@ -823,9 +823,10 @@ export default function Offices(props) {
     
     
     const formats = {
+        //if (viewCalendar === 'week')
         eventTimeRangeFormat: () => {
             return null;
-        },
+        }
     };
 
     const handleOnView = (view) => {
@@ -903,6 +904,7 @@ export default function Offices(props) {
                 justifyContent: 'center',
                 alignSelf: 'center',
                 justifySelf: 'center',
+                borderRadius:'5px'
             }}
         );
         else if (viewCalendar === 'week' || viewCalendar === 'day') return(
@@ -910,15 +912,9 @@ export default function Offices(props) {
                 backgroundColor: event.color,
                 borderColor: event.borderColor,
                 height: event.height,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: '33%',
-                marginRight: '22%',
-                minWidth: '0%',
-                width: '40%',
-                maxWidth: '45%',
                 alignSelf: 'center',
                 justifySelf: 'center',
+                textAlign:'center'
             }}
         );
     }
@@ -1157,6 +1153,7 @@ export default function Offices(props) {
             
             <Grid item xs={12} className={classes.container}>
                 <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
+                    titleAccessor = {(event) => (viewCalendar === 'day' ? null : event.title)}
                     localizer={localizer}
                     id='clndr'
                     views={['month', 'week', 'day']}

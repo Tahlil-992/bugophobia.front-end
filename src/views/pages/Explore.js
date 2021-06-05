@@ -566,6 +566,9 @@ function Explore({ signOut }) {
     const ViewProfile = (username) => {
         setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
     }
+    const ToCalendar = () => {
+        setLocalStorage({ username: username });
+    }
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
     var isDoctor = false;
     var isRemembered = false;
@@ -596,7 +599,7 @@ function Explore({ signOut }) {
                         <CardContent ><ListItemText primary='notification 1' /></CardContent>
                         <Box display="flex" flexDirection="row-reverse">
                             <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8' , color: 'white' }}>View</Button>
+                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
                             </CardActions>
                         </Box>
                     </Card>
@@ -788,22 +791,24 @@ function Explore({ signOut }) {
                                 <ListItemText primary="Profile" />
                             </ListItem>
                         </Link>
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/Calendar">
-                            <ListItem button>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to={ isDoctor ? "/DoctorCalendar" : "/Calendar"}>
+                            <ListItem button onClick={ToCalendar}>
                                 <ListItemIcon>
                                     <EventIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Calendar" />
                             </ListItem>
                         </Link>
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
-                            <ListItem button>
-                                <ListItemIcon>
-                                    <BookmarksIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Saved accounts" />
-                            </ListItem>
-                        </Link>
+                        {!isDoctor &&
+                            <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <BookmarksIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Saved accounts" />
+                                </ListItem>
+                            </Link>
+                        }
                     </div>
                 </List>
                 <List>
@@ -840,7 +845,7 @@ function Explore({ signOut }) {
                                 <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                                     Cancel
                                 </Button>
-                                <Link style={{textDecoration:'none'}} to="/">
+                                <Link style={{ textDecoration: 'none' }} to="/">
                                     <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm
                                     </Button>

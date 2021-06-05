@@ -17,6 +17,7 @@ import CalendarPage from "../src/views/pages/Calendar";
 import { connect, useSelector } from "react-redux";
 import { login, rememberMe, setIsDoctor, signOut } from "./core/Authentication/action/authActions";
 import CommentSection from "./views/pages/commentSection";
+import DoctorCalendarPage from "./views/pages/doctorCalendar";
 
 function App({ setIsDoctor, login, rememberMe }) {
 
@@ -106,6 +107,9 @@ function App({ setIsDoctor, login, rememberMe }) {
             </Route>
             <Route exact path="/Calendar">
               <CalendarPage />
+            </Route>
+            <Route exact path="/DoctorCalendar">
+              <DoctorCalendarPage />
             </Route>
           </>
         )}
