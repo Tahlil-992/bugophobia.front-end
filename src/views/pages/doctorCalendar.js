@@ -17,13 +17,14 @@ import getDay from 'date-fns/getDay';
 import "../../style.css";
 import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { connect } from "react-redux";
-import { getDate } from 'date-fns';
+import { getDate, set } from 'date-fns';
 import { setLocalStorage } from '../../core/modules/storageManager';
 import Select from '@material-ui/core/Select';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { callAPIHandler } from "../../core/modules/refreshToken";
+import { callGetDoctorOfficeRerservationsList } from "../../core/modules/calendarAPICalls";
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -44,17 +45,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewProfile = (username) => {
-    setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
+    setLocalStorage({ isvieweddoctor: 'false', viewedusername: username });
 }
 
 const EventButton = ({ children }) => {
-    return (
-        <Button
-            style={{ width: "100%", marginBottom: '0.1em', marginTop: '0.2em', padding: 0 }}
-            component={Link}
+    return(
+    children.AvailableState === null ?
+        <Link
             to="/view-profile">
             {children}
-        </Button>)
+        </Link>
+        :
+        <div>{children}</div>
+    )
 }
 
 const callGetOfficeAPI = async (doctorid, isRemembered) => {
@@ -127,6 +130,193 @@ function DoctorCalendarPage({ isRemembered }) {
         };
     }
 
+    const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
+    const [monthEvents, setMonthEvents] = useState([]);
+    const [monthEventsMapper, setMonthEventsMapper] = useState({});
+    const [currentEvents, setCurrentEvents] = useState([]);
+
+    const TwoDigits = (number) => {
+        const str = number.toString();
+        if (str.length === 1)
+            return "0" + str;
+        else
+            return str;
+    }
+
+    const callGetDoctorRerserve = async (officeid, VisitTimeDuration, start = 0, end = 30) => {
+        var newMonthEvents = new Array(end);
+        var newMonthEventsMapper = {};
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth();
+        var day = date.getDate() + start;
+        for (var j = start; j < end; j++) {
+            var newEvents = [];
+            var hours = 6;
+            var minutes = 0;
+            var allred = true;
+            try {
+                const DAY = new Date(year, month, day);
+                const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth() + 1) + TwoDigits(DAY.getDate());
+                const DAY2 = new Date(year, month, day + 1);
+                const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth() + 1) + TwoDigits(DAY2.getDate());
+                const response = await callGetDoctorOfficeRerservationsList({ office_id: officeid, from_date: from_date, to_date: to_date }, isRemembered)
+                if (response.status === 200) {
+                    const length = Math.floor((18 * 60) / VisitTimeDuration) - 1;
+                    const base = (6 * 60) + 0;
+                    for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                        newEvents.push(
+                            {
+                                'title': '✘',
+                                'allDay': false,
+                                'start': new Date(year, month, day, hours, minutes),
+                                'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
+                                'AvailableState': false,
+                                'id': -2,
+                                'events': [],
+                                'color': '#fb3640',
+                                'borderColor': 'red',
+                            }
+                        );
+                        minutes += VisitTimeDuration;
+                    }
+
+                    var minutes = 0;
+                    response.payload.map((reserve, index) => {
+                        allred = false;
+                        var sd0 = getDateElements(reserve.start_time);
+                        var sd = new Date(sd0.year, sd0.month - 1, sd0.day, sd0.hour, sd0.minute);
+                        const startDate = sd;
+                        const start = (startDate.getHours() * 60) + startDate.getMinutes();
+                        const startIndex = (start - base) / VisitTimeDuration;
+                        var ed0 = getDateElements(reserve.end_time);
+                        var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
+                        const patient = reserve.patient;
+                        newEvents[startIndex] = patient ?
+                            (
+                                {
+                                    'title': 'Reserved by ' + patient.user.username,
+                                    'allDay': false,
+                                    'start': sd,
+                                    'end': ed,
+                                    'AvailableState': null,
+                                    'username': patient.user.username,
+                                    'id': reserve.id,
+                                    'events': [],
+                                    'color': '#8ab6d6',
+                                    'borderColor': 'blue',
+                                }
+                            )
+                            :
+                            (
+                                {
+                                    'title': '✔',
+                                    'allDay': false,
+                                    'start': sd,
+                                    'end': ed,
+                                    'AvailableState': true,
+                                    'id': reserve.id,
+                                    'events': [],
+                                    'color': 'lightgreen',
+                                    'borderColor': 'green',
+                                }
+                            );
+                    });
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+            const mydate = new Date(year, month, day, 6, 0);
+            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+            newMonthEvents[j] = allred ?
+                ({
+                    'title': 'Unavailable',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'AvailableState': false,
+                    'id': -1,
+                    'events': newEvents,
+                    'color': '#fb3640',
+                    'borderColor': 'red',
+                    'height': '5em',
+                })
+                :
+                (
+                    {
+                        'title': 'Available',
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': true,
+                        'id': -1,
+                        'events': newEvents,
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                        'height': '5em',
+                    }
+                );
+            //alert(j + ' ' + newEvents.length);
+            newMonthEventsMapper[index] = j;
+            day += 1;
+            setCurrentEvents(newMonthEvents);
+        }
+        setMonthEvents((newMonthEvents));
+        setMonthEventsMapper(newMonthEventsMapper);
+        setCurrentEvents((newMonthEvents));
+    }
+    const [date, setdate] = useState(new Date());
+    const handleOnView = (view) => {
+        setView(view);
+        if (view === 'agenda') {
+            var newEvents = [];
+            monthEvents.map((event) => {
+                newEvents.concat(event.events)
+            });
+            setCurrentEvents(newEvents);
+        }
+    }
+
+    const handleOnNavigate = (date, view) => {
+        setdate(date);
+    }
+
+    const handleOnDrilldown = (date, view) => {
+
+        handleOnView(view);
+        handleOnRangeChange([date]);
+        setdate(date);
+    }
+
+    const handleOnRangeChange = (dates) => {
+
+        if (!dates.length && view !== 'agenda') {
+            setCurrentEvents(monthEvents);
+        }
+        else if (dates.length === 1) {
+
+            const index = monthEventsMapper['' + dates[0].getFullYear() + TwoDigits(dates[0].getMonth()) + TwoDigits(dates[0].getDate())];
+            if (index !== undefined) {
+                setCurrentEvents(monthEvents[index].events);
+                monthEvents[index].events.map((event) => console.log(event.start.toLocaleString()));
+            }
+            else {
+                setCurrentEvents([]);
+            }
+        }
+        else if (dates.length === 7) {
+            var newEvents = [];
+            for (var i = 0; i < 7; i++) {
+                let index = monthEventsMapper['' + dates[i].getFullYear() + TwoDigits(dates[i].getMonth()) + TwoDigits(dates[i].getDate())];
+                if (index !== undefined) {
+                    newEvents = newEvents.concat(monthEvents[index].events)
+                }
+            }
+            setCurrentEvents(newEvents);
+        }
+    }
+
     useEffect(() => {
         handleRangeAndViewChange(view, range);
     }, [view, range]);
@@ -136,6 +326,8 @@ function DoctorCalendarPage({ isRemembered }) {
     const [a, seta] = useState(0);
     const handleOfficeChange = (event) => {
         setofficeState(event.target.value);
+        callGetDoctorRerserve(event.target.value, VisitTimeDuration);
+        setView('month');
     };
     const [Doctorid, setDoctorid] = useState(0);
     const callGetAPI = async () => {
@@ -144,7 +336,9 @@ function DoctorCalendarPage({ isRemembered }) {
             if (response.status === 200) {
                 let payload = response.payload;
                 setDoctorid(payload.user.id);
-                callGetOffice(payload.user.id);
+                setVisitTimeDuration(payload.visit_duration_time);
+                seta(a + 1);
+                callGetOffice(payload.user.id, payload.visit_duration_time);
             }
         }
         catch (error) {
@@ -155,18 +349,52 @@ function DoctorCalendarPage({ isRemembered }) {
     useEffect(() => {
         callGetAPI()
     }, []);
-    const callGetOffice = async (id) => {
+    const callGetOffice = async (id, visit_duration_time) => {
         try {
             const response = await callGetOfficeAPI(id, isRemembered);
             if (response.status === 200) {
                 response.payload.map((office) => {
                     offices.push([office.title, office.id]);
                 })
-                seta(a+1);
+                callGetDoctorRerserve(response.payload[0].id, visit_duration_time);
+                seta(a + 1);
             }
         }
         catch (error) {
             console.log(error);
+        }
+    }
+    const handleEventProp = (event) => {
+        if (view === 'month') return (
+            {
+                style: {
+                    backgroundColor: event.color,
+                    borderColor: event.borderColor,
+                    height: event.height,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    alignSelf: 'center',
+                    justifySelf: 'center',
+                    borderRadius: '5px'
+                }
+            }
+        );
+        else if (view === 'week' || view === 'day') return (
+            {
+                style: {
+                    backgroundColor: event.color,
+                    borderColor: event.borderColor,
+                    height: event.height,
+                    alignSelf: 'center',
+                    justifySelf: 'center',
+                    textAlign: 'center'
+                }
+            }
+        );
+    }
+    const ChangeEventState = (event) => {
+        if (event.username) {
+            ViewProfile(event.username);
         }
     }
     return (
@@ -198,36 +426,10 @@ function DoctorCalendarPage({ isRemembered }) {
                             <Calendar style={{ height: '37rem' }}
                                 localizer={localizer}
                                 view={view}
-                                onView={(event) => { setView(event); console.log(event); }}
-                                onRangeChange={(event) => { setRange(event); console.log(event); }}
-                                events={
-                                    events ? events.map((event) => {
-                                        const start_date_obj = getDateElements(event.start_time);
-                                        const end_date_obj = getDateElements(event.end_time);
-                                        return {
-                                            'start': new Date(
-                                                start_date_obj.year,
-                                                start_date_obj.month - 1,
-                                                start_date_obj.day,
-                                                start_date_obj.hour,
-                                                start_date_obj.minute,
-                                            ),
-                                            'end': new Date(
-                                                end_date_obj.year,
-                                                end_date_obj.month - 1,
-                                                end_date_obj.day,
-                                                end_date_obj.hour,
-                                                end_date_obj.minute,
-                                            ),
-                                            'allDay': false,
-                                            'title': `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`,
-                                            'resource': {
-                                                docotor_username: event.doctor.user.username,
-                                            }
-                                        }
-                                    }) : []
-                                }
-                                step={60}
+                                views={['month', 'week', 'day']}
+                                date={date}
+                                events={currentEvents}
+                                step={VisitTimeDuration}
                                 showMultiDayTimes
                                 min={minTime}
                                 max={maxTime}
@@ -236,15 +438,21 @@ function DoctorCalendarPage({ isRemembered }) {
                                 components={{
                                     eventWrapper: EventButton,
                                 }}
-                                onSelectEvent={(event) => { ViewProfile(event.resource.docotor_username); }}
+                                eventPropGetter={handleEventProp}
+                                //onSelectEvent={(event) => { ViewProfile(event.resource.docotor_username); }}
+                                onSelectEvent={event => ChangeEventState(event)}
+                                onView={handleOnView}
+                                onNavigate={handleOnNavigate}
+                                onDrillDown={handleOnDrilldown}
+                                onRangeChange={handleOnRangeChange}
                                 popup
-                                tooltipAccessor={(event) => {
-                                    const sh = event.start.getHours();
-                                    const sm = event.start.getMinutes();
-                                    const eh = event.end.getHours();
-                                    const em = event.end.getMinutes();
-                                    return `${event.title}\nTime: ${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`;
-                                }}
+                            /*tooltipAccessor={(event) => {
+                                const sh = event.start.getHours();
+                                const sm = event.start.getMinutes();
+                                const eh = event.end.getHours();
+                                const em = event.end.getMinutes();
+                                return `${event.title}\nTime: ${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`;
+                            }}*/
                             />
                         </div>
                     </Grid>
