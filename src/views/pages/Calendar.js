@@ -42,15 +42,15 @@ const ViewProfile = (username) => {
     setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
 }
 
-const EventButton = ({ children }) => {
-    return (
-    <Button 
-        style={{width: "100%", marginBottom: '0.1em', marginTop: '0.2em', padding: 0}} 
-        component={Link} 
-        to="/view-profile">
-        {children}
-    </Button>)
-}
+// const EventButton = ({ children }) => {
+//     return (
+//     <Button 
+//         style={{width: "100%", marginBottom: '0.1em', marginTop: '0.2em', padding: 0}} 
+//         component={Link} 
+//         to="/view-profile">
+//         {children}
+//     </Button>)
+// }
 
 function CalendarPage({ isRemembered }) {
     const classes = useStyles();
@@ -182,9 +182,9 @@ function CalendarPage({ isRemembered }) {
                                 max={maxTime} 
                                 startAccessor="start"
                                 endAccessor="end"
-                                components={{
-                                    eventWrapper: EventButton,
-                                }}
+                                // components={{
+                                //     eventWrapper: EventButton,
+                                // }}
                                 onSelectEvent={(event) => {ViewProfile(event.resource.docotor_username);}}
                                 popup
                                 tooltipAccessor={(event) => {
