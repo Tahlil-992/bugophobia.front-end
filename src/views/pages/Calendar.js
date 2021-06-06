@@ -27,9 +27,7 @@ const locales = {
 const calendar_views = {
     month: 'month',
     week: 'week',
-    work_week: 'work_week',
-    day: 'day',
-    agenda: 'agenda',    
+    day: 'day',   
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -186,6 +184,7 @@ function CalendarPage({ isRemembered }) {
                             <Calendar style={{ height : '37rem' }}
                                 localizer={localizer}
                                 view={view}
+                                views={[calendar_views.month, calendar_views.week, calendar_views.day]}
                                 onView={(event) => {setView(event); console.log(event);}}
                                 onRangeChange={(event) => {setRange(event); console.log(event);}}
                                 events={
