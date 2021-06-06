@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
     },
     footer: {
         display: "flex",
-        marginTop: "5em",
         borderRadius: "100px 100px 0 0",
     },
     Btn: {
@@ -77,7 +76,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     <Typography variant="h6" color="inherit" noWrap>Let's Get Started</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid container style={{backgroundColor: "rgba(16,33,125, 0.3)", width: "84%", margin: "auto"}}>
+            <Grid container style={{width: "84%", margin: "auto"}}>
             <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center' }}>
                 <div className={classes.heroContent} style={{ backgroundColor: '#E0E0E0', display: 'flex', flexDirection: 'row', borderBottomLeftRadius: '100px', borderBottomRightRadius: '100px' }}>
                     <Container>
@@ -123,14 +122,16 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Container>
                 </div>
             </Grid>
-            <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center' }}>
+            <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center', backgroundColor: "rgba(16,33,125, 0.3)", margin: "0 8%" }}>
                 <div 
                     className={classes.heroContent} 
                     style={{ 
                         display: 'flex', 
                         flexDirection: 'row', 
-                        marginTop: "5em", 
-                        borderRadius: '100px' }}>
+                        marginTop: "5em",
+                        marginBottom: "5em", 
+                        borderRadius: '100px',
+                        }}>
                     <Grid container>
                         <Grid item xs={12}>
                             <Box width='60%' margin="auto">
@@ -139,7 +140,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                 </Typography>
                             </Box>   
                             <Box display="flex" flexDirection="column" width='60%' margin="auto">
-                                <Typography style={{ fontFamily: "cursive" }}>
+                                <Typography style={{ fontFamily: "cursive", color: "#DEDEDE" }}>
                                     When you’re diagnosed with a chronic condition, your whole life changes. 
                                     You go from feeling in control of your destiny to feeling like you have no control at all. 
                                     A doctor has taken over managing your health, yet you only see them a few minutes a year. 
@@ -151,7 +152,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                         <br/>
                                         A better way is possible.
                                     </Typography>
-                                    <Typography style={{ fontFamily: "cursive" }}>
+                                    <Typography style={{ fontFamily: "cursive", color: "#DEDEDE" }}>
                                         Reimagine your health, your limits, and your life.
                                         We are with you during the thousands of hours per year when you’re not at the doctor’s office.
                                         <br/>
@@ -160,7 +161,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                     <Typography style={{ fontFamily: "cursive", color: "white"  }}>
                                         We are all in this together.
                                     </Typography>
-                                    <Typography style={{ fontFamily: "cursive" }}>
+                                    <Typography style={{ fontFamily: "cursive", color: "#DEDEDE" }}>
                                         We give you back your time, your power, and your life. 
                                         And when we give back this time and power to millions of people around the world, 
                                         we have the potential to solve the problems facing our planet. We can change the future. 
@@ -190,51 +191,33 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                             </Box>
                             <Box width='60%' margin="auto">
                                 <Box display="flex">
-                                    <EventAvailableIcon/>
-                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                    <EventAvailableIcon style={{color: "#DEDEDE"}}/>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em", color: "#DEDEDE" }}>
                                         Using our calendars you can always keep track of your reservations.
                                     </Typography>
                                 </Box>
                                 <br/>
                                 <Box display="flex">
-                                    <AssignmentIcon/>
-                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                    <AssignmentIcon style={{color: "#DEDEDE"}}/>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em", color: "#DEDEDE" }}>
                                         Doctors can keep track of their reservation times.
                                     </Typography>
                                 </Box>
                                 <br/>
-                                <Box display="flex">
+                                <Box display="flex" style={{color: "#DEDEDE"}}>
                                     <SearchIcon/>
-                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em", color: "#DEDEDE" }}>
                                         Our advanced search lets you find your desired doctor easily.
                                     </Typography>
                                 </Box>
                                 <br/>
-                                <Box display="flex">
+                                <Box display="flex" style={{color: "#DEDEDE"}}>
                                     <SpeedIcon/>
-                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em" }}>
+                                    <Typography style={{ fontFamily: "cursive", marginLeft: "0.5em", color: "#DEDEDE" }}>
                                         Finally, don't waste time behind a phone for a visit time. Pick your most desired.
                                     </Typography>
                                 </Box>
-                            </Box>
-                                {/* <Box display="flex" justifyContent="center">
-                                    <SpeedIcon style={{margin: "0 0.5em"}}/>
-                                    <Typography align="center" style={{margin: "0 0.5em"}}>
-                                        Fast
-                                    </Typography> 
-                                </Box>
-                                <Box display="flex" justifyContent="center">
-                                    <SpeedIcon style={{margin: "0 0.5em"}}/>
-                                    <Typography align="center" style={{margin: "0 0.5em"}}>
-                                        Secure
-                                    </Typography> 
-                                </Box>
-                                <Box display="flex" justifyContent="center">
-                                    <SpeedIcon style={{margin: "0 0.5em"}}/>
-                                    <Typography align="center" style={{margin: "0 0.5em"}}>
-                                        Professional
-                                    </Typography> 
-                                </Box> */} 
+                            </Box>                           
                         </Grid>                                              
                     </Grid>
                 </div>
