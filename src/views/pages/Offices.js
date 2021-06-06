@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Grid, IconButton, Link, makeStyles, Paper, TextField, Typography, withStyles } from "@material-ui/core";
+import { Box, Button, Checkbox, FormControlLabel, Grid, IconButton, Link, makeStyles, Paper, TextField, Typography, withStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -11,16 +11,23 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import EventAvailableIcon from '@material-ui/icons/EventAvailable';
+import EventBusyIcon from '@material-ui/icons/EventBusy';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import "../../style.css";
 import Popper from '@material-ui/core/Popper';
-import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorOfficeRerservationsList } from "../../core/modules/calendarAPICalls";
+import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorOfficeRerservationsList, callCreateMultipleReservationAPI } from "../../core/modules/calendarAPICalls";
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import { setLocalStorage } from '../../core/modules/storageManager';
-import  { Redirect } from 'react-router-dom'
+import  { Redirect } from 'react-router-dom';
+//import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, } from '@material-ui/pickers';
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import { blue } from "@material-ui/core/colors";
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -164,6 +171,42 @@ const useStyles = makeStyles((theme) => ({
             color: '#fff',
         },
     },
+    availableicon: {
+        backgroundColor: 'rgba(36, 128, 36, 0.3)',
+        transition: 'all 0.1s ease',
+        '&:hover': {
+            backgroundColor: 'rgba(36, 128, 36, 0.3)',
+        },
+    },
+    availableiconactive: {
+        backgroundColor: 'rgba(36, 128, 36, 1)',
+        boxShadow: '0px 0px 20px rgba(36, 128, 36, 1)',
+        color: '#fff',
+        transition: 'all 0.1s ease',
+        '&:hover': {
+            backgroundColor: 'rgba(36, 128, 36, 1)',
+            boxShadow: '0px 0px 20px rgba(36, 128, 36, 1)',
+            color: '#fff',
+        },
+    },
+    unavailableicon: {
+        backgroundColor: 'rgba(128, 36, 36, 0.3)',
+        transition: 'all 0.1s ease',
+        '&:hover': {
+            backgroundColor: 'rgba(128, 36, 36, 0.3)',
+        },
+    },
+    unavailableiconactive: {
+        backgroundColor: 'rgba(128, 36, 36, 1)',
+        boxShadow: '0px 0px 20px rgba(128, 36, 36, 1)',
+        color: '#fff',
+        transition: 'all 0.1s ease',
+        '&:hover': {
+            backgroundColor: 'rgba(128, 36, 36, 1)',
+            boxShadow: '0px 0px 20px rgba(128, 36, 36, 1)',
+            color: '#fff',
+        },
+    },
     fullscreenicon: {
         //margin: '0.5em',
         backgroundColor: 'rgba(128, 36, 128, 0.3)',
@@ -261,6 +304,26 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#5f939a',
         },
     },
+    submitButton: {
+        textTransform: "none",
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
+        padding: '1em 4em 1em 4em',
+        margin: '1em 0em 1em 0em',
+        minWidth: '12em',
+        "&:hover": {
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
+        },
+    },
+    cancelButton: {
+        textTransform: "none",
+        backgroundColor: "#bdc1c5",
+        padding: '1em 4em 1em 4em',
+        margin: '1em 0em 1em 0em',
+        minWidth: '12em',
+        "&:hover": {
+            backgroundColor: "#9099A1",
+        },
+    },
 }));
 
 export default function Offices(props) {
@@ -283,18 +346,23 @@ export default function Offices(props) {
     const [monthEvents, setMonthEvents] = [props.monthEvents, props.setMonthEvents];
     const [monthEventsMapper, setMonthEventsMapper] = [props.monthEventsMapper, props.setMonthEventsMapper];
     const [currentEvents, setCurrentEvents] = [props.currentEvents, props.setCurrentEvents];
+    const [selectable, setSelectable] = [props.selectable, props.setSelectable];
+    const [weekSchedule, setWeekSchedule] = [props.weekSchedule, props.setWeekSchedule];
+    const [daySchedule, setDaySchedule] = [props.daySchedule, props.setDaySchedule];
 
     const classes = useStyles();
 
     const [offices, setOffices] = useState([]);
+    const [a, seta] = useState(0);
+    const [page, setPage] = useState(0);
 
     const callAddOffice = async (data) => {
         try {
             const response = await callAddOfficeAPI( data, isRemembered);
             if (response.status === 201) {
                 //alert(response.payload.id);
-                callCreateReservation(response.payload.id);
-                offices[officeIndex].id = response.payload.id;
+                offices[offices.length - 1].id = response.payload.id;
+                callCreateNewReservations(response.payload.id);
                 
             }
         }
@@ -385,7 +453,7 @@ export default function Offices(props) {
         };
     }
 
-    const callCreateReserve = async (year, month, day, hours, minutes, officeid, event=null) => {
+    const callCreateReserve = async (year, month, day, hours, minutes, officeid, event=null, event2=null) => {
         const mydate1 = new Date(year, month+1, day, hours, minutes);
         try {
             const response = await callCreateReservationAPI({ start_time: mydate1.getFullYear() + " " + mydate1.getMonth() + " " + mydate1.getDate() + " " + mydate1.getHours() + " " + mydate1.getMinutes(), office: officeid}, isRemembered);
@@ -400,16 +468,45 @@ export default function Offices(props) {
             console.log(error);
             //throw error;
             if (event) {
-                event.title = viewCalendar === 'month' ? 'Unavailable' : '✘';
+                event.title = event.id === -1 ? 'Unavailable' : '';
+                event.titleweek = '✘';
                 event.color = '#fb3640';
                 event.borderColor = 'red';
                 event.AvailableState = false;
-                setPaperElav(paperElav + 1);
+                seta(a + 1);
+            }
+            if (event2) {
+                event2.greens = event2.greens - 1;
+                if (event2.greens === 0) {
+                    event2.title = `Unavailable`;
+                    event2.color = '#fb3640';
+                    event2.borderColor = 'red';
+                    event2.AvailableState = false;
+                }
+                else {
+                    event2.title = `Available`;
+                }
+                seta(a + 1);
             }
         }
     }
 
-    const callDeleteReserve = async (id, event=null) => {
+    const callCreateMultipleReserve = async (startDate, endDate, officeid) => {
+        try {
+            const start_time = startDate.getFullYear() + " " + (startDate.getMonth()+1) + " " + startDate.getDate() + " " + startDate.getHours() + " " + startDate.getMinutes();
+            const end_time = endDate.getFullYear() + " " + (endDate.getMonth()+1) + " " + endDate.getDate() + " " + endDate.getHours() + " " + endDate.getMinutes();
+            const response = await callCreateMultipleReservationAPI({ start_time: start_time, end_time: end_time, office: officeid}, isRemembered);
+            if (response.status === 200) {
+                callUpdateDoctorRerserve(officeid, startDate);
+            }
+        }
+        catch (error) {
+            console.log(error);
+            callUpdateDoctorRerserve(officeid, startDate);
+        }
+    }
+
+    const callDeleteReserve = async (id, event=null, event2=null) => {
         try {
             const response = await callDeleteReservationAPI({id: id}, isRemembered);
             if (response.status === 204) {
@@ -421,16 +518,25 @@ export default function Offices(props) {
         catch (error) {
             console.log(error);
             if (event) {
-                event.title = viewCalendar === 'month' ? 'Available' : '✔';
+                event.title = event.id === -1 ? 'Available' : '';
+                event.titleweek = '✔';
                 event.color = 'lightgreen';
                 event.borderColor = 'green';
                 event.AvailableState = true;
-                setPaperElav(paperElav + 1);
+                seta(a + 1);
+            }
+            if (event2) {
+                event2.greens = event2.greens + 1;
+                event2.title = `Available`;
+                event2.color = 'lightgreen';
+                event2.borderColor = 'green';
+                event2.AvailableState = true;
+                seta(a + 1);
             }
         }
     }
 
-    const callGetDoctorRerserve = async (officeid, start=0, end=7) => {
+    const callGetDoctorRerserve = async (officeid, start=0, end=90) => {
             var newMonthEvents = new Array(end);
             var newMonthEventsMapper = {};
             var date = new Date();
@@ -441,7 +547,7 @@ export default function Offices(props) {
                 var newEvents = [];
                 var hours = 6;
                 var minutes = 0;
-                var allred = true;
+                var Greens = 0;
                 try {
                     const DAY = new Date(year, month, day);
                     const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth()+1) + TwoDigits(DAY.getDate());
@@ -454,7 +560,8 @@ export default function Offices(props) {
                         for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
                             newEvents.push(
                                 {
-                                    'title': '✘',
+                                    'title': '',
+                                    'titleweek': '✘',
                                     'allDay': false,
                                     'start': new Date(year, month, day, hours, minutes),
                                     'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
@@ -470,7 +577,6 @@ export default function Offices(props) {
                         
                         var minutes = 0;
                         response.payload.map((reserve, index) => {
-                            allred = false;
                             var sd0 = getDateElements(reserve.start_time);
                             var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
                             const startDate = sd;
@@ -479,10 +585,14 @@ export default function Offices(props) {
                             var ed0 = getDateElements(reserve.end_time);
                             var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
                             const patient = reserve.patient;
+                            if (!patient) {
+                                Greens += 1;
+                            }
                             newEvents[startIndex] = patient ?
                             (
                                 {
                                     'title': 'Reserved by ' + patient.user.username,
+                                    'titleweek': 'Reserved',
                                     'allDay': false,
                                     'start': sd,
                                     'end': ed,
@@ -497,7 +607,8 @@ export default function Offices(props) {
                             :
                             (
                                 {
-                                    'title': viewCalendar === 'day' ? ' ' : '✔',
+                                    'title': '',
+                                    'titleweek': '✔',
                                     'allDay': false,
                                     'start': sd,
                                     'end': ed,
@@ -516,28 +627,32 @@ export default function Offices(props) {
                 }
                 const mydate = new Date(year, month, day, 6, 0);
                 const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-                newMonthEvents[j] = allred ? 
-                ({
-                    'title': 'Unavailable',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'AvailableState': false,
-                    'id': -1,
-                    'events': newEvents,
-                    'color': '#fb3640',
-                    'borderColor': 'red',
-                    'height': '5em',
-                }) 
+                newMonthEvents[j] = Greens === 0 ? 
+                (
+                    {
+                        'title': 'Unavailable',
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': false,
+                        'id': -1,
+                        'greens': 0,
+                        'events': newEvents,
+                        'color': '#fb3640',
+                        'borderColor': 'red',
+                        'height': '5em',
+                    }
+                ) 
                 : 
                 (
                     {
-                        'title': 'Available',
+                        'title': `Available`,
                         'allDay': false,
                         'start': new Date(year, month, day, 6, 0),
                         'end': new Date(year, month, day, 23, 30),
                         'AvailableState': true,
                         'id': -1,
+                        'greens': Greens,
                         'events': newEvents,
                         'color': 'lightgreen',
                         'borderColor': 'green',
@@ -548,6 +663,7 @@ export default function Offices(props) {
                 newMonthEventsMapper[index] = j;
                 day += 1;
                 setCurrentEvents(newMonthEvents);
+                seta(a+1);
             }
             setMonthEvents((newMonthEvents));
             setMonthEventsMapper(newMonthEventsMapper);
@@ -561,7 +677,7 @@ export default function Offices(props) {
         var newEvents = [];
         var hours = 6;
         var minutes = 0;
-        var allred = true;
+        var Greens = 0;
         try {
             const DAY = new Date(year, month, day);
             const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth()+1) + TwoDigits(DAY.getDate());
@@ -574,7 +690,8 @@ export default function Offices(props) {
                 for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
                     newEvents.push(
                         {
-                            'title': '✘',
+                            'title': '',
+                            'titleweek': '✘',
                             'allDay': false,
                             'start': new Date(year, month, day, hours, minutes),
                             'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
@@ -590,7 +707,6 @@ export default function Offices(props) {
                 
                 var minutes = 0;
                 response.payload.map((reserve, index) => {
-                    allred = false;
                     var sd0 = getDateElements(reserve.start_time);
                     var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
                     const startDate = sd;
@@ -599,9 +715,31 @@ export default function Offices(props) {
                     var ed0 = getDateElements(reserve.end_time);
                     var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
                     console.log(sd + ' ' + ed);
-                    newEvents[startIndex] = (
+                    const patient = reserve.patient;
+                    if (!patient) {
+                        Greens += 1;
+                    }
+                    newEvents[startIndex] = patient ?
+                    (
                         {
-                            'title': '✔',
+                            'title': 'Reserved by ' + patient.user.username,
+                            'titleweek': 'Reserved',
+                            'allDay': false,
+                            'start': sd,
+                            'end': ed,
+                            'AvailableState': null,
+                            'username': patient.user.username,
+                            'id': reserve.id,
+                            'events': [],
+                            'color': '#8ab6d6',
+                            'borderColor': 'blue',
+                        }
+                    ) 
+                    :
+                    (
+                        {
+                            'title': '',
+                            'titleweek': '✔',
                             'allDay': false,
                             'start': sd,
                             'end': ed,
@@ -621,7 +759,7 @@ export default function Offices(props) {
         const mydate = date;
         const index = monthEventsMapper['' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate())];
         if (index === undefined) {
-            monthEvents.push(allred ? 
+            monthEvents.push(Greens === 0 ? 
             ({
                 'title': 'Unavailable',
                 'allDay': false,
@@ -629,6 +767,7 @@ export default function Offices(props) {
                 'end': new Date(year, month, day, 23, 30),
                 'AvailableState': false,
                 'id': -1,
+                'greens': 0,
                 'events': newEvents,
                 'color': '#fb3640',
                 'borderColor': 'red',
@@ -643,6 +782,7 @@ export default function Offices(props) {
                     'end': new Date(year, month, day, 23, 30),
                     'AvailableState': true,
                     'id': -1,
+                    'greens': Greens,
                     'events': newEvents,
                     'color': 'lightgreen',
                     'borderColor': 'green',
@@ -652,7 +792,7 @@ export default function Offices(props) {
             monthEventsMapper['' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate())] = monthEvents.length - 1;
         }
         else {
-            monthEvents[index] = allred ? 
+            monthEvents[index] = Greens === 0 ? 
             ({
                 'title': 'Unavailable',
                 'allDay': false,
@@ -681,72 +821,130 @@ export default function Offices(props) {
                 }
             );
         }
+        seta(a+1);
     }
 
-    const callCreateReservation = async (officeid) => {
+    const weekdayMap = {
+        'Sun': 0,
+        'Mon': 1,
+        'Tue': 2,
+        'Wed': 3,
+        'Thu': 4,
+        'Fri': 5,
+        'Sat': 6,
+    }
+
+    const callCreateNewReservations = async (officeid) => {
+        const startHour = daySchedule[0].getHours();
+        const startMinute = daySchedule[0].getMinutes();
+        const endHour = daySchedule[1].getHours();
+        const endMinute = daySchedule[1].getMinutes();
+        if ((startHour*60 + startMinute) >= (endHour*60 + endMinute)) {
+            return;
+        }
         var date = new Date();
         var year = date.getFullYear(); 
         var month = date.getMonth();
         var day = date.getDate();
-        for (var j = 0; j < 7; j++) {
-            var hours = 6;
-            var minutes = 0;
-            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
-                try {
-                    await callCreateReserve(year, month, day, hours, minutes, officeid);
-                }
-                catch(error) {
-
-                }
-                minutes += VisitTimeDuration; 
+        for (var j = 0; j < 90; j++) {
+            const start = new Date(year, month, day, startHour, startMinute);
+            const weekday = start.toDateString().split(' ')[0];
+            //alert(weekday + ' ' + weekdayMap[weekday] + ' ' + weekSchedule[weekdayMap[weekday]]);
+            if (weekSchedule[weekdayMap[weekday]]) {
+                const end = new Date(year, month, day, endHour, endMinute);
+                callCreateMultipleReserve(start, end, officeid);
             }
-            day += 1; 
-            callUpdateDoctorRerserve(officeid, new Date(year, month, day));
+            else {
+                callUpdateDoctorRerserve(officeid, start);
+            }
+            day += 1;
         }
     }
 
     const ChangeEventState = (event) => {
-        if (event.AvailableState === null) {
+        if (event.AvailableState === null || event.username) {
             ViewProfile(event.username);
+            setPage(2);
             return;
         }
-        if (event.AvailableState) {
-            event.title = viewCalendar === 'month' ? 'Unavailable' : '✘';
-            event.color = '#fb3640';
-            event.borderColor = 'red';
-            event.AvailableState = false;
-            event.events.map((e, index) => {
-                if (e.AvailableState !== null) {
-                    e.AvailableState = false;
-                    callDeleteReserve(e.id, e);
-                    e.title = '✘';
-                    e.color = '#fb3640';
-                    e.borderColor = 'red';
-                    e.id = -2;
-                    setPaperElav(paperElav + 1);
+        if (event.id === -1) {
+            if (selectable === 0) {
+                handleOnView('day');
+                handleOnRangeChange([event.start]);
+                handleOnNavigate(event.start);
+            }
+            else if (selectable === 1) {
+                event.color = 'lightgreen';
+                event.borderColor = 'green';
+                event.AvailableState = true;
+                event.events.map((e, index) => {
+                    if (e.AvailableState === false) {
+                        e.AvailableState = true;
+                        event.greens = event.greens + 1;
+                        event.title = `Available`;
+                        callCreateReserve(e.start.getFullYear(), e.start.getMonth(), e.start.getDate(), e.start.getHours(), e.start.getMinutes(), offices[officeIndex].id, e, event);
+                        e.title = '';
+                        e.titleweek = '✔';
+                        e.color = 'lightgreen';
+                        e.borderColor = 'green';
+                    }
+                });
+                setPaperElav(paperElav + 1);
+            }
+            else {
+                event.title = 'Unavailable';
+                event.color = '#fb3640';
+                event.borderColor = 'red';
+                event.AvailableState = false;
+                event.greens = 0;
+                event.events.map((e, index) => {
+                    if (e.AvailableState) {
+                        e.AvailableState = false;
+                        callDeleteReserve(e.id, e, event);
+                        e.title = '';
+                        e.titleweek = '✘';
+                        e.color = '#fb3640';
+                        e.borderColor = 'red';
+                        e.id = -2;
+                        setPaperElav(paperElav + 1);
+                    }
+                });
+            }
+        }
+        else if (event.id === -2) {
+            if (selectable === 1) {
+                event.title = '';
+                event.titleweek = '✔';
+                event.color = 'lightgreen';
+                event.borderColor = 'green';
+                event.AvailableState = true;
+                const startDate = event.start;
+                const index = monthEventsMapper['' + startDate.getFullYear() + TwoDigits(startDate.getMonth()) + TwoDigits(startDate.getDate())];
+                if (monthEvents[index].greens === 0) {
+                    monthEvents[index].title = 'Available';
+                    monthEvents[index].color = 'lightgreen';
+                    monthEvents[index].borderColor = 'green';
                 }
-            });
-            if (event.id >= 0) {
-                callDeleteReserve(event.id, event);
+                monthEvents[index].greens += 1;
+                callCreateReserve(event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours(), event.start.getMinutes(), offices[officeIndex].id, event, monthEvents[index]);
             }
         }
         else {
-            event.title = viewCalendar === 'month' ? 'Available' : '✔';
-            event.color = 'lightgreen';
-            event.borderColor = 'green';
-            event.AvailableState = true;
-            event.events.map((e, index) => {
-                if (e.AvailableState !== null) {
-                    e.AvailableState = true;
-                    callCreateReserve(e.start.getFullYear(), e.start.getMonth(), e.start.getDate(), e.start.getHours(), e.start.getMinutes(), offices[officeIndex].id, e);
-                    e.title = '✔';
-                    e.color = 'lightgreen';
-                    e.borderColor = 'green';
-                    setPaperElav(paperElav + 1);
+            if (selectable === 2) {
+                event.title = '';
+                event.titleweek = '✘';
+                event.color = '#fb3640';
+                event.borderColor = 'red';
+                event.AvailableState = false;
+                const startDate = event.start;
+                const index = monthEventsMapper['' + startDate.getFullYear() + TwoDigits(startDate.getMonth()) + TwoDigits(startDate.getDate())];
+                monthEvents[index].greens -= 1;
+                if (monthEvents[index].greens === 0) {
+                    monthEvents[index].title = 'Unavailable';
+                    monthEvents[index].color = '#fb3640';
+                    monthEvents[index].borderColor = 'red';
                 }
-            });
-            if (event.id === -2) {
-                callCreateReserve(event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours(), event.start.getMinutes(), offices[officeIndex].id, event);
+                callDeleteReserve(event.id, event, monthEvents[index]);
             }
         }
     }
@@ -769,6 +967,10 @@ export default function Offices(props) {
     );
 
     const addOffice = () => {
+        if (page === 0) {
+            setPage(1);
+            return;
+        }
         const index = offices.length;
         var newOffices = offices;
         newOffices.push({
@@ -863,6 +1065,7 @@ export default function Offices(props) {
             setCurrentEvents(monthEvents);
             setCalendarMode(false);
             setViewCalendar('month');
+            setSelectable(0);
         }
         else {
             setIsChanged(false);
@@ -870,6 +1073,10 @@ export default function Offices(props) {
             setPaperElav(-1);
             setOfficeIndex(-1);
             handlePopoverClose();
+            setPage(0);
+            setMonthEventsMapper({});
+            setMonthEvents([]);
+            setCurrentEvents([]);
         }
     };
 
@@ -967,23 +1174,55 @@ export default function Offices(props) {
             return;
         }
         if (viewCalendar === 'month') {
-
+            slotInfo.slots.map( async (slot) => {
+                const index = monthEventsMapper['' + slot.getFullYear() + TwoDigits(slot.getMonth()) + TwoDigits(slot.getDate())];
+                if (index !== undefined) {
+                    await ChangeEventState(monthEvents[index]);
+                }
+            });
         }
         else if (viewCalendar === 'week') {
-
+            if (slotInfo.slots[0].getHours() === 0) {
+                slotInfo.slots.map( async (slot) => {
+                    const index = monthEventsMapper['' + slot.getFullYear() + TwoDigits(slot.getMonth()) + TwoDigits(slot.getDate())];
+                    if (index !== undefined) {
+                        await ChangeEventState(monthEvents[index]);
+                    }
+                });
+            }
+            else {
+                const length = slotInfo.slots.length;
+                const startDate = slotInfo.slots[0];
+                const start = (startDate.getHours()*60) + startDate.getMinutes();
+                const base = (6*60) + 0;
+                const startIndex = (start - base) / VisitTimeDuration;
+                const endIndex = startIndex + length - 1;
+                const index = monthEventsMapper['' + startDate.getFullYear() + TwoDigits(startDate.getMonth()) + TwoDigits(startDate.getDate())];
+                for (var i = startIndex; i < endIndex; i++) {
+                    if (selectable === 1 && !monthEvents[index].events[i].AvailableState) {
+                        ChangeEventState(monthEvents[index].events[i]);
+                    }
+                    else if (selectable === 2 && monthEvents[index].events[i].AvailableState) {
+                        ChangeEventState(monthEvents[index].events[i]);
+                    }
+                }
+            }
         }
         else {
             const length = slotInfo.slots.length;
             const startDate = slotInfo.slots[0];
-            const endDate = slotInfo.slots.pop();
             const start = (startDate.getHours()*60) + startDate.getMinutes();
-            const end = (endDate.getHours()*60) + endDate.getMinutes();
             const base = (6*60) + 0;
             const startIndex = (start - base) / VisitTimeDuration;
             const endIndex = startIndex + length - 1;
             const index = monthEventsMapper['' + startDate.getFullYear() + TwoDigits(startDate.getMonth()) + TwoDigits(startDate.getDate())];
             for (var i = startIndex; i < endIndex; i++) {
-                ChangeEventState( monthEvents[index].events[i]);
+                if (selectable === 1 && !monthEvents[index].events[i].AvailableState) {
+                    ChangeEventState(monthEvents[index].events[i]);
+                }
+                else if (selectable === 2 && monthEvents[index].events[i].AvailableState) {
+                    ChangeEventState(monthEvents[index].events[i]);
+                }
             }
         }
     }
@@ -998,7 +1237,8 @@ export default function Offices(props) {
                 justifyContent: 'center',
                 alignSelf: 'center',
                 justifySelf: 'center',
-                borderRadius:'5px'
+                borderRadius:'5px',
+                fontSize: '0.9em',
             }}
         );
         else if (viewCalendar === 'week' || viewCalendar === 'day') return(
@@ -1013,17 +1253,128 @@ export default function Offices(props) {
         );
     }
 
+    const handleTitleAccessor = (event) => {
+        if (viewCalendar === 'month') {
+            if (event.greens > 0) {
+                return event.title + '(' + event.greens + ')';
+            }
+            else {
+                return event.title;
+            }
+        }
+        else if (viewCalendar === 'week') {
+            return event.titleweek;
+        }
+        else if (viewCalendar === 'day') {
+            return event.title;
+        }
+    }
+
     const ViewProfile = (username) => {
         setLocalStorage({ isvieweddoctor: 'false', viewedusername: username });
     }
 
-    const EventButton = ({ children }) => {
-        return (
-        <Link
-            to="/view-profile">
-            {children}
-        </Link>)
+    useEffect(() => {
+        seta(0);
+    }, [a])
+
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thuesday', 'Friday', 'Saturday'];
+
+    const defaultMaterialTheme = createMuiTheme({
+        palette: {
+            primary: blue,
+        },
+    });
+
+    const timepickerChange = (date, index) => {
+        daySchedule[index] = date;
+        seta(a+1);
     }
+
+    const checkboxChange = (event, index) => {
+        weekSchedule[index] = !weekSchedule[index];
+        seta(a+1);
+    }
+
+    if (page === 1) return (
+        <Grid container justify='center' alignItems='center' spacing={2} style={{padding: '2em'}}>
+            <Grid item xs={12}>
+                <Typography className={classes.title} align='center'>Please set your weekly and daily schedule</Typography>
+            </Grid>
+            <Grid item  xs={8} container spacing={2}>
+                <MuiPickersUtilsProvider Toolbar={{ backgroundColor: 'red' }} utils={DateFnsUtils}>
+                    <Grid container spacing={4} justify='flex-start' style={{ alignItems: 'center', textAlign: 'center' }}>
+                        <Grid item xs={12}>
+                            <ThemeProvider theme={defaultMaterialTheme}>
+                                <KeyboardTimePicker
+                                    style={{ width: '45%' }}
+                                    margin="normal"
+                                    id="time-picker"
+                                    label="Start Time"
+                                    disablePast={true}
+                                    ampm={true}
+                                    value={daySchedule[0]}
+                                    onChange={(date) => timepickerChange(date, 0)}
+                                    KeyboardButtonProps={{
+                                        'aria-label': 'change time',
+                                    }}
+                                    minutesStep={5}
+                                />
+                            </ThemeProvider>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <ThemeProvider theme={defaultMaterialTheme}>
+                                <KeyboardTimePicker
+                                    style={{ width: '45%' }}
+                                    margin="normal"
+                                    id="time-picker"
+                                    label="End Time"
+                                    disablePast={true}
+                                    ampm={true}
+                                    value={daySchedule[1]}
+                                    onChange={(date) => timepickerChange(date, 1)}
+                                    KeyboardButtonProps={{
+                                        'aria-label': 'change time',
+                                    }}
+                                    minutesStep={5}
+                                />
+                            </ThemeProvider>
+                        </Grid>
+                    </Grid>
+                </MuiPickersUtilsProvider>
+            </Grid>
+            <Grid item xs={4} container spacing={1}>
+                {weekSchedule.map((week, index) => (
+                    <Grid item xs={12} container justify='left'>
+                        <FormControlLabel
+                            control={<Checkbox checked={week}/>}
+                            label={weekdays[index]}
+                            onChange={(event) => checkboxChange(event, index)} />
+                    </Grid>
+                ))}
+            </Grid>
+            <Grid item xs={6} container justify='flex-end'>
+                <Button 
+                    className={classes.submitButton}
+                    onClick={() => {setPage(3); addOffice();}}
+                    >
+                        OK
+                </Button>
+            </Grid>
+            <Grid item xs={6} container justify='flex-start'>
+                <Button 
+                    className={classes.cancelButton}
+                    onClick={() => {setPage(0);}}
+                    >
+                        Cancel
+                </Button>
+            </Grid>
+        </Grid>
+    );
+
+    if (page === 2) return (
+        <Redirect to='view-profile'/>
+    )
 
     return (officeIndex === -1 ?
         <Grid container direction='row' justify='center' alignItems='center' style={{marginTop: '1em'}}>
@@ -1098,65 +1449,86 @@ export default function Offices(props) {
                 </Paper>
             </Popper>
         </Grid>
-
         :
         <Grid container spacing={1} direction='row' className={classes.officegrid} justify='center'>
             <Grid item xs={12} container direction='row' className={classes.sidebar} justify='flex-start' alignItems='baseline' spacing={1}>
                 <Grid item>
-                <IconButton
-                    onClick={backToList}
-                    className={classes.backicon}
-                    onMouseEnter={(event) => handlePopoverOpen(event, 'Back')}
-                    onMouseLeave={handlePopoverClose}
-                >
-                    <ArrowBackIcon />
-                </IconButton>
-                </Grid>
-                <Grid item>
-                <IconButton
-                    onClick={saveChanges}
-                    className={classes.doneicon}
-                    disabled={!isChanged}
-                    onMouseEnter={(event) => handlePopoverOpen(event, 'Save changes')}
-                    onMouseLeave={handlePopoverClose}
-                >
-                    <DoneIcon />
-                </IconButton>
-                </Grid>
-                <Grid item>
-                <IconButton
-                    onClick={cancelChanges}
-                    className={classes.cancelicon}
-                    disabled={!isChanged}
-                    onMouseEnter={(event) => handlePopoverOpen(event, 'Cancel changes')}
-                    onMouseLeave={handlePopoverClose}
-                >
-                    <ClearIcon />
-                </IconButton>
+                    <IconButton
+                        onClick={backToList}
+                        className={classes.backicon}
+                        onMouseEnter={(event) => handlePopoverOpen(event, 'Back')}
+                        onMouseLeave={handlePopoverClose}
+                        >
+                            <ArrowBackIcon />
+                    </IconButton>
                 </Grid>
                 {calendarMode ?
-                    <Grid item>
-                        <IconButton
-                            onClick={() => setFullscreenMode(!fullscreenMode)}
-                            className={classes.fullscreenicon}
-                            onMouseEnter={
-                                (event) => {
-                                    if (fullscreenMode) {
-                                        handlePopoverOpen(event, 'Exit Fullscreen')
+                    <>
+                        <Grid item>
+                            <IconButton
+                                onClick={() => setFullscreenMode(!fullscreenMode)}
+                                className={classes.fullscreenicon}
+                                onMouseEnter={
+                                    (event) => {
+                                        if (fullscreenMode) {
+                                            handlePopoverOpen(event, 'Exit Fullscreen')
+                                        }
+                                        else {
+                                            handlePopoverOpen(event, 'Fullscreen');
+                                        }
                                     }
-                                    else {
-                                        handlePopoverOpen(event, 'Fullscreen');
-                                    }
-                                    
                                 }
-                            }
-                            onMouseLeave={handlePopoverClose}
-                        >
-                            {fullscreenMode ? <FullscreenExitIcon/> : <FullscreenIcon/>}
-                        </IconButton>
-                    </Grid> 
+                                onMouseLeave={handlePopoverClose}
+                                >
+                                    {fullscreenMode ? <FullscreenExitIcon/> : <FullscreenIcon/>}
+                            </IconButton>
+                        </Grid> 
+                        <Grid item>
+                            <IconButton
+                                onClick={() => setSelectable(selectable === 1 ? 0 : 1)}
+                                className={selectable === 1 ? classes.availableiconactive : classes.availableicon}
+                                onMouseEnter={(event) => handlePopoverOpen(event, 'Select to set Available')}
+                                onMouseLeave={handlePopoverClose}
+                                >
+                                    <EventAvailableIcon />
+                            </IconButton>
+                        </Grid>
+                        <Grid item>
+                            <IconButton
+                                onClick={() => setSelectable(selectable === 2 ? 0 : 2)}
+                                className={selectable === 2 ? classes.unavailableiconactive : classes.unavailableicon}
+                                onMouseEnter={(event) => handlePopoverOpen(event, 'Select to set Unavailable')}
+                                onMouseLeave={handlePopoverClose}
+                                >
+                                    <EventBusyIcon />
+                            </IconButton>
+                        </Grid>
+                    </>
                     :
-                    <></>
+                    <>
+                        <Grid item>
+                            <IconButton
+                                onClick={saveChanges}
+                                className={classes.doneicon}
+                                disabled={!isChanged}
+                                onMouseEnter={(event) => handlePopoverOpen(event, 'Save changes')}
+                                onMouseLeave={handlePopoverClose}
+                                >
+                                    <DoneIcon />
+                            </IconButton>
+                        </Grid>
+                        <Grid item>
+                            <IconButton
+                                onClick={cancelChanges}
+                                className={classes.cancelicon}
+                                disabled={!isChanged}
+                                onMouseEnter={(event) => handlePopoverOpen(event, 'Cancel changes')}
+                                onMouseLeave={handlePopoverClose}
+                                >
+                                    <ClearIcon />
+                            </IconButton>
+                        </Grid>
+                    </>
                 }
             </Grid>
             {!calendarMode ?
@@ -1256,16 +1628,15 @@ export default function Offices(props) {
                         
             </Grid>
             :
-            
             <Grid item xs={12} className={classes.container}>
                 <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
-                    titleAccessor = {(event) => (viewCalendar === 'day' ? null : event.title)}
+                    titleAccessor = {handleTitleAccessor}
                     localizer={localizer}
                     id='clndr'
                     views={['month', 'week', 'day']}
                     view={viewCalendar}
                     date={date}
-                    selectable
+                    selectable={selectable}
                     popup
                     onSelectEvent={event => ChangeEventState(event)}
                     onSelectSlot={handleOnSelect}

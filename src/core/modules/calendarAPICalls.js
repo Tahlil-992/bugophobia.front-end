@@ -24,6 +24,18 @@ export const callCreateReservationAPI = async ({start_time, office}, isRemembere
     }
 }
 
+export const callCreateMultipleReservationAPI = async ({start_time, end_time, office}, isRemembered) => {
+    try
+    {
+        const response = await callAPIHandler({method: "POST", data: {start_time: start_time, end_time: end_time, office: office}, url: "/schedule/create_multiple_reservations/"}, true, isRemembered);
+        return response;
+    }
+    catch (e)
+    {
+        throw e
+    }
+}
+
 export const callDeleteReservationAPI = async({id}, isRemembered) => {
     try
     {

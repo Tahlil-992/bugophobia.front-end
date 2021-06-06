@@ -733,6 +733,9 @@ export default function Profile() {
     const [monthEvents, setMonthEvents] = useState([]);
     const [monthEventsMapper, setMonthEventsMapper] = useState({});
     const [currentEvents, setCurrentEvents] = useState([]);
+    const [selectable, setSelectable] = useState(0);
+    const [weekSchedule, setWeekSchedule] = useState([true, true, true, true, true, true, true]);
+    const [daySchedule, setDaySchedule] = useState([new Date(2021, 1, 1, 6, 0), new Date(2021, 1, 1, 23, 30)]);
 
     return (
         <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
@@ -764,6 +767,9 @@ export default function Profile() {
                     monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
                     monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
                     currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                    selectable={selectable}                     setSelectable={setSelectable}
+                    weekSchedule={weekSchedule}                 setWeekSchedule={setWeekSchedule}
+                    daySchedule={daySchedule}                   setDaySchedule={setDaySchedule}
                 />
             </div>
             </Container>
@@ -1026,6 +1032,9 @@ export default function Profile() {
                                             monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
                                             monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
                                             currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                                            selectable={selectable}                     setSelectable={setSelectable}
+                                            weekSchedule={weekSchedule}                 setWeekSchedule={setWeekSchedule}
+                                            daySchedule={daySchedule}                   setDaySchedule={setDaySchedule}
                                             />
                                         :
                                         <Typography>Notifications</Typography>

@@ -244,7 +244,7 @@ export default function About(props) {
                     label='Gender'
                     value={gender}
                     disabled={isDoctor || viewProfile}
-                    select={!isDoctor}
+                    select={!isDoctor && !viewProfile}
                     InputProps={{
                         startAdornment: (<InputAdornment position="start" > <WcIcon/> </InputAdornment>),
                     }}

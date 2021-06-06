@@ -457,7 +457,7 @@ export default function Profile() {
             if (response.status === 200) {
                 let pro_picture = response.payload.pro_picture;
                 if (pro_picture === null) {
-                    setProfileImage(isDoctor ? DoctorImage : PatientImage);
+                    setProfileImage(isViewedDoctor ? DoctorImage : PatientImage);
                 }
                 else {
                     setProfileImage(pro_picture);
