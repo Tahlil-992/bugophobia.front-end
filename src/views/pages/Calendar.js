@@ -64,6 +64,26 @@ function CalendarPage({ isRemembered }) {
     const [view, setView] = useState(calendar_views.agenda);
     const [events, setEvents] = useState(null);
     const [range, setRange] = useState(null);
+    const [minVisitDuration, setMinVisitDuration] = useState(30);
+
+    const getDateElements = (date_time_str) => {
+        const date_str = date_time_str.split("T")[0];
+        const time_str = (date_time_str.split("T")[1]).split("Z")[0];
+        const date_specs = date_str.split("-");
+        const year = Number(date_specs[0]);
+        const month = Number(date_specs[1]);
+        const day = Number(date_specs[2]);
+        const time_specs = time_str.split(":");
+        const hour = time_specs[0];
+        const minute = time_specs[1];
+        return {
+            year: year,
+            month: month,
+            day: day,
+            hour: hour, 
+            minute: minute,
+        };
+    }
 
     const getPatientReservationsList = async(start_date, end_date) => {
         const start_month = start_date.getMonth() + 1;
@@ -78,6 +98,15 @@ function CalendarPage({ isRemembered }) {
             console.log(response);
             if(response.status === 200) {
                 setEvents(response.payload);
+                // const first_start = getDateElements(response.payload[0].start_time);
+                // const first_end = getDateElements(response.payload[0].end_time);
+                let minimum_visit_time = response.payload.length > 0 ? moment(response.payload[0].end_time).diff(moment(response.payload[0].start_time), 'minutes') : 30;
+                response.payload.forEach(element => {
+                    const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
+                    minimum_visit_time = minimum_visit_time > diff ? diff : minimum_visit_time;
+                });
+                setMinVisitDuration(minimum_visit_time);
+                // console.log(minimum_visit_time);
             }
         }
         catch
@@ -104,23 +133,33 @@ function CalendarPage({ isRemembered }) {
         }
     }
 
-    const getDateElements = (date_time_str) => {
-        const date_str = date_time_str.split("T")[0];
-        const time_str = (date_time_str.split("T")[1]).split("Z")[0];
-        const date_specs = date_str.split("-");
-        const year = Number(date_specs[0]);
-        const month = Number(date_specs[1]);
-        const day = Number(date_specs[2]);
-        const time_specs = time_str.split(":");
-        const hour = time_specs[0];
-        const minute = time_specs[1];
-        return {
-            year: year,
-            month: month,
-            day: day,
-            hour: hour, 
-            minute: minute,
-        };
+    const handleEventProp = (event) => {
+        if (view === 'month') return (
+            {
+                style: {
+                    backgroundColor: event.color,
+                    borderColor: event.borderColor,
+                    height: event.height,
+                    alignItems: 'start',
+                    justifyContent: 'start',
+                    alignSelf: 'start',
+                    justifySelf: 'start',
+                    borderRadius: '5px'
+                }
+            }
+        );
+        else if (view === 'week' || view === 'day') return (
+            {
+                style: {
+                    backgroundColor: event.color,
+                    borderColor: event.borderColor,
+                    height: event.height,
+                    alignSelf: 'start',
+                    justifySelf: 'start',
+                    textAlign: 'start'
+                }
+            }
+        );
     }
 
     useEffect(() => {
@@ -176,7 +215,7 @@ function CalendarPage({ isRemembered }) {
                                     }
                                 }) : []
                                 }
-                                step={60}
+                                step={30}
                                 showMultiDayTimes
                                 min={minTime}
                                 max={maxTime} 
@@ -185,6 +224,7 @@ function CalendarPage({ isRemembered }) {
                                 // components={{
                                 //     eventWrapper: EventButton,
                                 // }}
+                                eventPropGetter={handleEventProp}
                                 onSelectEvent={(event) => {ViewProfile(event.resource.docotor_username);}}
                                 popup
                                 tooltipAccessor={(event) => {
