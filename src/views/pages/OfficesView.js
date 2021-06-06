@@ -185,6 +185,11 @@ export default function OfficesView(props) {
     const classes = useStyles();
 
     const [offices, setOffices] = useState([]);
+    const [a, seta] = useState(0);
+
+    useEffect(() => {
+        seta(0);
+    }, [a])
 
     const callGetOffice = async () => {
         try {
@@ -265,7 +270,7 @@ export default function OfficesView(props) {
     }
 
     const callGetDoctorRerserve = async (officeid) => {
-        const dayTo = 10;
+        const dayTo = 90;
         var newMonthEvents = new Array(dayTo);
         var newMonthEventsMapper = {};
         var newEvents = {};
@@ -336,6 +341,7 @@ export default function OfficesView(props) {
             day += 1;
             newMonthEventsMapper[index] = j;
             setCurrentEvents(newMonthEvents);
+            seta(a+1);
         }
         setMonthEvents(newMonthEvents);
         setMonthEventsMapper(newMonthEventsMapper);
@@ -660,7 +666,7 @@ const ChangeEventState = (event) => {
                             onDrillDown={handleOnDrilldown}
                             onRangeChange={handleOnRangeChange}
                             eventPropGetter={handleEventProp}
-                            selectable
+                            selectable={false}
                             popup
                             timeslots={2}
                             defaultView='month'
