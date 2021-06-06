@@ -135,8 +135,8 @@ function CalendarPage({ isRemembered }) {
         if (view === 'month') return (
             {
                 style: {
-                    backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    backgroundColor: "#90ee90",
+                    borderColor: "#252e7f",
                     height: event.height,
                     alignItems: 'start',
                     justifyContent: 'start',
@@ -149,8 +149,8 @@ function CalendarPage({ isRemembered }) {
         else if (view === 'week' || view === 'day') return (
             {
                 style: {
-                    backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    backgroundColor: "#90ee90",
+                    borderColor: "#252e7f",
                     height: event.height,
                     alignSelf: 'start',
                     justifySelf: 'start',
