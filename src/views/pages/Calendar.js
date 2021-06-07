@@ -78,7 +78,7 @@ function CalendarPage({ isRemembered }) {
     maxTime.setHours(23,30,0);  
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [view, setView] = useState(calendar_views.agenda);
+    const [view, setView] = useState(calendar_views.week);
     const [events, setEvents] = useState([]);
     const [range, setRange] = useState(null);
     const [minVisitDuration, setMinVisitDuration] = useState(30);
@@ -113,13 +113,8 @@ function CalendarPage({ isRemembered }) {
         try
         {
             const response = await callListPatientReservations({from_date: from_date, to_date: to_date}, isRemembered);
-            // console.log(response);
             if(response.status === 200) {
                 setEvents(response.payload);
-                // const first_start = getDateElements(response.payload[0].start_time);
-                // const first_end = getDateElements(response.payload[0].end_time);
-
-                // console.log(minimum_visit_time);
             }
         }
         catch (e)
@@ -129,39 +124,40 @@ function CalendarPage({ isRemembered }) {
     }
 
     useEffect(() => {
-        let Ids = [];
-        doctorColors.forEach(el => {Ids.push(el.username)});
-        let colorIds = [];
-        doctorColors.forEach(el => {colorIds.push(el.color)});
-        let newIds = [];
-        // console.log(doctorColors);
-        let minimum_visit_time = events.length > 0 ? moment(events[0].end_time).diff(moment(events[0].start_time), 'minutes') : 30;
-        events.forEach(element => {
-            const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
-            minimum_visit_time = minimum_visit_time > diff ? diff : minimum_visit_time;
-            if (!Ids.includes(element.doctor.user.username) && !newIds.includes(element.doctor.user.username)) {
-                newIds.push(element.doctor.user.username);
-            }
-        });
-        // console.log("SSSSS");
-        // console.log(newIds);
-        // console.log(doctorColors);
-        // console.log(Ids);
-        // const colorsArr = [...colorIds];
-        // console.log(colorsArr);
-        let newColors = doctorColors;
-        getRandomColor(newIds.length, colorIds).forEach((color, index) => {
-            newColors.push({username: newIds[index], color: color});
-        })
-        // console.log("AAAAA");
-        setDoctorColors(newColors);
-        setMinVisitDuration(minimum_visit_time);
-        // console.log("COLORS\n", colorIds);
+        if (events) {
+            let Ids = [];
+            doctorColors.forEach(el => {Ids.push(el.username)});
+            let colorIds = [];
+            doctorColors.forEach(el => {colorIds.push(el.color)});
+            let newIds = [];
+            let minimum_visit_time = events.length > 0 ? 
+                moment(events[0].end_time).diff(moment(events[0].start_time), 'minutes') : 
+                30;
+            events.forEach(element => {
+                const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
+                minimum_visit_time = minimum_visit_time > diff ? 
+                    diff : 
+                    minimum_visit_time;
+                if (!Ids.includes(element.doctor.user.username) && !newIds.includes(element.doctor.user.username)) {
+                    newIds.push(element.doctor.user.username);
+                }
+            });
+            let newColors = doctorColors;
+            getRandomColor(newIds.length, colorIds).forEach((color, index) => {
+                newColors.push({username: newIds[index], color: color});
+            })
+            setDoctorColors(newColors);
+            setMinVisitDuration(minimum_visit_time);
+        }
+        else {
+            setDoctorColors([]);
+            setMinVisitDuration(30);
+        }
     }, [events])
 
     const handleRangeAndViewChange = (view, range_data) => {
         if (range_data) {
-            if (view === calendar_views.month || view === calendar_views.agenda) {
+            if (view === calendar_views.month) {
                 setStartDate(range_data.start);
                 setEndDate(range_data.end);
                 console.log(range_data.end.getMonth());
@@ -178,11 +174,12 @@ function CalendarPage({ isRemembered }) {
     }
 
     const handleEventProp = (event) => {
-        // console.log("EVENT_COLORS\n", event.resource ? event.resource : "N/A");
         if (view === 'month') return (
             {
                 style: {
-                    backgroundColor: event.resource && event.resource.doctor_username && doctorColors.length > 0 ? doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : "#90ee90",
+                    backgroundColor: doctorColors.length > 0 ? 
+                        doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : 
+                        "#90ee90",
                     borderColor: "#252e7f",
                     height: event.height,
                     alignItems: 'start',
@@ -196,7 +193,9 @@ function CalendarPage({ isRemembered }) {
         else if (view === 'week' || view === 'day') return (
             {
                 style: {
-                    backgroundColor: event.resource && event.resource.doctor_username && doctorColors.length > 0 ? doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : "#90ee90",
+                    backgroundColor: doctorColors.length > 0 ? 
+                        doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : 
+                        "#90ee90",
                     borderColor: "#252e7f",
                     height: event.height,
                     alignSelf: 'start',
@@ -220,11 +219,9 @@ function CalendarPage({ isRemembered }) {
         const date = new Date(), y = date.getFullYear(), m = date.getMonth();
         const firstDay = new Date(y, m, 1);
         const lastDay = new Date(y, m + 1, 0);
-        const d = lastDay.getDate();
-        // const start_str = `${y}${(m + 1) < 10 ? `0${m + 1}` : m + 1}${d < 10 ? `0${d}` : d}`;
-        // const end_str = `${y}${(m + 2) < 10 ? `0${m + 2}` : m + 2}1`;
         setStartDate(firstDay);
         setEndDate(lastDay);
+        setView(calendar_views.month);
     }, [])
 
     return (
