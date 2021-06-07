@@ -27,9 +27,8 @@ const locales = {
 const calendar_views = {
     month: 'month',
     week: 'week',
-    work_week: 'work_week',
     day: 'day',
-    agenda: 'agenda',    
+    agenda: 'agenda',  
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -42,14 +41,33 @@ const ViewProfile = (username) => {
     setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
 }
 
-const EventButton = ({ children }) => {
-    return (
-    <Button 
-        style={{width: "100%", marginBottom: '0.1em', marginTop: '0.2em', padding: 0}} 
-        component={Link} 
-        to="/view-profile">
-        {children}
-    </Button>)
+// const EventButton = ({ children }) => {
+//     return (
+//     <Button 
+//         style={{width: "100%", marginBottom: '0.1em', marginTop: '0.2em', padding: 0}} 
+//         component={Link} 
+//         to="/view-profile">
+//         {children}
+//     </Button>)
+// }
+
+function getRandomColor(colorNum, colorsArr) {
+    const letters = '0123456789ABCDEF';
+    let colors = [];
+    for (let i = 0; i < colorNum; i++)
+    {
+        let color = '#';
+        for (var j = 0; j < 6; j++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        if (!colorsArr.includes(color)) {
+            colors.push(color);
+        }
+        else {
+            i--;
+        }
+    }
+    return colors;
 }
 
 function CalendarPage({ isRemembered }) {
@@ -64,45 +82,8 @@ function CalendarPage({ isRemembered }) {
     const [view, setView] = useState(calendar_views.agenda);
     const [events, setEvents] = useState(null);
     const [range, setRange] = useState(null);
-
-    const getPatientReservationsList = async(start_date, end_date) => {
-        const start_month = start_date.getMonth() + 1;
-        const end_month = end_date.getMonth() + 1;
-        const start_day = start_date.getDate();
-        const end_day = end_date.getDate();
-        const from_date = `${start_date.getFullYear()}${start_month < 10 ? `0${start_month}` : start_month}${start_day < 10 ? `0${start_day}` : start_day}`;
-        const to_date = `${end_date.getFullYear()}${end_month < 10 ? `0${end_month}` : end_month}${end_day < 10 ? `0${end_day}` : end_day}`;
-        try
-        {
-            const response = await callListPatientReservations({from_date: from_date, to_date: to_date}, isRemembered);
-            console.log(response);
-            if(response.status === 200) {
-                setEvents(response.payload);
-            }
-        }
-        catch
-        {
-            console.log("error on get reserve");
-        }    
-    }
-
-    const handleRangeAndViewChange = (view, range_data) => {
-        if (range_data) {
-            if (view === calendar_views.month || view === calendar_views.agenda) {
-                setStartDate(range_data.start);
-                setEndDate(range_data.end);
-                console.log(range_data.end.getMonth());
-            }
-            else if (view === calendar_views.week) {
-                setStartDate(range_data[0]);
-                setEndDate(range_data[6]);
-            }
-            else if (view === calendar_views.day) {
-                setStartDate(range_data[0]);
-                setEndDate(moment(range_data[0]).add(1, 'days').toDate());
-            }
-        }
-    }
+    const [minVisitDuration, setMinVisitDuration] = useState(30);
+    const [doctorColors, setDoctorColors] = useState([]);
 
     const getDateElements = (date_time_str) => {
         const date_str = date_time_str.split("T")[0];
@@ -123,6 +104,109 @@ function CalendarPage({ isRemembered }) {
         };
     }
 
+    const getPatientReservationsList = async(start_date, end_date) => {
+        const start_month = start_date.getMonth() + 1;
+        const end_month = end_date.getMonth() + 1;
+        const start_day = start_date.getDate();
+        const end_day = end_date.getDate();
+        const from_date = `${start_date.getFullYear()}${start_month < 10 ? `0${start_month}` : start_month}${start_day < 10 ? `0${start_day}` : start_day}`;
+        const to_date = `${end_date.getFullYear()}${end_month < 10 ? `0${end_month}` : end_month}${end_day < 10 ? `0${end_day}` : end_day}`;
+        try
+        {
+            const response = await callListPatientReservations({from_date: from_date, to_date: to_date}, isRemembered);
+            if(response.status === 200) {
+                setEvents(response.payload);
+            }
+        }
+        catch (e)
+        {
+            console.log("error on get reserve\n", e);
+        }    
+    }
+
+    useEffect(() => {
+        if (events) {
+            let Ids = [];
+            doctorColors.forEach(el => {Ids.push(el.username)});
+            let colorIds = [];
+            doctorColors.forEach(el => {colorIds.push(el.color)});
+            let newIds = [];
+            let minimum_visit_time = events.length > 0 ? 
+                moment(events[0].end_time).diff(moment(events[0].start_time), 'minutes') : 
+                30;
+            events.forEach(element => {
+                const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
+                minimum_visit_time = minimum_visit_time > diff ? 
+                    diff : 
+                    minimum_visit_time;
+                if (!Ids.includes(element.doctor.user.username) && !newIds.includes(element.doctor.user.username)) {
+                    newIds.push(element.doctor.user.username);
+                }
+            });
+            let newColors = doctorColors;
+            getRandomColor(newIds.length, colorIds).forEach((color, index) => {
+                newColors.push({username: newIds[index], color: color});
+            })
+            setDoctorColors(newColors);
+            setMinVisitDuration(minimum_visit_time);
+        }
+        else {
+            setDoctorColors([]);
+            setMinVisitDuration(30);
+        }
+    }, [events])
+
+    const handleRangeAndViewChange = (view, range_data) => {
+        if (range_data) {
+            if (view === calendar_views.month || view === calendar_views.agenda) {
+                setStartDate(range_data.start);
+                setEndDate(range_data.end);
+                console.log(range_data.end.getMonth());
+            }
+            else if (view === calendar_views.week) {
+                setStartDate(range_data[0]);
+                setEndDate(range_data[6]);
+            }
+            else if (view === calendar_views.day) {
+                setStartDate(range_data[0]);
+                setEndDate(moment(range_data[0]).add(1, 'days').toDate());
+            }
+        }
+    }
+
+    const handleEventProp = (event) => {
+        if (view === 'month') return (
+            {
+                style: {
+                    backgroundColor: doctorColors.length > 0 ? 
+                        doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : 
+                        "#90ee90",
+                    borderColor: "#252e7f",
+                    height: event.height,
+                    alignItems: 'start',
+                    justifyContent: 'start',
+                    alignSelf: 'start',
+                    justifySelf: 'start',
+                    borderRadius: '5px'
+                }
+            }
+        );
+        else if (view === 'week' || view === 'day') return (
+            {
+                style: {
+                    backgroundColor: doctorColors.length > 0 ? 
+                        doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : 
+                        "#90ee90",
+                    borderColor: "#252e7f",
+                    height: event.height,
+                    alignSelf: 'start',
+                    justifySelf: 'start',
+                    textAlign: 'start'
+                }
+            }
+        );
+    }
+
     useEffect(() => {
         handleRangeAndViewChange(view, range);
     }, [view, range]);
@@ -132,6 +216,15 @@ function CalendarPage({ isRemembered }) {
             getPatientReservationsList(startDate, endDate);
     }, [startDate, endDate]);
 
+    useEffect(() => {
+        const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+        const firstDay = new Date(y, m, 1);
+        const lastDay = new Date(y, m + 1, 0);
+        setStartDate(firstDay);
+        setEndDate(lastDay);
+        // setView(calendar_views.month);
+    }, []);
+    
     return (
         <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
@@ -147,6 +240,7 @@ function CalendarPage({ isRemembered }) {
                             <Calendar style={{ height : '37rem' }}
                                 localizer={localizer}
                                 view={view}
+                                views={[calendar_views.month, calendar_views.week, calendar_views.day, calendar_views.agenda]}
                                 onView={(event) => {setView(event); console.log(event);}}
                                 onRangeChange={(event) => {setRange(event); console.log(event);}}
                                 events={
@@ -169,22 +263,26 @@ function CalendarPage({ isRemembered }) {
                                             end_date_obj.minute,
                                         ),
                                         'allDay': false,
-                                        'title': `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`,
+                                        'title': view === calendar_views.day ?
+                                            `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`:
+                                            (view === calendar_views.month ? `Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}` : ''),
                                         'resource': {
-                                            docotor_username: event.doctor.user.username,
+                                            doctor_username: event.doctor.user.username,
+                                            doctor_id: event.doctor.user.id,
                                         }
                                     }
                                 }) : []
                                 }
-                                step={60}
+                                step={minVisitDuration}
                                 showMultiDayTimes
                                 min={minTime}
                                 max={maxTime} 
                                 startAccessor="start"
                                 endAccessor="end"
-                                components={{
-                                    eventWrapper: EventButton,
-                                }}
+                                // components={{
+                                //     eventWrapper: EventButton,
+                                // }}
+                                eventPropGetter={handleEventProp}
                                 onSelectEvent={(event) => {ViewProfile(event.resource.docotor_username);}}
                                 popup
                                 tooltipAccessor={(event) => {
