@@ -79,7 +79,7 @@ function CalendarPage({ isRemembered }) {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [view, setView] = useState(calendar_views.agenda);
-    const [events, setEvents] = useState(null);
+    const [events, setEvents] = useState([]);
     const [range, setRange] = useState(null);
     const [minVisitDuration, setMinVisitDuration] = useState(30);
     const [doctorColors, setDoctorColors] = useState([]);
@@ -113,39 +113,12 @@ function CalendarPage({ isRemembered }) {
         try
         {
             const response = await callListPatientReservations({from_date: from_date, to_date: to_date}, isRemembered);
-            console.log(response);
+            // console.log(response);
             if(response.status === 200) {
                 setEvents(response.payload);
                 // const first_start = getDateElements(response.payload[0].start_time);
                 // const first_end = getDateElements(response.payload[0].end_time);
-                let Ids = [];
-                doctorColors.forEach(el => {Ids.push(el.username)});
-                let colorIds = [];
-                doctorColors.forEach(el => {colorIds.push(el.color)});
-                let newIds = [];
-                console.log(doctorColors);
-                let minimum_visit_time = response.payload.length > 0 ? moment(response.payload[0].end_time).diff(moment(response.payload[0].start_time), 'minutes') : 30;
-                response.payload.forEach(element => {
-                    const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
-                    minimum_visit_time = minimum_visit_time > diff ? diff : minimum_visit_time;
-                    if (!Ids.includes(element.doctor.user.username) && !newIds.includes(element.doctor.user.username)) {
-                        newIds.push(element.doctor.user.username);
-                    }
-                });
-                console.log("SSSSS");
-                console.log(newIds);
-                console.log(doctorColors);
-                console.log(Ids);
-                // const colorsArr = [...colorIds];
-                // console.log(colorsArr);
-                let newColors = doctorColors;
-                getRandomColor(newIds.length, colorIds).forEach((color, index) => {
-                    newColors.push({username: newIds[index], color: color});
-                })
-                console.log("AAAAA");
-                setDoctorColors(newColors);
-                setMinVisitDuration(minimum_visit_time);
-                console.log("COLORS\n", colorIds);
+
                 // console.log(minimum_visit_time);
             }
         }
@@ -154,6 +127,37 @@ function CalendarPage({ isRemembered }) {
             console.log("error on get reserve\n", e);
         }    
     }
+
+    useEffect(() => {
+        let Ids = [];
+        doctorColors.forEach(el => {Ids.push(el.username)});
+        let colorIds = [];
+        doctorColors.forEach(el => {colorIds.push(el.color)});
+        let newIds = [];
+        // console.log(doctorColors);
+        let minimum_visit_time = events.length > 0 ? moment(events[0].end_time).diff(moment(events[0].start_time), 'minutes') : 30;
+        events.forEach(element => {
+            const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
+            minimum_visit_time = minimum_visit_time > diff ? diff : minimum_visit_time;
+            if (!Ids.includes(element.doctor.user.username) && !newIds.includes(element.doctor.user.username)) {
+                newIds.push(element.doctor.user.username);
+            }
+        });
+        // console.log("SSSSS");
+        // console.log(newIds);
+        // console.log(doctorColors);
+        // console.log(Ids);
+        // const colorsArr = [...colorIds];
+        // console.log(colorsArr);
+        let newColors = doctorColors;
+        getRandomColor(newIds.length, colorIds).forEach((color, index) => {
+            newColors.push({username: newIds[index], color: color});
+        })
+        // console.log("AAAAA");
+        setDoctorColors(newColors);
+        setMinVisitDuration(minimum_visit_time);
+        // console.log("COLORS\n", colorIds);
+    }, [events])
 
     const handleRangeAndViewChange = (view, range_data) => {
         if (range_data) {
@@ -212,6 +216,17 @@ function CalendarPage({ isRemembered }) {
             getPatientReservationsList(startDate, endDate);
     }, [startDate, endDate]);
 
+    useEffect(() => {
+        const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+        const firstDay = new Date(y, m, 1);
+        const lastDay = new Date(y, m + 1, 0);
+        const d = lastDay.getDate();
+        // const start_str = `${y}${(m + 1) < 10 ? `0${m + 1}` : m + 1}${d < 10 ? `0${d}` : d}`;
+        // const end_str = `${y}${(m + 2) < 10 ? `0${m + 2}` : m + 2}1`;
+        setStartDate(firstDay);
+        setEndDate(lastDay);
+    }, [])
+
     return (
         <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
@@ -250,7 +265,9 @@ function CalendarPage({ isRemembered }) {
                                             end_date_obj.minute,
                                         ),
                                         'allDay': false,
-                                        'title': `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`,
+                                        'title': view === calendar_views.day ?
+                                            `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`:
+                                            (view === calendar_views.month ? `Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}` : ''),
                                         'resource': {
                                             doctor_username: event.doctor.user.username,
                                             doctor_id: event.doctor.user.id,
