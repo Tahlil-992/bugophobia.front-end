@@ -27,7 +27,8 @@ const locales = {
 const calendar_views = {
     month: 'month',
     week: 'week',
-    day: 'day',   
+    day: 'day',
+    agenda: 'agenda',  
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -78,8 +79,8 @@ function CalendarPage({ isRemembered }) {
     maxTime.setHours(23,30,0);  
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [view, setView] = useState(calendar_views.week);
-    const [events, setEvents] = useState([]);
+    const [view, setView] = useState(calendar_views.agenda);
+    const [events, setEvents] = useState(null);
     const [range, setRange] = useState(null);
     const [minVisitDuration, setMinVisitDuration] = useState(30);
     const [doctorColors, setDoctorColors] = useState([]);
@@ -157,7 +158,7 @@ function CalendarPage({ isRemembered }) {
 
     const handleRangeAndViewChange = (view, range_data) => {
         if (range_data) {
-            if (view === calendar_views.month) {
+            if (view === calendar_views.month || view === calendar_views.agenda) {
                 setStartDate(range_data.start);
                 setEndDate(range_data.end);
                 console.log(range_data.end.getMonth());
@@ -221,9 +222,9 @@ function CalendarPage({ isRemembered }) {
         const lastDay = new Date(y, m + 1, 0);
         setStartDate(firstDay);
         setEndDate(lastDay);
-        setView(calendar_views.month);
-    }, [])
-
+        // setView(calendar_views.month);
+    }, []);
+    
     return (
         <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
@@ -239,7 +240,7 @@ function CalendarPage({ isRemembered }) {
                             <Calendar style={{ height : '37rem' }}
                                 localizer={localizer}
                                 view={view}
-                                views={[calendar_views.month, calendar_views.week, calendar_views.day]}
+                                views={[calendar_views.month, calendar_views.week, calendar_views.day, calendar_views.agenda]}
                                 onView={(event) => {setView(event); console.log(event);}}
                                 onRangeChange={(event) => {setRange(event); console.log(event);}}
                                 events={
