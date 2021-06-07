@@ -61,9 +61,19 @@ const callGetOfficeAPI = async (doctorid, isRemembered) => {
     }
 }
 
-const callEditOfficeAPI = async (data, isRemembered) => {
+const callEditOfficeAPI = async (officeid, data, isRemembered) => {
     try {
-        const response = callAPIHandler({ method: "PUT", url: `/auth/office-list/`, data: data }, true, isRemembered);
+        const response = callAPIHandler({ method: "PUT", url: `/auth/office-detail/${officeid}/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callDeleteOfficeAPI = async (officeid, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "DELETE", url: `/auth/office-detail/${officeid}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -383,11 +393,7 @@ export default function Offices(props) {
                     newOffice.id = office.id;
                     newOffice.title = office.title;
                     newOffice.address = office.address;
-                    var newPhone = [];
-                    office.phone.map((phone, index) => {
-                        newPhone.push(phone.phone);
-                    });
-                    newOffice.phone = newPhone;
+                    newOffice.phone = office.phone;
                     newOffices.push(newOffice);
                 });
                 setOffices(newOffices);
@@ -400,9 +406,9 @@ export default function Offices(props) {
         }
     }
 
-    const callEditOffice = async (data) => {
+    const callEditOffice = async (officeid, data) => {
         try {
-            const response = await callEditOfficeAPI( data, isRemembered);
+            const response = await callEditOfficeAPI(officeid, data, isRemembered);
             if (response.status === 201) {
             }
         }
@@ -467,42 +473,83 @@ export default function Offices(props) {
         catch (error) {
             console.log(error);
             //throw error;
-            if (event) {
-                event.title = event.id === -1 ? 'Unavailable' : '';
-                event.titleweek = '✘';
-                event.color = '#fb3640';
-                event.borderColor = 'red';
-                event.AvailableState = false;
-                seta(a + 1);
+            if (error.status === 500) {
+                callCreateReserve(year, month, day, hours, minutes, officeid, event, event2);
             }
-            if (event2) {
-                event2.greens = event2.greens - 1;
-                if (event2.greens === 0) {
-                    event2.title = `Unavailable`;
-                    event2.color = '#fb3640';
-                    event2.borderColor = 'red';
-                    event2.AvailableState = false;
+            else {
+                if (event) {
+                    event.title = event.id === -1 ? 'Unavailable' : '';
+                    event.titleweek = '✘';
+                    event.color = '#fb3640';
+                    event.borderColor = 'red';
+                    event.AvailableState = false;
+                    seta(a + 1);
                 }
-                else {
-                    event2.title = `Available`;
+                if (event2) {
+                    event2.greens = event2.greens - 1;
+                    if (event2.greens === 0) {
+                        event2.title = `Unavailable`;
+                        event2.color = '#fb3640';
+                        event2.borderColor = 'red';
+                        event2.AvailableState = false;
+                    }
+                    else {
+                        event2.title = `Available`;
+                    }
+                    seta(a + 1);
                 }
-                seta(a + 1);
             }
         }
     }
 
-    const callCreateMultipleReserve = async (startDate, endDate, officeid) => {
+    const callCreateMultipleReserve = async (startDate, endDate, officeid, newEvents, j) => {
         try {
             const start_time = startDate.getFullYear() + " " + (startDate.getMonth()+1) + " " + startDate.getDate() + " " + startDate.getHours() + " " + startDate.getMinutes();
             const end_time = endDate.getFullYear() + " " + (endDate.getMonth()+1) + " " + endDate.getDate() + " " + endDate.getHours() + " " + endDate.getMinutes();
             const response = await callCreateMultipleReservationAPI({ start_time: start_time, end_time: end_time, office: officeid}, isRemembered);
+            var Greens = 0;
+            var year = startDate.getFullYear();
+            var month = startDate.getMonth();
+            var day = startDate.getDate();
             if (response.status === 200) {
-                callUpdateDoctorRerserve(officeid, startDate);
+                const base = (6*60) + 0;
+                response.payload.map((reserve, index) => {
+                    var sd0 = getDateElements(reserve.start_time);
+                    var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
+                    const start = (sd.getHours()*60) + sd.getMinutes();
+                    const startIndex = (start - base) / VisitTimeDuration;
+                    var ed0 = getDateElements(reserve.end_time);
+                    var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
+                    Greens += 1;
+                    newEvents[startIndex] = ({
+                        'title': '',
+                        'titleweek': '✔',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': true,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                    });
+                });
+                if (Greens > 0) {
+                    monthEvents[j].greens = Greens;
+                    monthEvents[j].title = 'Available';
+                    monthEvents[j].AvailableState = true;
+                    monthEvents[j].color = 'lightgreen';
+                    monthEvents[j].borderColor = 'green';
+                    monthEvents[j].events = newEvents;
+                }
+                seta(a+1);
             }
         }
         catch (error) {
             console.log(error);
-            callUpdateDoctorRerserve(officeid, startDate);
+            if (error.status === 500) {
+                callCreateMultipleReserve(startDate, endDate, officeid, newEvents, j);
+            }
         }
     }
 
@@ -517,28 +564,32 @@ export default function Offices(props) {
         }
         catch (error) {
             console.log(error);
-            if (event) {
-                event.title = event.id === -1 ? 'Available' : '';
-                event.titleweek = '✔';
-                event.color = 'lightgreen';
-                event.borderColor = 'green';
-                event.AvailableState = true;
-                seta(a + 1);
+            if (error.status === 500) {
+                callDeleteReserve(id, event, event2);
             }
-            if (event2) {
-                event2.greens = event2.greens + 1;
-                event2.title = `Available`;
-                event2.color = 'lightgreen';
-                event2.borderColor = 'green';
-                event2.AvailableState = true;
-                seta(a + 1);
+            else {
+                if (event) {
+                    event.title = event.id === -1 ? 'Available' : '';
+                    event.titleweek = '✔';
+                    event.color = 'lightgreen';
+                    event.borderColor = 'green';
+                    event.AvailableState = true;
+                    seta(a + 1);
+                }
+                if (event2) {
+                    event2.greens = event2.greens + 1;
+                    event2.title = `Available`;
+                    event2.color = 'lightgreen';
+                    event2.borderColor = 'green';
+                    event2.AvailableState = true;
+                    seta(a + 1);
+                }
             }
         }
     }
 
-    const callGetDoctorRerserve = async (officeid, start=0, end=90) => {
-            var newMonthEvents = new Array(end);
-            var newMonthEventsMapper = {};
+    const callGetDoctorRerserve = async (officeid, start=0, end=30) => {
+            setCurrentEvents(monthEvents);
             var date = new Date();
             var year = date.getFullYear(); 
             var month = date.getMonth();
@@ -627,7 +678,7 @@ export default function Offices(props) {
                 }
                 const mydate = new Date(year, month, day, 6, 0);
                 const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-                newMonthEvents[j] = Greens === 0 ? 
+                monthEvents[j] = Greens === 0 ? 
                 (
                     {
                         'title': 'Unavailable',
@@ -660,14 +711,14 @@ export default function Offices(props) {
                     }
                 );
                 //alert(j + ' ' + newEvents.length);
-                newMonthEventsMapper[index] = j;
+                monthEventsMapper[index] = j;
                 day += 1;
-                setCurrentEvents(newMonthEvents);
+                //setCurrentEvents(monthEvents);
                 seta(a+1);
             }
-            setMonthEvents((newMonthEvents));
-            setMonthEventsMapper(newMonthEventsMapper);
-            setCurrentEvents((newMonthEvents));
+            //setMonthEvents((newMonthEvents));
+            //setMonthEventsMapper(newMonthEventsMapper);
+            //setCurrentEvents(monthEvents);
     }
 
     const callUpdateDoctorRerserve = async (officeid, date) => {
@@ -842,23 +893,81 @@ export default function Offices(props) {
         if ((startHour*60 + startMinute) >= (endHour*60 + endMinute)) {
             return;
         }
+        const toDay = 30;
+        //setMonthEvents(Array(toDay));
+        //setMonthEventsMapper({});
         var date = new Date();
         var year = date.getFullYear(); 
         var month = date.getMonth();
         var day = date.getDate();
-        for (var j = 0; j < 90; j++) {
+        for (var j = 0; j < toDay; j++) {
+            var newEvents = [];
+            var hours = 6;
+            var minutes = 0;
+            var Greens = 0;
+            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                newEvents.push(
+                    {
+                        'title': '',
+                        'titleweek': '✘',
+                        'allDay': false,
+                        'start': new Date(year, month, day, hours, minutes),
+                        'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
+                        'AvailableState': false,
+                        'id': -2,
+                        'events': [],
+                        'color': '#fb3640',
+                        'borderColor': 'red',
+                    }
+                );
+                minutes += VisitTimeDuration; 
+            }
             const start = new Date(year, month, day, startHour, startMinute);
             const weekday = start.toDateString().split(' ')[0];
-            //alert(weekday + ' ' + weekdayMap[weekday] + ' ' + weekSchedule[weekdayMap[weekday]]);
             if (weekSchedule[weekdayMap[weekday]]) {
                 const end = new Date(year, month, day, endHour, endMinute);
-                callCreateMultipleReserve(start, end, officeid);
+                const mydate = new Date(year, month, day, 6, 0);
+                const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+                monthEvents[j] =({
+                    'title': 'Unavailable',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'AvailableState': false,
+                    'id': -1,
+                    'greens': 0,
+                    'events': newEvents,
+                    'color': '#fb3640',
+                    'borderColor': 'red',
+                    'height': '5em',
+                }); 
+                monthEventsMapper[index] = j;
+                callCreateMultipleReserve(start, end, officeid, newEvents, j);
+                day += 1;
             }
             else {
-                callUpdateDoctorRerserve(officeid, start);
+                //callUpdateDoctorRerserve(officeid, start);
+                const mydate = new Date(year, month, day, 6, 0);
+                const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+                monthEvents[j] =({
+                    'title': 'Unavailable',
+                    'allDay': false,
+                    'start': new Date(year, month, day, 6, 0),
+                    'end': new Date(year, month, day, 23, 30),
+                    'AvailableState': false,
+                    'id': -1,
+                    'greens': 0,
+                    'events': newEvents,
+                    'color': '#fb3640',
+                    'borderColor': 'red',
+                    'height': '5em',
+                }); 
+                monthEventsMapper[index] = j;
+                day += 1;
             }
-            day += 1;
         }
+        setCurrentEvents(monthEvents);
+        seta(a+1);
     }
 
     const ChangeEventState = (event) => {
@@ -998,10 +1107,14 @@ export default function Offices(props) {
 
     const removeOffice = (index) => {
         if (index === -1) {
+            offices.map((office) => {
+                callDeleteOfficeAPI(office.id, isRemembered);
+            });
             setOffices([]);
             setPaperElav(1);
         }
         else {
+            callDeleteOfficeAPI(offices[index].id, isRemembered);
             let newOffices = offices;
             newOffices.splice(index, 1);
             setOffices(newOffices);
@@ -1034,19 +1147,15 @@ export default function Offices(props) {
         setAutoFocus(false);
         setPaperElav(paperElav + 1);
         handlePopoverClose();
-        var phone = [];
-        phoneNos.map((ph, index) => {
-            phone.push({phone: ph});
-        });
         const data = {
             id: offices[officeIndex].id,
             doctor: doctorid,
             title: title,
             address: address,
             location: 0,
-            phone: phone,
+            phone: phoneNos,
         }
-        callEditOffice(data);
+        callEditOffice(offices[officeIndex].id, data);
     };
 
     const cancelChanges = () => {
@@ -1066,6 +1175,7 @@ export default function Offices(props) {
             setCalendarMode(false);
             setViewCalendar('month');
             setSelectable(0);
+            setDate(new Date());
         }
         else {
             setIsChanged(false);
@@ -1082,7 +1192,7 @@ export default function Offices(props) {
 
     const changePhone = (index, phone) => {
         var newPhone = [...phoneNos];
-        newPhone[index] = phone;
+        newPhone[index]['phone'] = phone;
         setPhoneNos(newPhone);
         setIsChanged(true);
         setPaperElav(paperElav + 1);
@@ -1090,7 +1200,7 @@ export default function Offices(props) {
 
     const addPhone = () => {
         var newPhone = [...phoneNos];
-        newPhone.push('');
+        newPhone.push({phone: '0', id: 0});
         setPhoneNos(newPhone);
         setIsChanged(true);
         setAutoFocus(true);
@@ -1571,14 +1681,13 @@ export default function Offices(props) {
                         />
                     </Box>
                 </Grid>
-                
                         {phoneNos.map((phone, index) => (
                             <Grid item xs={12} md={6}>
                             <Box display='flex' alignItems='center'>
                                 <MyTextField
                                     label={"Phone No." + (index+1)}
                                     variant='outlined'
-                                    value={phone}
+                                    value={phone.phone}
                                     fullWidth
                                     autoFocus={autoFocus}
                                     className={classes.textfield}

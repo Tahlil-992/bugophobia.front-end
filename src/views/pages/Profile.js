@@ -730,7 +730,7 @@ export default function Profile() {
     const [phoneNos, setPhoneNos] = useState([]);
     const [isChanged, setIsChanged] = useState(false);
     const [paperElav, setPaperElav] = useState(-1);
-    const [monthEvents, setMonthEvents] = useState([]);
+    const [monthEvents, setMonthEvents] = useState(Array(90));
     const [monthEventsMapper, setMonthEventsMapper] = useState({});
     const [currentEvents, setCurrentEvents] = useState([]);
     const [selectable, setSelectable] = useState(0);
