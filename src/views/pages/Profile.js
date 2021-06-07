@@ -949,8 +949,6 @@ export default function Profile() {
                                         <Tab label="About" {...a11yProps2(0)} className={(tabValue2 === 0) ? classes.seltab : classes.onetab} />
                                         <Tab label="Change Password" {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
                                         {/*<Tab label="Saved Profiles" {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />*/}
-                                        <Tab label="Calendar" {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Notifications" {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                 }
                             </Grid>

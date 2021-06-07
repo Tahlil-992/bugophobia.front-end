@@ -14,6 +14,12 @@ import { callListAllReservationsAvailableToPatients } from '../../core/modules/c
 import { callGetDoctorRerservationsList, callGetReservationAPI } from '../../core/modules/calendarAPICalls';
 //import { callGetReservationAPI } from '../../core/modules/calendarAPICalls';
 import { callAPIHandler } from "../../core/modules/refreshToken";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
 
 const MyTextField = withStyles({
     root: {
@@ -51,10 +57,10 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     cardbutton: {
-        padding: '0em', 
-        margin: '0em 0em', 
-        textTransform: 'none', 
-        width: '100%', 
+        padding: '0em',
+        margin: '0em 0em',
+        textTransform: 'none',
+        width: '100%',
         transition: 'all 0.3s ease',
     },
     title: {
@@ -139,7 +145,7 @@ const useStyles = makeStyles((theme) => ({
     },
     container: {
         paddingTop: theme.spacing(4),
-    },     
+    },
     button2: {
         backgroundColor: '#40bad5',
         padding: '2em 4em 2em 4em',
@@ -255,16 +261,16 @@ export default function OfficesView(props) {
             year: year,
             month: month,
             day: day,
-            hour: hour, 
+            hour: hour,
             minute: minute,
         };
     }
 
     const callTakeReserve = (id) => {
         try {
-            const response = callGetReservationAPI({id: id}, isRemembered);
+            const response = callGetReservationAPI({ id: id }, isRemembered);
         }
-        catch(error) {
+        catch (error) {
 
         }
     }
@@ -276,15 +282,15 @@ export default function OfficesView(props) {
         var newEvents = {};
         var Greens = {};
         var date = new Date();
-        var year = date.getFullYear(); 
+        var year = date.getFullYear();
         var month = date.getMonth();
         var day = date.getDate();
-        const response = await callListAllReservationsAvailableToPatients({office_id: officeid});
+        const response = await callListAllReservationsAvailableToPatients({ office_id: officeid });
         response.payload.map((reserve, inx) => {
             let st = getDateElements(reserve.start_time);
-            let start_time = new Date(st.year, st.month-1, st.day, st.hour, st.minute);
+            let start_time = new Date(st.year, st.month - 1, st.day, st.hour, st.minute);
             let et = getDateElements(reserve.end_time);
-            let end_time = new Date(et.year, et.month-1, et.day, et.hour, et.minute);
+            let end_time = new Date(et.year, et.month - 1, et.day, et.hour, et.minute);
             const index = '' + start_time.getFullYear() + TwoDigits(start_time.getMonth()) + TwoDigits(start_time.getDate());
             if (newEvents[index] === undefined) {
                 newEvents[index] = [];
@@ -308,71 +314,69 @@ export default function OfficesView(props) {
         for (var j = 0; j < dayTo; j++) {
             const mydate = new Date(year, month, day, 6, 0);
             const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = !Greens[index] ? 
-            (
-                {
-                    'title': 'Unavailable',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'AvailableState': false,
-                    'id': -1,
-                    'events': [],
-                    'color': '#fb3640',
-                    'borderColor': 'red',
-                    'height': '5em',
-                }
-            ) 
-            : 
-            (
-                {
-                    'title': `Available(${Greens[index]})`,
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'AvailableState': true,
-                    'id': -1,
-                    'events': newEvents[index] ? newEvents[index] : [],
-                    'color': 'lightgreen',
-                    'borderColor': 'green',
-                    'height': '5em',
-                }
-            );
+            newMonthEvents[j] = !Greens[index] ?
+                (
+                    {
+                        'title': 'Unavailable',
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': false,
+                        'id': -1,
+                        'events': [],
+                        'color': '#fb3640',
+                        'borderColor': 'red',
+                        'height': '5em',
+                    }
+                )
+                :
+                (
+                    {
+                        'title': `Available(${Greens[index]})`,
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': true,
+                        'id': -1,
+                        'events': newEvents[index] ? newEvents[index] : [],
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                        'height': '5em',
+                    }
+                );
             day += 1;
             newMonthEventsMapper[index] = j;
             setCurrentEvents(newMonthEvents);
-            seta(a+1);
+            seta(a + 1);
         }
         setMonthEvents(newMonthEvents);
         setMonthEventsMapper(newMonthEventsMapper);
         setCurrentEvents(newMonthEvents);
-}
+    }
+    const [ReserveEvent, setReserveEvent] = useState();
+    const ChangeEventState = (event) => {
+        if (viewCalendar !== 'month') {
+            if (event.AvailableState) {
 
-const ChangeEventState = (event) => {
-    if (viewCalendar !== 'month') {
-        if (event.AvailableState) {
-            event.title = viewCalendar === 'day' ? 'Reserved' : '✘';
-            event.color = '#8ab6d6';
-            event.borderColor = 'blue';
-            event.AvailableState = false;
-            if (event.id !== -1) {
-                callTakeReserve(event.id);
+                if (event.id !== -1) {
+                    setReserveEvent(event);
+                    handleReserveConfirmOpen(event.id);
+                }
             }
         }
-    } 
-    if (viewCalendar === 'month') {
-        handleOnView('day');
-        handleOnNavigate(event.start);
-        handleOnRangeChange([event.start]);
+        if (viewCalendar === 'month') {
+            handleOnView('day');
+            handleOnNavigate(event.start);
+            handleOnRangeChange([event.start]);
+        }
     }
-}
 
 
     const localizer = momentLocalizer(moment);
     const minTime = new Date();
-    minTime.setHours(6,0,0);
+    minTime.setHours(6, 0, 0);
     const maxTime = new Date();
-    maxTime.setHours(23,30,0);
+    maxTime.setHours(23, 30, 0);
 
     const goToOffice = (index) => {
         setOfficeid(offices[index].id);
@@ -398,9 +402,9 @@ const ChangeEventState = (event) => {
 
     const getAvailableTimes = () => {
         try {
-            const response = callListAllReservationsAvailableToPatients({id: doctorid}, isRemembered);
+            const response = callListAllReservationsAvailableToPatients({ id: doctorid }, isRemembered);
         }
-        catch(error) {
+        catch (error) {
 
         }
     }
@@ -412,9 +416,9 @@ const ChangeEventState = (event) => {
     const getReservedTimes = () => {
         try {
             const td = '20210423';
-            const response = callGetDoctorRerservationsList({from_date: td , to_date: '20210521'}, isRemembered);
+            const response = callGetDoctorRerservationsList({ from_date: td, to_date: '20210521' }, isRemembered);
         }
-        catch(error) {
+        catch (error) {
 
         }
     }
@@ -438,30 +442,30 @@ const ChangeEventState = (event) => {
     }
 
     const handleOnDrilldown = (date, view) => {
-        
+
         handleOnView(view);
         handleOnRangeChange([date]);
         setDate(date);
     }
 
     const handleOnRangeChange = (dates) => {
-        
+
         if (!dates.length) {
             setCurrentEvents(monthEvents);
         }
         else if (dates.length === 1) {
-            
+
             const index = monthEventsMapper['' + dates[0].getFullYear() + TwoDigits(dates[0].getMonth()) + TwoDigits(dates[0].getDate())];
             //alert('... ' + index);
             if (index !== undefined) {
                 //alert(monthEvents[index].events[0].start + ' ' + monthEvents[index].events[0].end);
                 setCurrentEvents(monthEvents[index].events);
-                monthEvents[index].events.map((event)=>console.log(event.start.toLocaleString()));
+                monthEvents[index].events.map((event) => console.log(event.start.toLocaleString()));
                 //alert(monthEvents[index].events[0].start.toString());
                 //alert('... ' + monthEvents[index].events[0].start);
             }
             else {
-                 setCurrentEvents([]);
+                setCurrentEvents([]);
             }
         }
         else if (dates.length === 7) {
@@ -476,52 +480,64 @@ const ChangeEventState = (event) => {
             setCurrentEvents(newEvents);
         }
     }
+    const [ReserveConfirmOpen, setReserveConfirmOpen] = useState(0);
+    const handleReserveConfirmOpen = (id) => {
+        setReserveConfirmOpen(id);
+    };
+    const handleReserveConfirmClose = () => {
+        setReserveConfirmOpen(0);
+        setReserveEvent(null);
+    };
 
     const handleEventProp = (event) => {
-        if (viewCalendar === 'month') return(
-            {style: {
-                backgroundColor: event.color,
-                borderColor: event.borderColor,
-                height: event.height,
-                alignItems: 'center',
-                justifyContent: 'center',
-                alignSelf: 'center',
-                justifySelf: 'center',
-                fontSize: '0.9em',
-            }}
+        if (viewCalendar === 'month') return (
+            {
+                style: {
+                    backgroundColor: event.color,
+                    borderColor: event.borderColor,
+                    height: event.height,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    alignSelf: 'center',
+                    justifySelf: 'center',
+                    fontSize: '0.9em',
+                    textAlign: 'center'
+                }
+            }
         );
-        else if (viewCalendar === 'week' || viewCalendar === 'day') return(
-            {style: {
-                backgroundColor: event.color,
-                borderColor: event.borderColor,
-                height: event.height,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: '33%',
-                marginRight: '22%',
-                minWidth: '0%',
-                width: '40%',
-                maxWidth: '45%',
-                alignSelf: 'center',
-                justifySelf: 'center',
-            }}
+        else if (viewCalendar === 'week' || viewCalendar === 'day') return (
+            {
+                style: {
+                    backgroundColor: event.color,
+                    borderColor: event.borderColor,
+                    height: event.height,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    alignSelf: 'center',
+                    justifySelf: 'center',
+                    textAlign: 'center'
+                }
+            }
         );
     }
+    const Transition = React.forwardRef(function Transition(props, ref) {
+        return <Slide direction="up" ref={ref} {...props} />;
+    });
 
-    return ( officeIndex === -1 ? 
+    return (officeIndex === -1 ?
         <>
-            <Typography 
-                className={classes.title} 
-                style={{margin: '1em 0em'}} 
+            <Typography
+                className={classes.title}
+                style={{ margin: '1em 0em' }}
                 align='center'
-                >
-                    {offices.length !== 0 ? 'Please choose the office you want to take visit time' : 'There is no office to choose'}
-                </Typography>
+            >
+                {offices.length !== 0 ? 'Please choose the office you want to take visit time' : 'There is no office to choose'}
+            </Typography>
             <Grid container direction='row' justify='center' alignItems='center'>
                 {offices.map((office, index) => (
-                    <Grid item xs={12} style={{padding: '0.5em 1em'}}>
-                        <Button  className={classes.cardbutton} onClick={() => goToOffice(index)} key={index}>
-                            <Paper className={classes.paper} 
+                    <Grid item xs={12} style={{ padding: '0.5em 1em' }}>
+                        <Button className={classes.cardbutton} onClick={() => goToOffice(index)} key={index}>
+                            <Paper className={classes.paper}
                                 onMouseEnter={() => setPaperElav(index)}
                                 onMouseLeave={() => setPaperElav(-1)}
                                 elevation={paperElav === index ? 10 : 1}
@@ -534,14 +550,14 @@ const ChangeEventState = (event) => {
             </Grid>
         </>
         :
-        <Grid container  spacing={1} direction='row' className={classes.officegrid} justify='center'>
+        <Grid container spacing={1} direction='row' className={classes.officegrid} justify='center'>
             <Grid item xs={12} container direction='row' className={classes.sidebar} justify='flex-start' alignItems='center' spacing={1}>
                 <Grid item>
-                    <IconButton 
-                        onClick={backToList} 
+                    <IconButton
+                        onClick={backToList}
                         className={classes.backicon}
-                        >
-                            <ArrowBackIcon />
+                    >
+                        <ArrowBackIcon />
                     </IconButton>
                 </Grid>
                 {calendarMode ?
@@ -550,15 +566,15 @@ const ChangeEventState = (event) => {
                             onClick={() => setFullscreenMode(!fullscreenMode)}
                             className={classes.fullscreenicon}
                         >
-                            {fullscreenMode ? <FullscreenExitIcon/> : <FullscreenIcon/>}
+                            {fullscreenMode ? <FullscreenExitIcon /> : <FullscreenIcon />}
                         </IconButton>
-                    </Grid> 
+                    </Grid>
                     :
                     <></>
                 }
             </Grid>
             {!calendarMode ?
-                <Grid item xs={11} container direction='row' spacing={2} style={{marginTop: '0em'}}> 
+                <Grid item xs={11} container direction='row' spacing={2} style={{ marginTop: '0em' }}>
                     <Grid item xs={12}>
                         <Box >
                             <MyTextField
@@ -600,7 +616,7 @@ const ChangeEventState = (event) => {
                                 value={phone}
                                 fullWidth
                                 disabled
-                                label={'Phone No.' + (index+1)}
+                                label={'Phone No.' + (index + 1)}
                                 className={classes.textfield}
                                 InputProps={{
                                     startAdornment: (
@@ -610,15 +626,15 @@ const ChangeEventState = (event) => {
                                     ),
                                 }}
                             />
-                        
-                        </Grid> 
+
+                        </Grid>
                     ))}
                     <Grid item xs={12} container justify='center'>
-                        <Button 
+                        <Button
                             className={classes.button2}
                             onClick={() => setCalendarMode(true)}
-                            >
-                                Take a visit time from this office
+                        >
+                            Take a visit time from this office
                         </Button>
                     </Grid>
                 </Grid>
@@ -660,7 +676,7 @@ const ChangeEventState = (event) => {
                             min={minTime}
                             max={maxTime}
                             onSelectEvent={ChangeEventState}
-                            onSelectSlot={slotInfo => {}}
+                            onSelectSlot={slotInfo => { }}
                             onView={handleOnView}
                             onNavigate={handleOnNavigate}
                             onDrillDown={handleOnDrilldown}
@@ -673,9 +689,31 @@ const ChangeEventState = (event) => {
                             showMultiDayTimes
                             startAccessor="start"
                             endAccessor="end"
-                            //titleAccessor={(event) => {return event.title + '\n' + event.color}}
-                            //drilldownView='day'
+                        //titleAccessor={(event) => {return event.title + '\n' + event.color}}
+                        //drilldownView='day'
                         />
+                        {ReserveEvent &&
+                            <Dialog fullWidth open={ReserveConfirmOpen} TransitionComponent={Transition} keepMounted onClose={handleReserveConfirmClose}>
+                                <DialogTitle>{"Reserve Confirmation"}</DialogTitle>
+                                <DialogContent><DialogContentText>Are you sure you want to take a visit time on {ReserveEvent.start.toLocaleString()} ?</DialogContentText></DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleReserveConfirmClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={() => {
+                                        ReserveEvent.title = viewCalendar !== 'month' ? 'Reserved' : '✘';
+                                        ReserveEvent.color = '#8ab6d6';
+                                        ReserveEvent.borderColor = 'blue';
+                                        ReserveEvent.AvailableState = false;
+                                        callTakeReserve(ReserveConfirmOpen);
+                                        handleReserveConfirmClose();
+                                    }}
+                                        style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                        Confirm
+                                </Button>
+                                </DialogActions>
+                            </Dialog>
+                        }
                     </Grid>
                 </>
             }
