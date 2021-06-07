@@ -61,9 +61,19 @@ const callGetOfficeAPI = async (doctorid, isRemembered) => {
     }
 }
 
-const callEditOfficeAPI = async (data, isRemembered) => {
+const callEditOfficeAPI = async (officeid, data, isRemembered) => {
     try {
-        const response = callAPIHandler({ method: "PUT", url: `/auth/office-list/`, data: data }, true, isRemembered);
+        const response = callAPIHandler({ method: "PUT", url: `/auth/office-detail/${officeid}/`, data: data }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const callDeleteOfficeAPI = async (officeid, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "DELETE", url: `/auth/office-detail/${officeid}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -400,9 +410,9 @@ export default function Offices(props) {
         }
     }
 
-    const callEditOffice = async (data) => {
+    const callEditOffice = async (officeid, data) => {
         try {
-            const response = await callEditOfficeAPI( data, isRemembered);
+            const response = await callEditOfficeAPI(officeid, data, isRemembered);
             if (response.status === 201) {
             }
         }
@@ -998,10 +1008,14 @@ export default function Offices(props) {
 
     const removeOffice = (index) => {
         if (index === -1) {
+            offices.map((office) => {
+                callDeleteOfficeAPI(office.id, isRemembered);
+            });
             setOffices([]);
             setPaperElav(1);
         }
         else {
+            callDeleteOfficeAPI(offices[index].id, isRemembered);
             let newOffices = offices;
             newOffices.splice(index, 1);
             setOffices(newOffices);
@@ -1046,7 +1060,7 @@ export default function Offices(props) {
             location: 0,
             phone: phone,
         }
-        callEditOffice(data);
+        callEditOffice(offices[officeIndex].id, data);
     };
 
     const cancelChanges = () => {
