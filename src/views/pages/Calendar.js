@@ -50,6 +50,25 @@ const ViewProfile = (username) => {
 //     </Button>)
 // }
 
+function getRandomColor(colorNum, colorsArr) {
+    const letters = '0123456789ABCDEF';
+    let colors = [];
+    for (let i = 0; i < colorNum; i++)
+    {
+        let color = '#';
+        for (var j = 0; j < 6; j++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        if (!colorsArr.includes(color)) {
+            colors.push(color);
+        }
+        else {
+            i--;
+        }
+    }
+    return colors;
+}
+
 function CalendarPage({ isRemembered }) {
     const classes = useStyles();
     const localizer = momentLocalizer(moment);
@@ -63,6 +82,7 @@ function CalendarPage({ isRemembered }) {
     const [events, setEvents] = useState(null);
     const [range, setRange] = useState(null);
     const [minVisitDuration, setMinVisitDuration] = useState(30);
+    const [doctorColors, setDoctorColors] = useState([]);
 
     const getDateElements = (date_time_str) => {
         const date_str = date_time_str.split("T")[0];
@@ -98,18 +118,40 @@ function CalendarPage({ isRemembered }) {
                 setEvents(response.payload);
                 // const first_start = getDateElements(response.payload[0].start_time);
                 // const first_end = getDateElements(response.payload[0].end_time);
+                let Ids = [];
+                doctorColors.forEach(el => {Ids.push(el.username)});
+                let colorIds = [];
+                doctorColors.forEach(el => {colorIds.push(el.color)});
+                let newIds = [];
+                console.log(doctorColors);
                 let minimum_visit_time = response.payload.length > 0 ? moment(response.payload[0].end_time).diff(moment(response.payload[0].start_time), 'minutes') : 30;
                 response.payload.forEach(element => {
                     const diff = moment(element.end_time).diff(moment(element.start_time), 'minutes');
                     minimum_visit_time = minimum_visit_time > diff ? diff : minimum_visit_time;
+                    if (!Ids.includes(element.doctor.user.username) && !newIds.includes(element.doctor.user.username)) {
+                        newIds.push(element.doctor.user.username);
+                    }
                 });
+                console.log("SSSSS");
+                console.log(newIds);
+                console.log(doctorColors);
+                console.log(Ids);
+                // const colorsArr = [...colorIds];
+                // console.log(colorsArr);
+                let newColors = doctorColors;
+                getRandomColor(newIds.length, colorIds).forEach((color, index) => {
+                    newColors.push({username: newIds[index], color: color});
+                })
+                console.log("AAAAA");
+                setDoctorColors(newColors);
                 setMinVisitDuration(minimum_visit_time);
+                console.log("COLORS\n", colorIds);
                 // console.log(minimum_visit_time);
             }
         }
-        catch
+        catch (e)
         {
-            console.log("error on get reserve");
+            console.log("error on get reserve\n", e);
         }    
     }
 
@@ -132,10 +174,11 @@ function CalendarPage({ isRemembered }) {
     }
 
     const handleEventProp = (event) => {
+        // console.log("EVENT_COLORS\n", event.resource ? event.resource : "N/A");
         if (view === 'month') return (
             {
                 style: {
-                    backgroundColor: "#90ee90",
+                    backgroundColor: event.resource && event.resource.doctor_username && doctorColors.length > 0 ? doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : "#90ee90",
                     borderColor: "#252e7f",
                     height: event.height,
                     alignItems: 'start',
@@ -149,7 +192,7 @@ function CalendarPage({ isRemembered }) {
         else if (view === 'week' || view === 'day') return (
             {
                 style: {
-                    backgroundColor: "#90ee90",
+                    backgroundColor: event.resource && event.resource.doctor_username && doctorColors.length > 0 ? doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : "#90ee90",
                     borderColor: "#252e7f",
                     height: event.height,
                     alignSelf: 'start',
@@ -209,12 +252,13 @@ function CalendarPage({ isRemembered }) {
                                         'allDay': false,
                                         'title': `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`,
                                         'resource': {
-                                            docotor_username: event.doctor.user.username,
+                                            doctor_username: event.doctor.user.username,
+                                            doctor_id: event.doctor.user.id,
                                         }
                                     }
                                 }) : []
                                 }
-                                step={30}
+                                step={minVisitDuration}
                                 showMultiDayTimes
                                 min={minTime}
                                 max={maxTime} 
