@@ -25,6 +25,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import { callGetDoctorOfficeRerservationsList } from "../../core/modules/calendarAPICalls";
+import { Redirect } from 'react-router-dom';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -49,14 +50,14 @@ const ViewProfile = (username) => {
 }
 
 const EventButton = ({ children }) => {
-    return(
-    children.AvailableState === null ?
-        <Link
-            to="/view-profile">
-            {children}
-        </Link>
-        :
-        <div>{children}</div>
+    return (
+        children.AvailableState === null ?
+            <Link
+                to="/view-profile">
+                {children}
+            </Link>
+            :
+            <div>{children}</div>
     )
 }
 
@@ -143,7 +144,7 @@ function DoctorCalendarPage({ isRemembered }) {
             return str;
     }
 
-    const callGetDoctorRerserve = async (officeid, VisitTimeDuration, start = 0, end = 30) => {
+    /*const callGetDoctorRerserve = async (officeid, VisitTimeDuration, start = 0, end = 30) => {
         var newMonthEvents = new Array(end);
         var newMonthEventsMapper = {};
         var date = new Date();
@@ -265,7 +266,7 @@ function DoctorCalendarPage({ isRemembered }) {
         setMonthEvents((newMonthEvents));
         setMonthEventsMapper(newMonthEventsMapper);
         setCurrentEvents((newMonthEvents));
-    }
+    }*/
     const [date, setdate] = useState(new Date());
     const handleOnView = (view) => {
         setView(view);
@@ -395,8 +396,166 @@ function DoctorCalendarPage({ isRemembered }) {
     const ChangeEventState = (event) => {
         if (event.username) {
             ViewProfile(event.username);
+            setisRedirct(true);
         }
     }
+    const handleTitleAccessor = (event) => {
+        if (view === 'month') {
+            if (event.greens > 0) {
+                return event.title + '(' + event.greens + ')';
+            }
+            else {
+                return event.title;
+            }
+        }
+        else if (view === 'week') {
+            return null;
+        }
+        else if (view === 'day') {
+            return event.title;
+        }
+    }
+    const callGetDoctorRerserve = async (officeid, VisitTimeDuration, start = 0, end = 90) => {
+        var newMonthEvents = new Array(end);
+        var newMonthEventsMapper = {};
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth();
+        var day = date.getDate() + start;
+        for (var j = start; j < end; j++) {
+            var newEvents = [];
+            var hours = 6;
+            var minutes = 0;
+            var Greens = 0;
+            try {
+                const DAY = new Date(year, month, day);
+                const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth() + 1) + TwoDigits(DAY.getDate());
+                const DAY2 = new Date(year, month, day + 1);
+                const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth() + 1) + TwoDigits(DAY2.getDate());
+                const response = await callGetDoctorOfficeRerservationsList({ office_id: officeid, from_date: from_date, to_date: to_date }, isRemembered)
+                if (response.status === 200) {
+                    const length = Math.floor((18 * 60) / VisitTimeDuration) - 1;
+                    const base = (6 * 60) + 0;
+                    for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                        newEvents.push(
+                            {
+                                'title': '',
+                                'titleweek': '✘',
+                                'allDay': false,
+                                'start': new Date(year, month, day, hours, minutes),
+                                'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
+                                'AvailableState': false,
+                                'id': -2,
+                                'events': [],
+                                'color': '#fb3640',
+                                'borderColor': 'red',
+                            }
+                        );
+                        minutes += VisitTimeDuration;
+                    }
+
+                    var minutes = 0;
+                    response.payload.map((reserve, index) => {
+                        var sd0 = getDateElements(reserve.start_time);
+                        var sd = new Date(sd0.year, sd0.month - 1, sd0.day, sd0.hour, sd0.minute);
+                        const startDate = sd;
+                        const start = (startDate.getHours() * 60) + startDate.getMinutes();
+                        const startIndex = (start - base) / VisitTimeDuration;
+                        var ed0 = getDateElements(reserve.end_time);
+                        var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
+                        const patient = reserve.patient;
+                        if (!patient) {
+                            Greens += 1;
+                        }
+                        newEvents[startIndex] = patient ?
+                            (
+                                {
+                                    'title': 'Reserved by ' + patient.user.username,
+                                    'titleweek': 'Reserved',
+                                    'allDay': false,
+                                    'start': sd,
+                                    'end': ed,
+                                    'AvailableState': null,
+                                    'username': patient.user.username,
+                                    'id': reserve.id,
+                                    'events': [],
+                                    'color': '#8ab6d6',
+                                    'borderColor': 'blue',
+                                }
+                            )
+                            :
+                            (
+                                {
+                                    'title': '',
+                                    'titleweek': '✔',
+                                    'allDay': false,
+                                    'start': sd,
+                                    'end': ed,
+                                    'AvailableState': true,
+                                    'id': reserve.id,
+                                    'events': [],
+                                    'color': 'lightgreen',
+                                    'borderColor': 'green',
+                                }
+                            );
+                    });
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+            const mydate = new Date(year, month, day, 6, 0);
+            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+            newMonthEvents[j] = Greens === 0 ?
+                (
+                    {
+                        'title': 'Unavailable',
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': false,
+                        'id': -1,
+                        'greens': 0,
+                        'events': newEvents,
+                        'color': '#fb3640',
+                        'borderColor': 'red',
+                        'height': '5em',
+                    }
+                )
+                :
+                (
+                    {
+                        'title': `Available`,
+                        'allDay': false,
+                        'start': new Date(year, month, day, 6, 0),
+                        'end': new Date(year, month, day, 23, 30),
+                        'AvailableState': true,
+                        'id': -1,
+                        'greens': Greens,
+                        'events': newEvents,
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                        'height': '5em',
+                    }
+                );
+            //alert(j + ' ' + newEvents.length);
+            newMonthEventsMapper[index] = j;
+            day += 1;
+            setCurrentEvents(newMonthEvents);
+            seta(a + 1);
+        }
+        setMonthEvents((newMonthEvents));
+        setMonthEventsMapper(newMonthEventsMapper);
+        setCurrentEvents((newMonthEvents));
+    }
+    useEffect(() => {
+        seta(0);
+    }, [a])
+    const [isRedirct, setisRedirct] = useState(false);
+    if (isRedirct) {
+        return (<Redirect to="view-profile" />);
+    }
+
     return (
         <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
@@ -425,6 +584,7 @@ function DoctorCalendarPage({ isRemembered }) {
                             </FormControl>
                             <Calendar style={{ height: '37rem' }}
                                 localizer={localizer}
+                                titleAccessor={handleTitleAccessor}
                                 view={view}
                                 views={['month', 'week', 'day']}
                                 date={date}
