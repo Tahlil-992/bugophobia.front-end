@@ -51,6 +51,50 @@ const ViewProfile = (username) => {
 //     </Button>)
 // }
 
+const specializationMap = (spec) => {
+    switch (spec) {
+        case 'C': return 'Cardiologist';
+        case 'D': return 'Dermatologist';
+        case 'G': return 'General Practitioner';
+        case 'GY': return 'Gynecologist';
+        case 'I': return 'Internist';
+        case 'N': return 'Neurologist';
+        case 'O': return 'Obstetrician';
+        case 'OP': return 'Ophthalmologist';
+        case 'OT': return 'Otolaryngologist';
+        case 'P': return 'Pediatrician';
+        case 'PS': return 'Psychiatrist';
+        case 'U': return 'Urologist';
+        default: return '';
+    }
+}
+
+const specStr = (spec) => spec !== '' ? `, ${spec}` : '';
+
+function EventAgenda({ event }) {
+    return (
+      <span style={{lineHeight: "0.75em"}}>
+        <em style={{ color: event.resource.bgColor }}>Visit time with Dr.{event.resource.doctor_fname} {event.resource.doctor_lname}{specStr(specializationMap(event.resource.spec))}</em>
+        <br/>
+        <em>At office : {event.resource.office.title}</em>
+        <br/>
+        <em>Located at : {event.resource.office.address}.</em>
+      </span>
+    )
+}
+
+function TimeAgenda({ event }) {
+    const sh = event.start.getHours();
+    const sm = event.start.getMinutes();
+    const eh = event.end.getHours();
+    const em = event.end.getMinutes();
+    return ( 
+    <span>
+        <em>{
+        `${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`}</em>
+    </span>);    
+}
+
 function getRandomColor(colorNum, colorsArr) {
     const letters = '0123456789ABCDEF';
     let colors = [];
@@ -79,7 +123,7 @@ function CalendarPage({ isRemembered }) {
     maxTime.setHours(23,30,0);  
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [view, setView] = useState(calendar_views.agenda);
+    const [view, setView] = useState(calendar_views.month);
     const [events, setEvents] = useState(null);
     const [range, setRange] = useState(null);
     const [minVisitDuration, setMinVisitDuration] = useState(30);
@@ -180,7 +224,7 @@ function CalendarPage({ isRemembered }) {
                 style: {
                     backgroundColor: doctorColors.length > 0 ? 
                         doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : 
-                        "#90ee90",
+                        "#e0e0e0",
                     borderColor: "#252e7f",
                     height: event.height,
                     alignItems: 'start',
@@ -196,12 +240,20 @@ function CalendarPage({ isRemembered }) {
                 style: {
                     backgroundColor: doctorColors.length > 0 ? 
                         doctorColors[doctorColors.findIndex(x => x.username === event.resource.doctor_username)].color : 
-                        "#90ee90",
+                        "#e0e0e0",
                     borderColor: "#252e7f",
                     height: event.height,
                     alignSelf: 'start',
                     justifySelf: 'start',
                     textAlign: 'start'
+                }
+            }
+        );
+        else return (
+            {
+                style: {
+                    fontStyle: "Italic",
+                    color: "black",
                 }
             }
         );
@@ -222,7 +274,7 @@ function CalendarPage({ isRemembered }) {
         const lastDay = new Date(y, m + 1, 0);
         setStartDate(firstDay);
         setEndDate(lastDay);
-        // setView(calendar_views.month);
+        getPatientReservationsList(firstDay, lastDay);
     }, []);
     
     return (
@@ -263,12 +315,19 @@ function CalendarPage({ isRemembered }) {
                                             end_date_obj.minute,
                                         ),
                                         'allDay': false,
-                                        'title': view === calendar_views.day ?
-                                            `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}`:
-                                            (view === calendar_views.month ? `Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}` : ''),
+                                        'title': view === calendar_views.day || view === calendar_views.agenda ?
+                                            `Visit time set with Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name} at office : ${event.office.title}, located at : ${event.office.address}`:
+                                            (view === calendar_views.month ? `Dr.${event.doctor.user.first_name} ${event.doctor.user.last_name}, ${event.office.title}` : ''),
                                         'resource': {
                                             doctor_username: event.doctor.user.username,
+                                            doctor_fname: event.doctor.user.first_name,
+                                            doctor_lname: event.doctor.user.last_name,
                                             doctor_id: event.doctor.user.id,
+                                            office: event.office,
+                                            bgColor: doctorColors.length > 0 ? 
+                                                doctorColors[doctorColors.findIndex(x => x.username === event.doctor.user.username)].color : 
+                                                "#90ee90",
+                                            spec: event.doctor.filed_of_specialization,
                                         }
                                     }
                                 }) : []
@@ -279,9 +338,15 @@ function CalendarPage({ isRemembered }) {
                                 max={maxTime} 
                                 startAccessor="start"
                                 endAccessor="end"
-                                // components={{
-                                //     eventWrapper: EventButton,
-                                // }}
+                                components={{
+                                    // eventWrapper: EventButton,
+                                    agenda: {
+                                        event: EventAgenda,
+                                        time: TimeAgenda,
+                                        
+                                    }
+                                }}
+                                // dayPropGetter={{style: {fontSyle: "italic"}}}
                                 eventPropGetter={handleEventProp}
                                 onSelectEvent={(event) => {ViewProfile(event.resource.docotor_username);}}
                                 popup
@@ -290,7 +355,9 @@ function CalendarPage({ isRemembered }) {
                                     const sm = event.start.getMinutes();
                                     const eh = event.end.getHours();
                                     const em = event.end.getMinutes();
-                                    return `${event.title}\nTime: ${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`;                                    
+                                    return view === calendar_views.month ?
+                                        `${event.title}\nTime: ${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`:
+                                        (view === calendar_views.week ? `Dr.${event.resource.doctor_fname} ${event.resource.doctor_lname}, ${event.resource.office.title}`: '');                                    
                                 }}
                             />
                         </div>
