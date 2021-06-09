@@ -420,9 +420,9 @@ function Explore({ signOut }) {
     }
     const handeDeleteAccount = () => {
         callDeleteAccountAPI(username, isDoctor, isRemembered);
+        signOut();
         resetLocalStorage();
         resetSessionStorage();
-        signOut();
         document.location.reload();
     }
     const [cards, setcards] = useState([]);
