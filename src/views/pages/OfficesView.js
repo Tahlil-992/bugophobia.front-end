@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button, Grid, IconButton, makeStyles, Paper, TextareaAutosize, TextField, Typography, withStyles } from "@material-ui/core";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
@@ -29,7 +29,7 @@ const MyTextField = withStyles({
     }
 })(TextField);
 
-const callGetOfficeAPI = async (doctorid, isRemembered) => {
+ const callGetOfficeAPI = async (doctorid, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/office-list/${doctorid}/` }, true, isRemembered);
         return response;
@@ -37,7 +37,7 @@ const callGetOfficeAPI = async (doctorid, isRemembered) => {
     catch (e) {
         throw e;
     }
-}
+} 
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -169,11 +169,14 @@ export default function OfficesView(props) {
     const [monthEvents, setMonthEvents] = [props.monthEvents, props.setMonthEvents];
     const [monthEventsMapper, setMonthEventsMapper] = [props.monthEventsMapper, props.setMonthEventsMapper];
     const [currentEvents, setCurrentEvents] = [props.currentEvents, props.setCurrentEvents];
+    const [offices, setOffices] = [props.offices, props.setOffices];
+    const [re, setRe] = [props.re, props.setRe];
 
     const classes = useStyles();
-
-    const [offices, setOffices] = useState([]);
+    
     const [a, seta] = useState(0);
+    const [redirected, setRedirected] = useState(0);
+    const bottomRef = useRef();
 
     useEffect(() => {
         seta(0);
@@ -308,8 +311,7 @@ export default function OfficesView(props) {
             var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
             var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
             if (index !== undefined) {
-                const patient = reserve.patient;
-                if (!patient) {
+                if (monthEvents[index].events[startIndex].AvailableState === false) {
                     if (monthEvents[index].greens === 0) {
                         monthEvents[index].title = 'Available';
                         monthEvents[index].AvailableState = true;
@@ -317,39 +319,19 @@ export default function OfficesView(props) {
                         monthEvents[index].borderColor = 'green';
                     }
                     monthEvents[index].greens += 1;
+                    monthEvents[index].events[startIndex] = ({
+                        'title': '',
+                        'titleweek': '✔',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': true,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                    });
                 }
-                monthEvents[index].events[startIndex] = patient ?
-                    (
-                        {
-                            'title': 'Reserved by ' + patient.user.username,
-                            'titleweek': 'Reserved',
-                            'allDay': false,
-                            'start': sd,
-                            'end': ed,
-                            'AvailableState': null,
-                            'username': patient.user.username,
-                            'id': reserve.id,
-                            'events': [],
-                            'color': '#8ab6d6',
-                            'borderColor': 'blue',
-                        }
-                    )
-                    :
-                    (
-                        {
-                            'title': '',
-                            'titleweek': '✔',
-                            'allDay': false,
-                            'start': sd,
-                            'end': ed,
-                            'AvailableState': true,
-                            'id': reserve.id,
-                            'events': [],
-                            'color': 'lightgreen',
-                            'borderColor': 'green',
-                        }
-                    );
-
             }
         });
         //seta(a+1); 
@@ -489,33 +471,6 @@ export default function OfficesView(props) {
         }
     };
 
-    const getAvailableTimes = () => {
-        try {
-            const response = callListAllReservationsAvailableToPatients({ id: doctorid }, isRemembered);
-        }
-        catch (error) {
-
-        }
-    }
-
-    useEffect(() => {
-        //getAvailableTimes();
-    }, [])
-
-    const getReservedTimes = () => {
-        try {
-            const td = '20210423';
-            const response = callGetDoctorRerservationsList({ from_date: td, to_date: '20210521' }, isRemembered);
-        }
-        catch (error) {
-
-        }
-    }
-
-    useEffect(() => {
-        //getReservedTimes();
-    }, [])
-
     const formats = {
         eventTimeRangeFormat: () => {
             return null;
@@ -543,15 +498,10 @@ export default function OfficesView(props) {
             setCurrentEvents(monthEvents);
         }
         else if (dates.length === 1) {
-
             const index = monthEventsMapper['' + dates[0].getFullYear() + TwoDigits(dates[0].getMonth()) + TwoDigits(dates[0].getDate())];
-            //alert('... ' + index);
             if (index !== undefined) {
-                //alert(monthEvents[index].events[0].start + ' ' + monthEvents[index].events[0].end);
                 setCurrentEvents(monthEvents[index].events);
                 monthEvents[index].events.map((event) => console.log(event.start.toLocaleString()));
-                //alert(monthEvents[index].events[0].start.toString());
-                //alert('... ' + monthEvents[index].events[0].start);
             }
             else {
                 setCurrentEvents([]);
@@ -584,6 +534,46 @@ export default function OfficesView(props) {
         }
         else if (viewCalendar === 'day') {
             return event.title;
+        }
+    }
+
+    const blockMaker = (date) => {
+        const hour = date.getHours();
+        if (hour < 10) {
+            return 'start';
+        }
+        else if (hour < 18) {
+            return 'center';
+        }
+        else {
+            return 'end';
+        }
+    }
+
+    if (re) {
+        if (redirected === 0 && localStorage.getItem("viewedOffice") && officeIndex >= 0) {
+            setRedirected(1);
+            goToOffice(officeIndex);
+        }
+
+        if (redirected === 1 && localStorage.getItem("viewedOffice") && officeIndex >= 0) {
+            setRedirected(2);
+            const md = getDateElements(localStorage.getItem("viewedEventDate"));
+            const myDate = new Date(md.year, md.month-1, md.day, md.hour, md.minute);
+            handleOnRangeChange([myDate]);
+            handleOnView('day');
+            handleOnNavigate(myDate);
+        }
+
+        if (redirected === 2 && localStorage.getItem("viewedOffice") && bottomRef.current) {
+            setRedirected(3);
+            setRe(false);
+            const md = getDateElements(localStorage.getItem("viewedEventDate"));
+            const myDate = new Date(md.year, md.month-1, md.day, md.hour, md.minute);
+            bottomRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: blockMaker(myDate),
+            });
         }
     }
 
@@ -776,8 +766,8 @@ export default function OfficesView(props) {
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} className={classes.container}>
-                        <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
+                    <Grid item xs={12} className={classes.container} ref={bottomRef}>
+                        <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}} 
                             titleAccessor={handleTitleAccessor}
                             localizer={localizer}
                             views={['month', 'week', 'day']}
