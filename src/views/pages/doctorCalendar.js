@@ -144,129 +144,136 @@ function DoctorCalendarPage({ isRemembered }) {
             return str;
     }
 
-    /*const callGetDoctorRerserve = async (officeid, VisitTimeDuration, start = 0, end = 30) => {
-        var newMonthEvents = new Array(end);
-        var newMonthEventsMapper = {};
+    const RedMaker = (VisitTimeDuration) => {
+        setCurrentEvents(monthEvents);
+        const toDay = 30;
         var date = new Date();
-        var year = date.getFullYear();
+        var year = date.getFullYear(); 
         var month = date.getMonth();
-        var day = date.getDate() + start;
-        for (var j = start; j < end; j++) {
+        var day = date.getDate();
+        for (var j = 0; j < toDay; j++) {
             var newEvents = [];
             var hours = 6;
             var minutes = 0;
-            var allred = true;
-            try {
-                const DAY = new Date(year, month, day);
-                const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth() + 1) + TwoDigits(DAY.getDate());
-                const DAY2 = new Date(year, month, day + 1);
-                const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth() + 1) + TwoDigits(DAY2.getDate());
-                const response = await callGetDoctorOfficeRerservationsList({ office_id: officeid, from_date: from_date, to_date: to_date }, isRemembered)
-                if (response.status === 200) {
-                    const length = Math.floor((18 * 60) / VisitTimeDuration) - 1;
-                    const base = (6 * 60) + 0;
-                    for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
-                        newEvents.push(
-                            {
-                                'title': '✘',
-                                'allDay': false,
-                                'start': new Date(year, month, day, hours, minutes),
-                                'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
-                                'AvailableState': false,
-                                'id': -2,
-                                'events': [],
-                                'color': '#fb3640',
-                                'borderColor': 'red',
-                            }
-                        );
-                        minutes += VisitTimeDuration;
+            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                newEvents.push(
+                    {
+                        'title': '',
+                        'titleweek': '✘',
+                        'allDay': false,
+                        'start': new Date(year, month, day, hours, minutes),
+                        'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
+                        'AvailableState': false,
+                        'id': -2,
+                        'events': [],
+                        'color': '#fb3640',
+                        'borderColor': 'red',
                     }
-
-                    var minutes = 0;
-                    response.payload.map((reserve, index) => {
-                        allred = false;
-                        var sd0 = getDateElements(reserve.start_time);
-                        var sd = new Date(sd0.year, sd0.month - 1, sd0.day, sd0.hour, sd0.minute);
-                        const startDate = sd;
-                        const start = (startDate.getHours() * 60) + startDate.getMinutes();
-                        const startIndex = (start - base) / VisitTimeDuration;
-                        var ed0 = getDateElements(reserve.end_time);
-                        var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
-                        const patient = reserve.patient;
-                        newEvents[startIndex] = patient ?
-                            (
-                                {
-                                    'title': 'Reserved by ' + patient.user.username,
-                                    'allDay': false,
-                                    'start': sd,
-                                    'end': ed,
-                                    'AvailableState': null,
-                                    'username': patient.user.username,
-                                    'id': reserve.id,
-                                    'events': [],
-                                    'color': '#8ab6d6',
-                                    'borderColor': 'blue',
-                                }
-                            )
-                            :
-                            (
-                                {
-                                    'title': '✔',
-                                    'allDay': false,
-                                    'start': sd,
-                                    'end': ed,
-                                    'AvailableState': true,
-                                    'id': reserve.id,
-                                    'events': [],
-                                    'color': 'lightgreen',
-                                    'borderColor': 'green',
-                                }
-                            );
-                    });
-                }
-            }
-            catch (error) {
-                console.log(error);
+                );
+                minutes += VisitTimeDuration; 
             }
             const mydate = new Date(year, month, day, 6, 0);
             const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = allred ?
-                ({
-                    'title': 'Unavailable',
-                    'allDay': false,
-                    'start': new Date(year, month, day, 6, 0),
-                    'end': new Date(year, month, day, 23, 30),
-                    'AvailableState': false,
-                    'id': -1,
-                    'events': newEvents,
-                    'color': '#fb3640',
-                    'borderColor': 'red',
-                    'height': '5em',
-                })
+            monthEvents[j] =({
+                'title': 'Unavailable',
+                'allDay': false,
+                'start': new Date(year, month, day, 6, 0),
+                'end': new Date(year, month, day, 23, 30),
+                'AvailableState': false,
+                'id': -1,
+                'greens': 0,
+                'events': newEvents,
+                'color': '#fb3640',
+                'borderColor': 'red',
+                'height': '5em',
+            }); 
+            monthEventsMapper[index] = j;
+            day += 1;
+        }
+        seta(a+1);
+    }
+
+    const Updater = (payload, VisitTimeDuration) => {
+        const base = (6*60) + 0;
+        payload.map((reserve) => {
+            var sd0 = getDateElements(reserve.start_time);
+            var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
+            const start = (sd.getHours()*60) + sd.getMinutes();
+            const startIndex = (start - base) / VisitTimeDuration;
+            var ed0 = getDateElements(reserve.end_time);
+            var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
+            var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
+            if (index !== undefined) {
+                const patient = reserve.patient;
+                if (!patient) {
+                    if (monthEvents[index].greens === 0) {
+                        monthEvents[index].title = 'Available';
+                        monthEvents[index].AvailableState = true;
+                        monthEvents[index].color = 'lightgreen';
+                        monthEvents[index].borderColor = 'green';
+                    }
+                    monthEvents[index].greens += 1;
+                }
+                monthEvents[index].events[startIndex] = patient ?
+                (
+                    {
+                        'title': 'Reserved by ' + patient.user.username,
+                        'titleweek': 'Reserved',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': null,
+                        'username': patient.user.username,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': '#8ab6d6',
+                        'borderColor': 'blue',
+                    }
+                )
                 :
                 (
                     {
-                        'title': 'Available',
+                        'title': '',
+                        'titleweek': '✔',
                         'allDay': false,
-                        'start': new Date(year, month, day, 6, 0),
-                        'end': new Date(year, month, day, 23, 30),
+                        'start': sd,
+                        'end': ed,
                         'AvailableState': true,
-                        'id': -1,
-                        'events': newEvents,
+                        'id': reserve.id,
+                        'events': [],
                         'color': 'lightgreen',
                         'borderColor': 'green',
-                        'height': '5em',
                     }
                 );
-            //alert(j + ' ' + newEvents.length);
-            newMonthEventsMapper[index] = j;
-            day += 1;
-            setCurrentEvents(newMonthEvents);
+                
+            }
+        });
+        //seta(a+1); 
+    }
+
+    const callGetDoctorRerserve = async (officeid, VisitTimeDuration) => {
+        const toDay = 30;
+        const DAY = new Date();
+        const year = DAY.getFullYear();
+        const month = DAY.getMonth();
+        const day = DAY.getDate();
+        RedMaker(VisitTimeDuration);
+        try {
+            const DAY1 = DAY;
+            const from_date = '' + DAY1.getFullYear() + TwoDigits(DAY1.getMonth()+1) + TwoDigits(DAY1.getDate());
+            const DAY2 = new Date(year, month, day + toDay);
+            const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth()+1) + TwoDigits(DAY2.getDate());
+            const response = await callGetDoctorOfficeRerservationsList({ office_id: officeid, from_date: from_date, to_date: to_date }, isRemembered)
+            if (response.status === 200) {
+                Updater(response.payload, VisitTimeDuration);
+                seta(a+1);
+            }
         }
-        setMonthEvents((newMonthEvents));
-        setMonthEventsMapper(newMonthEventsMapper);
-        setCurrentEvents((newMonthEvents));
-    }*/
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     const [date, setdate] = useState(new Date());
     const handleOnView = (view) => {
         setView(view);
@@ -296,7 +303,6 @@ function DoctorCalendarPage({ isRemembered }) {
             setCurrentEvents(monthEvents);
         }
         else if (dates.length === 1) {
-
             const index = monthEventsMapper['' + dates[0].getFullYear() + TwoDigits(dates[0].getMonth()) + TwoDigits(dates[0].getDate())];
             if (index !== undefined) {
                 setCurrentEvents(monthEvents[index].events);
@@ -398,6 +404,11 @@ function DoctorCalendarPage({ isRemembered }) {
             ViewProfile(event.username);
             setisRedirct(true);
         }
+        else if (event.id === -1) {
+            handleOnView('day');
+            handleOnRangeChange([event.start]);
+            handleOnNavigate(event.start);
+        }
     }
     const handleTitleAccessor = (event) => {
         if (view === 'month') {
@@ -415,145 +426,15 @@ function DoctorCalendarPage({ isRemembered }) {
             return event.title;
         }
     }
-    const callGetDoctorRerserve = async (officeid, VisitTimeDuration, start = 0, end = 90) => {
-        var newMonthEvents = new Array(end);
-        var newMonthEventsMapper = {};
-        var date = new Date();
-        var year = date.getFullYear();
-        var month = date.getMonth();
-        var day = date.getDate() + start;
-        for (var j = start; j < end; j++) {
-            var newEvents = [];
-            var hours = 6;
-            var minutes = 0;
-            var Greens = 0;
-            try {
-                const DAY = new Date(year, month, day);
-                const from_date = '' + DAY.getFullYear() + TwoDigits(DAY.getMonth() + 1) + TwoDigits(DAY.getDate());
-                const DAY2 = new Date(year, month, day + 1);
-                const to_date = '' + DAY2.getFullYear() + TwoDigits(DAY2.getMonth() + 1) + TwoDigits(DAY2.getDate());
-                const response = await callGetDoctorOfficeRerservationsList({ office_id: officeid, from_date: from_date, to_date: to_date }, isRemembered)
-                if (response.status === 200) {
-                    const length = Math.floor((18 * 60) / VisitTimeDuration) - 1;
-                    const base = (6 * 60) + 0;
-                    for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
-                        newEvents.push(
-                            {
-                                'title': '',
-                                'titleweek': '✘',
-                                'allDay': false,
-                                'start': new Date(year, month, day, hours, minutes),
-                                'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
-                                'AvailableState': false,
-                                'id': -2,
-                                'events': [],
-                                'color': '#fb3640',
-                                'borderColor': 'red',
-                            }
-                        );
-                        minutes += VisitTimeDuration;
-                    }
-
-                    var minutes = 0;
-                    response.payload.map((reserve, index) => {
-                        var sd0 = getDateElements(reserve.start_time);
-                        var sd = new Date(sd0.year, sd0.month - 1, sd0.day, sd0.hour, sd0.minute);
-                        const startDate = sd;
-                        const start = (startDate.getHours() * 60) + startDate.getMinutes();
-                        const startIndex = (start - base) / VisitTimeDuration;
-                        var ed0 = getDateElements(reserve.end_time);
-                        var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
-                        const patient = reserve.patient;
-                        if (!patient) {
-                            Greens += 1;
-                        }
-                        newEvents[startIndex] = patient ?
-                            (
-                                {
-                                    'title': 'Reserved by ' + patient.user.username,
-                                    'titleweek': 'Reserved',
-                                    'allDay': false,
-                                    'start': sd,
-                                    'end': ed,
-                                    'AvailableState': null,
-                                    'username': patient.user.username,
-                                    'id': reserve.id,
-                                    'events': [],
-                                    'color': '#8ab6d6',
-                                    'borderColor': 'blue',
-                                }
-                            )
-                            :
-                            (
-                                {
-                                    'title': '',
-                                    'titleweek': '✔',
-                                    'allDay': false,
-                                    'start': sd,
-                                    'end': ed,
-                                    'AvailableState': true,
-                                    'id': reserve.id,
-                                    'events': [],
-                                    'color': 'lightgreen',
-                                    'borderColor': 'green',
-                                }
-                            );
-                    });
-                }
-            }
-            catch (error) {
-                console.log(error);
-            }
-            const mydate = new Date(year, month, day, 6, 0);
-            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = Greens === 0 ?
-                (
-                    {
-                        'title': 'Unavailable',
-                        'allDay': false,
-                        'start': new Date(year, month, day, 6, 0),
-                        'end': new Date(year, month, day, 23, 30),
-                        'AvailableState': false,
-                        'id': -1,
-                        'greens': 0,
-                        'events': newEvents,
-                        'color': '#fb3640',
-                        'borderColor': 'red',
-                        'height': '5em',
-                    }
-                )
-                :
-                (
-                    {
-                        'title': `Available`,
-                        'allDay': false,
-                        'start': new Date(year, month, day, 6, 0),
-                        'end': new Date(year, month, day, 23, 30),
-                        'AvailableState': true,
-                        'id': -1,
-                        'greens': Greens,
-                        'events': newEvents,
-                        'color': 'lightgreen',
-                        'borderColor': 'green',
-                        'height': '5em',
-                    }
-                );
-            //alert(j + ' ' + newEvents.length);
-            newMonthEventsMapper[index] = j;
-            day += 1;
-            setCurrentEvents(newMonthEvents);
-            seta(a + 1);
-        }
-        setMonthEvents((newMonthEvents));
-        setMonthEventsMapper(newMonthEventsMapper);
-        setCurrentEvents((newMonthEvents));
-    }
+    
     useEffect(() => {
         seta(0);
-    }, [a])
+    }, [a]);
+
     const [isRedirct, setisRedirct] = useState(false);
+
     if (isRedirct) {
-        return (<Redirect to="view-profile" />);
+        return (<Redirect to="/view-profile" />);
     }
 
     return (
@@ -582,7 +463,7 @@ function DoctorCalendarPage({ isRemembered }) {
                                     ))}
                                 </Select>
                             </FormControl>
-                            <Calendar style={{ height: '37rem' }}
+                            <Calendar style={{ minHeight: '37rem' }}
                                 localizer={localizer}
                                 titleAccessor={handleTitleAccessor}
                                 view={view}

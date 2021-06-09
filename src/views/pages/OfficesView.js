@@ -12,7 +12,7 @@ import moment from 'moment';
 import "../../style.css";
 import { callListAllReservationsAvailableToPatients } from '../../core/modules/calendarAPICalls';
 import { callGetDoctorRerservationsList, callGetReservationAPI } from '../../core/modules/calendarAPICalls';
-//import { callGetReservationAPI } from '../../core/modules/calendarAPICalls';
+import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -95,26 +95,8 @@ const useStyles = makeStyles((theme) => ({
             color: '#fff',
         },
     },
-    fullscreenicon: {
-        //margin: '0.5em',
-        backgroundColor: 'rgba(128, 36, 128, 0.3)',
-        position: 'sticky',
-        top: '0%',
-        transition: 'all 0.1s ease',
-        '&:hover': {
-            backgroundColor: 'rgba(128, 36, 128, 1)',
-            boxShadow: '0px 0px 20px rgba(128, 36, 128, 1)',
-            color: '#fff',
-        },
-    },
     sidebar: {
-        borderRight: '1px solid #aaa',
-        borderLeft: '1px solid #aaa',
         borderBottom: '1px solid #aaa',
-        borderTop: '1px solid #aaa',
-        borderBottomRightRadius: '10px',
-        borderBottomLeftRadius: '10px',
-        //marginLeft: '1em',
         marginBottom: '1em',
     },
     textfield: {
@@ -266,6 +248,143 @@ export default function OfficesView(props) {
         };
     }
 
+    const RedMaker = () => {
+        setCurrentEvents(monthEvents);
+        const toDay = 30;
+        var date = new Date();
+        var year = date.getFullYear(); 
+        var month = date.getMonth();
+        var day = date.getDate();
+        for (var j = 0; j < toDay; j++) {
+            var newEvents = [];
+            var hours = 6;
+            var minutes = 0;
+            for (var i = 0; i < Math.floor((18 * 60) / VisitTimeDuration) - 1; i++) {
+                newEvents.push(
+                    {
+                        'title': '',
+                        'titleweek': '✘',
+                        'allDay': false,
+                        'start': new Date(year, month, day, hours, minutes),
+                        'end': new Date(year, month, day, hours, minutes + VisitTimeDuration),
+                        'AvailableState': false,
+                        'id': -2,
+                        'events': [],
+                        'color': '#fb3640',
+                        'borderColor': 'red',
+                    }
+                );
+                minutes += VisitTimeDuration; 
+            }
+            const mydate = new Date(year, month, day, 6, 0);
+            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
+            monthEvents[j] =({
+                'title': 'Unavailable',
+                'allDay': false,
+                'start': new Date(year, month, day, 6, 0),
+                'end': new Date(year, month, day, 23, 30),
+                'AvailableState': false,
+                'id': -1,
+                'greens': 0,
+                'events': newEvents,
+                'color': '#fb3640',
+                'borderColor': 'red',
+                'height': '5em',
+            }); 
+            monthEventsMapper[index] = j;
+            day += 1;
+        }
+        seta(a+1);
+    }
+
+    const Updater = (payload) => {
+        const base = (6*60) + 0;
+        payload.map((reserve) => {
+            var sd0 = getDateElements(reserve.start_time);
+            var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
+            const start = (sd.getHours()*60) + sd.getMinutes();
+            const startIndex = (start - base) / VisitTimeDuration;
+            var ed0 = getDateElements(reserve.end_time);
+            var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
+            var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
+            if (index !== undefined) {
+                const patient = reserve.patient;
+                if (!patient) {
+                    if (monthEvents[index].greens === 0) {
+                        monthEvents[index].title = 'Available';
+                        monthEvents[index].AvailableState = true;
+                        monthEvents[index].color = 'lightgreen';
+                        monthEvents[index].borderColor = 'green';
+                    }
+                    monthEvents[index].greens += 1;
+                }
+                monthEvents[index].events[startIndex] = patient ?
+                (
+                    {
+                        'title': 'Reserved by ' + patient.user.username,
+                        'titleweek': 'Reserved',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': null,
+                        'username': patient.user.username,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': '#8ab6d6',
+                        'borderColor': 'blue',
+                    }
+                )
+                :
+                (
+                    {
+                        'title': '',
+                        'titleweek': '✔',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': true,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': 'lightgreen',
+                        'borderColor': 'green',
+                    }
+                );
+                
+            }
+        });
+        //seta(a+1); 
+    }
+
+    const patientReserveUpdater = (payload, officeid) => {
+        const base = (6*60) + 0;
+        payload.map((reserve) => {
+            if (reserve.office.id === officeid) {
+                var sd0 = getDateElements(reserve.start_time);
+                var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
+                const start = (sd.getHours()*60) + sd.getMinutes();
+                const startIndex = (start - base) / VisitTimeDuration;
+                var ed0 = getDateElements(reserve.end_time);
+                var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
+                var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
+                if (index !== undefined) {
+                    monthEvents[index].events[startIndex] = ({
+                        'title': 'Reserved by you',
+                        'titleweek': 'Reserved',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': null,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': '#8ab6d6',
+                        'borderColor': 'blue',
+                    });
+                }
+            }
+        });
+        //seta(a+1); 
+    }
+
     const callTakeReserve = (id) => {
         try {
             const response = callGetReservationAPI({ id: id }, isRemembered);
@@ -276,83 +395,44 @@ export default function OfficesView(props) {
     }
 
     const callGetDoctorRerserve = async (officeid) => {
-        const dayTo = 90;
-        var newMonthEvents = new Array(dayTo);
-        var newMonthEventsMapper = {};
-        var newEvents = {};
-        var Greens = {};
-        var date = new Date();
-        var year = date.getFullYear();
-        var month = date.getMonth();
-        var day = date.getDate();
-        const response = await callListAllReservationsAvailableToPatients({ office_id: officeid });
-        response.payload.map((reserve, inx) => {
-            let st = getDateElements(reserve.start_time);
-            let start_time = new Date(st.year, st.month - 1, st.day, st.hour, st.minute);
-            let et = getDateElements(reserve.end_time);
-            let end_time = new Date(et.year, et.month - 1, et.day, et.hour, et.minute);
-            const index = '' + start_time.getFullYear() + TwoDigits(start_time.getMonth()) + TwoDigits(start_time.getDate());
-            if (newEvents[index] === undefined) {
-                newEvents[index] = [];
+        RedMaker();
+        try {
+            const response = await callListAllReservationsAvailableToPatients({ office_id: officeid }, isRemembered);
+            if (response.status === 200) {
+                Updater(response.payload);
+                await getPatientReservationsList(officeid);
+                seta(a+1);
             }
-            if (Greens[index] === undefined) {
-                Greens[index] = 0;
-            }
-            newEvents[index].push({
-                'title': '✔',
-                'allDay': false,
-                'start': start_time,
-                'end': end_time,
-                'AvailableState': true,
-                'id': reserve.id,
-                'events': [],
-                'color': 'lightgreen',
-                'borderColor': 'green',
-            });
-            Greens[index] += 1;
-        });
-        for (var j = 0; j < dayTo; j++) {
-            const mydate = new Date(year, month, day, 6, 0);
-            const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            newMonthEvents[j] = !Greens[index] ?
-                (
-                    {
-                        'title': 'Unavailable',
-                        'allDay': false,
-                        'start': new Date(year, month, day, 6, 0),
-                        'end': new Date(year, month, day, 23, 30),
-                        'AvailableState': false,
-                        'id': -1,
-                        'events': [],
-                        'color': '#fb3640',
-                        'borderColor': 'red',
-                        'height': '5em',
-                    }
-                )
-                :
-                (
-                    {
-                        'title': `Available(${Greens[index]})`,
-                        'allDay': false,
-                        'start': new Date(year, month, day, 6, 0),
-                        'end': new Date(year, month, day, 23, 30),
-                        'AvailableState': true,
-                        'id': -1,
-                        'events': newEvents[index] ? newEvents[index] : [],
-                        'color': 'lightgreen',
-                        'borderColor': 'green',
-                        'height': '5em',
-                    }
-                );
-            day += 1;
-            newMonthEventsMapper[index] = j;
-            setCurrentEvents(newMonthEvents);
-            seta(a + 1);
         }
-        setMonthEvents(newMonthEvents);
-        setMonthEventsMapper(newMonthEventsMapper);
-        setCurrentEvents(newMonthEvents);
+        catch (error) {
+            console.log(error);
+        }
     }
+
+    const getPatientReservationsList = async(officeid) => {
+        const toDay = 30;
+        var start_date = new Date();
+        var end_date = new Date();
+        end_date.setDate(end_date.getDate() + toDay);
+        const start_month = start_date.getMonth() + 1;
+        const end_month = end_date.getMonth() + 1;
+        const start_day = start_date.getDate();
+        const end_day = end_date.getDate();
+        const from_date = `${start_date.getFullYear()}${start_month < 10 ? `0${start_month}` : start_month}${start_day < 10 ? `0${start_day}` : start_day}`;
+        const to_date = `${end_date.getFullYear()}${end_month < 10 ? `0${end_month}` : end_month}${end_day < 10 ? `0${end_day}` : end_day}`;
+        try
+        {
+            const response = await callListPatientReservations({from_date: from_date, to_date: to_date}, isRemembered);
+            if(response.status === 200) {
+                patientReserveUpdater(response.payload, officeid);
+            }
+        }
+        catch (e)
+        {
+            console.log("error on get reserve\n", e);
+        }    
+    }
+
     const [ReserveEvent, setReserveEvent] = useState();
     const ChangeEventState = (event) => {
         if (viewCalendar !== 'month') {
@@ -370,7 +450,6 @@ export default function OfficesView(props) {
             handleOnRangeChange([event.start]);
         }
     }
-
 
     const localizer = momentLocalizer(moment);
     const minTime = new Date();
@@ -480,6 +559,24 @@ export default function OfficesView(props) {
             setCurrentEvents(newEvents);
         }
     }
+
+    const handleTitleAccessor = (event) => {
+        if (viewCalendar === 'month') {
+            if (event.greens > 0) {
+                return event.title + '(' + event.greens + ')';
+            }
+            else {
+                return event.title;
+            }
+        }
+        else if (viewCalendar === 'week') {
+            return event.titleweek;
+        }
+        else if (viewCalendar === 'day') {
+            return event.title;
+        }
+    }
+
     const [ReserveConfirmOpen, setReserveConfirmOpen] = useState(0);
     const handleReserveConfirmOpen = (id) => {
         setReserveConfirmOpen(id);
@@ -564,7 +661,7 @@ export default function OfficesView(props) {
                     <Grid item>
                         <IconButton
                             onClick={() => setFullscreenMode(!fullscreenMode)}
-                            className={classes.fullscreenicon}
+                            className={classes.backicon}
                         >
                             {fullscreenMode ? <FullscreenExitIcon /> : <FullscreenIcon />}
                         </IconButton>
@@ -667,6 +764,7 @@ export default function OfficesView(props) {
                     </Grid>
                     <Grid item xs={12} className={classes.container}>
                         <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
+                            titleAccessor = {handleTitleAccessor}
                             localizer={localizer}
                             views={['month', 'week', 'day']}
                             view={viewCalendar}
