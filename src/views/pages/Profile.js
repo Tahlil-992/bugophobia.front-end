@@ -420,10 +420,10 @@ export default function Profile() {
                     setExperience(nullCheck(payload.work_experience));
                     if (!payload.visit_duration_time) {
                         callChangeVisitDurationTimeAPI({ visit_duration_time: 30 }, isRemembered);
-                        setVisitTimeDuration(30);
                     }
                     else {
                         setVisitTimeDuration(payload.visit_duration_time);
+                        setMainVisitTimeDuration(payload.visit_duration_time);
                     }
                 }
                 else {
@@ -696,6 +696,7 @@ export default function Profile() {
     }
 
     const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
+    const [mainVisitTimeDuration, setMainVisitTimeDuration] = useState(30);
     const [ChangeVisitTimeDuration, setChangeVisitTimeDuration] = useState(false);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -750,7 +751,7 @@ export default function Profile() {
             <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                 <Offices 
                     isRemembered={isRemembered} 
-                    VisitTimeDuration={VisitTimeDuration} 
+                    VisitTimeDuration={mainVisitTimeDuration} 
                     doctorid={doctorid} 
                     got={got}
                     mainUsername={mainUsername}
@@ -859,10 +860,11 @@ export default function Profile() {
                                 {isDoctor &&
                                     <Grid item xs={9} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
                                         <Button className={classes.applyButton} style={{ width: '49%', marginRight: '1%' }}
-                                            disabled={!ChangeVisitTimeDuration}
+                                            disabled={!ChangeVisitTimeDuration || VisitTimeDuration === mainVisitTimeDuration}
                                             onClick={() => {
                                                 setChangeVisitTimeDuration(false);
                                                 callChangeVisitDurationTimeAPI({ visit_duration_time: VisitTimeDuration }, isRemembered);
+                                                setMainVisitTimeDuration(VisitTimeDuration);
                                                 setMessage("Visit duration time changed successfully!");
                                                 setSnackColor([SUCCESS_BACKGROUND, SUCCESS_COLOR]);
                                                 setOpenSnackBar(true);
@@ -870,7 +872,7 @@ export default function Profile() {
                                             Apply Changes
                                         </Button>
                                         <Button className={classes.cancelButton} style={{ width: '49%', marginLeft: '1%' }}
-                                            disabled={!ChangeVisitTimeDuration}
+                                            disabled={!ChangeVisitTimeDuration || VisitTimeDuration === mainVisitTimeDuration}
                                             onClick={() => { setChangeVisitTimeDuration(false); }}>
                                             Cancel
                                         </Button>
@@ -1013,7 +1015,7 @@ export default function Profile() {
                                     {isDoctor ?
                                         <Offices 
                                             isRemembered={isRemembered} 
-                                            VisitTimeDuration={VisitTimeDuration} 
+                                            VisitTimeDuration={mainVisitTimeDuration} 
                                             doctorid={doctorid} 
                                             got={got}
                                             mainUsername={mainUsername}
