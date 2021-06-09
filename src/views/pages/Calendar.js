@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import format from 'date-fns/format';
@@ -37,8 +37,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const ViewProfile = (username) => {
-    setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
+const ViewProfile = (event) => {
+    setLocalStorage(
+        { isvieweddoctor: 'true', 
+        viewedusername: event.resource.doctor_username, 
+        viewedOffice: event.resource.office.id, 
+        viewedEvent: event.resource.event_id});
+
 }
 
 // const EventButton = ({ children }) => {
@@ -128,6 +133,8 @@ function CalendarPage({ isRemembered }) {
     const [range, setRange] = useState(null);
     const [minVisitDuration, setMinVisitDuration] = useState(30);
     const [doctorColors, setDoctorColors] = useState([]);
+
+    const history = useHistory();
 
     const getDateElements = (date_time_str) => {
         const date_str = date_time_str.split("T")[0];
@@ -329,6 +336,7 @@ function CalendarPage({ isRemembered }) {
                                                 doctorColors[doctorColors.findIndex(x => x.username === event.doctor.user.username)].color : 
                                                 "#90ee90",
                                             spec: event.doctor.filed_of_specialization,
+                                            event_id: event.id,
                                         }
                                     }
                                 }) : []
@@ -349,7 +357,7 @@ function CalendarPage({ isRemembered }) {
                                 }}
                                 // dayPropGetter={{style: {fontSyle: "italic"}}}
                                 eventPropGetter={handleEventProp}
-                                onSelectEvent={(event) => {ViewProfile(event.resource.docotor_username);}}
+                                onSelectEvent={(event) => {ViewProfile(event); history.push("/view-profile")}}
                                 popup
                                 tooltipAccessor={(event) => {
                                     const sh = event.start.getHours();
