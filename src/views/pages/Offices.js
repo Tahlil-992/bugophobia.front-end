@@ -1106,7 +1106,7 @@ export default function Offices(props) {
     }
 
     const ViewProfile = (username) => {
-        setLocalStorage({ isvieweddoctor: 'false', viewedusername: username });
+        setLocalStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: ''});
     }
 
     useEffect(() => {
