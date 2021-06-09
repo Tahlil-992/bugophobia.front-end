@@ -95,16 +95,16 @@ function TimeAgenda({ event }) {
     </span>);    
 }
 
+const colorArr = [
+    "#CF6464", "#C5C533", "#2CB32C", "#00FF00", "#33A0A0", "#4DC9C9", "#BA4FBA", "#FF31FF"
+]
+
 function getRandomColor(colorNum, colorsArr) {
-    const letters = '0123456789ABCDEF';
     let colors = [];
     for (let i = 0; i < colorNum; i++)
     {
-        let color = '#';
-        for (var j = 0; j < 6; j++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        if (!colorsArr.includes(color)) {
+        const color = colorArr[Math.floor(Math.random() * colorArr.length)]
+        if (!colorsArr.includes(color) && !colors.includes(color)) {
             colors.push(color);
         }
         else {
@@ -191,6 +191,7 @@ function CalendarPage({ isRemembered }) {
             getRandomColor(newIds.length, colorIds).forEach((color, index) => {
                 newColors.push({username: newIds[index], color: color});
             })
+            console.log(newColors);
             setDoctorColors(newColors);
             setMinVisitDuration(minimum_visit_time);
         }
