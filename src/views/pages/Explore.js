@@ -298,7 +298,16 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         marginTop: '0.6em',
         marginBottom: '0.6em',
-        border: '3px solid #ebebeb'
+    },
+    SearchCardMedia: {
+        height: '10vh',
+        width: '10vh',
+        marginLeft: '0.5em',
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex',
+        marginTop: '0.6em',
+        marginBottom: '0.6em',
     },
     cardContent: {
         flexGrow: 1,
@@ -420,9 +429,9 @@ function Explore({ signOut }) {
     }
     const handeDeleteAccount = () => {
         callDeleteAccountAPI(username, isDoctor, isRemembered);
+        signOut();
         resetLocalStorage();
         resetSessionStorage();
-        signOut();
         document.location.reload();
     }
     const [cards, setcards] = useState([]);
@@ -471,10 +480,23 @@ function Explore({ signOut }) {
                 if (response.status === 200) {
                     let pro_picture = response.payload.pro_picture;
                     if (pro_picture === null) {
-                        proPictures[index] = (card.user.is_doctor ? DoctorImage : PatientImage);
+                        proPictures[card.user.username] = (card.user.is_doctor ? DoctorImage : PatientImage);
                     }
                     else {
-                        proPictures[index] = (pro_picture);
+                        proPictures[card.user.username] = (pro_picture);
+                    }
+                    try {
+                        const response = await getRatingDetailCallAPI({ doctor_id: card.user.id });
+                        if (response.status == 200) {
+                            const payload = response.payload;
+                            rateCount[card.user.username] = (payload.number);
+                            rateAvg[card.user.username] = (payload.avg);
+                            setSent(!sent);
+                        }
+                        setSent(!sent);
+                    }
+                    catch (e) {
+                        console.log(e);
                     }
                 }
             });
@@ -485,28 +507,6 @@ function Explore({ signOut }) {
 
         }
     }
-
-    const callGetDetailRatingAPI = async () => {
-        try {
-            cards.map(async (card, index) => {
-                const response = await getRatingDetailCallAPI({ doctor_id: card.user.id });
-                // console.log(response);
-                if (response.status == 200) {
-                    const payload = response.payload;
-                    rateCount[index] = (payload.number);
-                    //rateCount.push(payload.number);
-                    //rateAvg.push(payload.avg);
-                    rateAvg[index] = (payload.avg);
-                    setSent(!sent);
-                }
-            });
-            setSent(!sent);
-        }
-        catch (e) {
-            console.log(e);
-        }
-    }
-
     const [sent, setSent] = useState(false);
     if (!sent) {
         //callGetAPI();
@@ -520,11 +520,6 @@ function Explore({ signOut }) {
             callProfilePictureGetAPI();
         }
     }, [got]);
-    useEffect(() => {
-        if (got) {
-            callGetDetailRatingAPI();
-        }
-    }, [got])
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleDrawerOpen = () => {
@@ -581,7 +576,6 @@ function Explore({ signOut }) {
         isRemembered = true;
     }
     const theme = useTheme();
-
     const [Drawerstate, setDrawerstate] = React.useState({ right: false });
     const toggleDrawer = (anchor, open) => (event) => {
         if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) { return; }
@@ -705,21 +699,22 @@ function Explore({ signOut }) {
                                                                         className={classes.limitedCard}
                                                                         style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
                                                                         <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
-                                                                            <Grid item xs={4}>
-                                                                                <CardMedia
-                                                                                    className={classes.cardMedia}
-                                                                                    image={DoctorImage}
-                                                                                    title="Image title"
-                                                                                    style={{ paddingBottom: 0, height: "4em", width: "4em", margin: "auto", border: 'none' }} />
+                                                                            <Grid item xs={5} container justify='center'>
+                                                                                <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.username]} />
                                                                             </Grid>
-                                                                            <Grid item xs={8}>
+                                                                            <Grid item xs={7}>
                                                                                 <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
-                                                                                    <Typography variant="h6">
+                                                                                    <Typography align='left' variant="h6">
                                                                                         {list.user.username}
                                                                                     </Typography>
-                                                                                    <Typography>
+                                                                                    <Typography align='left'>
                                                                                         {specializationMap(list.filed_of_specialization)}
                                                                                     </Typography>
+                                                                                    <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
+                                                                                        <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                                            <StarRating val={list.rate_avg} />
+                                                                                        </Paper>
+                                                                                    </Box>
                                                                                 </CardContent>
                                                                             </Grid>
                                                                         </Grid>
@@ -791,7 +786,7 @@ function Explore({ signOut }) {
                                 <ListItemText primary="Profile" />
                             </ListItem>
                         </Link>
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to={ isDoctor ? "/DoctorCalendar" : "/Calendar"}>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to={isDoctor ? "/DoctorCalendar" : "/Calendar"}>
                             <ListItem button onClick={ToCalendar}>
                                 <ListItemIcon>
                                     <EventIcon />
@@ -857,7 +852,7 @@ function Explore({ signOut }) {
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                <SearchFiltersFragment anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
+                <SearchFiltersFragment proPictures={proPictures} anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container>
                         <Grid item xs={12}>
@@ -886,7 +881,7 @@ function Explore({ signOut }) {
                                                     <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
                                                         <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                <Avatar className={classes.cardMedia} src={proPictures[index]} />
+                                                                <Avatar className={classes.cardMedia} src={proPictures[card.user.username]} />
                                                                 <CardContent className={classes.cardContent}>
                                                                     <Typography gutterBottom variant="h5" component="h2">
                                                                         {card.user.username}
@@ -896,9 +891,9 @@ function Explore({ signOut }) {
                                                                     </Typography>
                                                                     <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
                                                                         <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                            <StarRating val={rateAvg[index]} />
+                                                                            <StarRating val={card.rate_avg} />
                                                                             <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
-                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[index]}</Typography>
+                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[card.user.username]}</Typography>
                                                                         </Paper>
                                                                     </Box>
                                                                 </CardContent>

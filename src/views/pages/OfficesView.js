@@ -252,7 +252,7 @@ export default function OfficesView(props) {
         setCurrentEvents(monthEvents);
         const toDay = 30;
         var date = new Date();
-        var year = date.getFullYear(); 
+        var year = date.getFullYear();
         var month = date.getMonth();
         var day = date.getDate();
         for (var j = 0; j < toDay; j++) {
@@ -274,11 +274,11 @@ export default function OfficesView(props) {
                         'borderColor': 'red',
                     }
                 );
-                minutes += VisitTimeDuration; 
+                minutes += VisitTimeDuration;
             }
             const mydate = new Date(year, month, day, 6, 0);
             const index = '' + mydate.getFullYear() + TwoDigits(mydate.getMonth()) + TwoDigits(mydate.getDate());
-            monthEvents[j] =({
+            monthEvents[j] = ({
                 'title': 'Unavailable',
                 'allDay': false,
                 'start': new Date(year, month, day, 6, 0),
@@ -290,22 +290,22 @@ export default function OfficesView(props) {
                 'color': '#fb3640',
                 'borderColor': 'red',
                 'height': '5em',
-            }); 
+            });
             monthEventsMapper[index] = j;
             day += 1;
         }
-        seta(a+1);
+        seta(a + 1);
     }
 
     const Updater = (payload) => {
-        const base = (6*60) + 0;
+        const base = (6 * 60) + 0;
         payload.map((reserve) => {
             var sd0 = getDateElements(reserve.start_time);
-            var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
-            const start = (sd.getHours()*60) + sd.getMinutes();
+            var sd = new Date(sd0.year, sd0.month - 1, sd0.day, sd0.hour, sd0.minute);
+            const start = (sd.getHours() * 60) + sd.getMinutes();
             const startIndex = (start - base) / VisitTimeDuration;
             var ed0 = getDateElements(reserve.end_time);
-            var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
+            var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
             var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
             if (index !== undefined) {
                 const patient = reserve.patient;
@@ -319,52 +319,52 @@ export default function OfficesView(props) {
                     monthEvents[index].greens += 1;
                 }
                 monthEvents[index].events[startIndex] = patient ?
-                (
-                    {
-                        'title': 'Reserved by ' + patient.user.username,
-                        'titleweek': 'Reserved',
-                        'allDay': false,
-                        'start': sd,
-                        'end': ed,
-                        'AvailableState': null,
-                        'username': patient.user.username,
-                        'id': reserve.id,
-                        'events': [],
-                        'color': '#8ab6d6',
-                        'borderColor': 'blue',
-                    }
-                )
-                :
-                (
-                    {
-                        'title': '',
-                        'titleweek': '✔',
-                        'allDay': false,
-                        'start': sd,
-                        'end': ed,
-                        'AvailableState': true,
-                        'id': reserve.id,
-                        'events': [],
-                        'color': 'lightgreen',
-                        'borderColor': 'green',
-                    }
-                );
-                
+                    (
+                        {
+                            'title': 'Reserved by ' + patient.user.username,
+                            'titleweek': 'Reserved',
+                            'allDay': false,
+                            'start': sd,
+                            'end': ed,
+                            'AvailableState': null,
+                            'username': patient.user.username,
+                            'id': reserve.id,
+                            'events': [],
+                            'color': '#8ab6d6',
+                            'borderColor': 'blue',
+                        }
+                    )
+                    :
+                    (
+                        {
+                            'title': '',
+                            'titleweek': '✔',
+                            'allDay': false,
+                            'start': sd,
+                            'end': ed,
+                            'AvailableState': true,
+                            'id': reserve.id,
+                            'events': [],
+                            'color': 'lightgreen',
+                            'borderColor': 'green',
+                        }
+                    );
+
             }
         });
         //seta(a+1); 
     }
 
     const patientReserveUpdater = (payload, officeid) => {
-        const base = (6*60) + 0;
+        const base = (6 * 60) + 0;
         payload.map((reserve) => {
             if (reserve.office.id === officeid) {
                 var sd0 = getDateElements(reserve.start_time);
-                var sd = new Date(sd0.year, sd0.month-1, sd0.day, sd0.hour, sd0.minute);
-                const start = (sd.getHours()*60) + sd.getMinutes();
+                var sd = new Date(sd0.year, sd0.month - 1, sd0.day, sd0.hour, sd0.minute);
+                const start = (sd.getHours() * 60) + sd.getMinutes();
                 const startIndex = (start - base) / VisitTimeDuration;
                 var ed0 = getDateElements(reserve.end_time);
-                var ed = new Date(ed0.year, ed0.month-1, ed0.day, ed0.hour, ed0.minute);
+                var ed = new Date(ed0.year, ed0.month - 1, ed0.day, ed0.hour, ed0.minute);
                 var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
                 if (index !== undefined) {
                     monthEvents[index].events[startIndex] = ({
@@ -393,6 +393,14 @@ export default function OfficesView(props) {
 
         }
     }
+    const callRemoveReserve = (id) => {
+        try {
+            
+        }
+        catch (error) {
+
+        }
+    }
 
     const callGetDoctorRerserve = async (officeid) => {
         RedMaker();
@@ -401,7 +409,7 @@ export default function OfficesView(props) {
             if (response.status === 200) {
                 Updater(response.payload);
                 await getPatientReservationsList(officeid);
-                seta(a+1);
+                seta(a + 1);
             }
         }
         catch (error) {
@@ -409,7 +417,7 @@ export default function OfficesView(props) {
         }
     }
 
-    const getPatientReservationsList = async(officeid) => {
+    const getPatientReservationsList = async (officeid) => {
         const toDay = 30;
         var start_date = new Date();
         var end_date = new Date();
@@ -420,28 +428,30 @@ export default function OfficesView(props) {
         const end_day = end_date.getDate();
         const from_date = `${start_date.getFullYear()}${start_month < 10 ? `0${start_month}` : start_month}${start_day < 10 ? `0${start_day}` : start_day}`;
         const to_date = `${end_date.getFullYear()}${end_month < 10 ? `0${end_month}` : end_month}${end_day < 10 ? `0${end_day}` : end_day}`;
-        try
-        {
-            const response = await callListPatientReservations({from_date: from_date, to_date: to_date}, isRemembered);
-            if(response.status === 200) {
+        try {
+            const response = await callListPatientReservations({ from_date: from_date, to_date: to_date }, isRemembered);
+            if (response.status === 200) {
                 patientReserveUpdater(response.payload, officeid);
             }
         }
-        catch (e)
-        {
+        catch (e) {
             console.log("error on get reserve\n", e);
-        }    
+        }
     }
 
     const [ReserveEvent, setReserveEvent] = useState();
+    const [UnreserveEvent, setUnreserveEvent] = useState();
     const ChangeEventState = (event) => {
         if (viewCalendar !== 'month') {
             if (event.AvailableState) {
-
                 if (event.id !== -1) {
                     setReserveEvent(event);
                     handleReserveConfirmOpen(event.id);
                 }
+            }
+            if (event.AvailableState === null) {
+                setUnreserveEvent(event);
+                handleUnreserveConfirmOpen(event.id);
             }
         }
         if (viewCalendar === 'month') {
@@ -585,6 +595,14 @@ export default function OfficesView(props) {
         setReserveConfirmOpen(0);
         setReserveEvent(null);
     };
+    const [UnreserveConfirmOpen, setUnreserveConfirmOpen] = useState(0);
+    const handleUnreserveConfirmOpen = (id) => {
+        setUnreserveConfirmOpen(id);
+    }
+    const handleUnreserveConfirmClose = () => {
+        setUnreserveConfirmOpen(0);
+        setUnreserveEvent(null);
+    }
 
     const handleEventProp = (event) => {
         if (viewCalendar === 'month') return (
@@ -593,12 +611,8 @@ export default function OfficesView(props) {
                     backgroundColor: event.color,
                     borderColor: event.borderColor,
                     height: event.height,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    alignSelf: 'center',
-                    justifySelf: 'center',
                     fontSize: '0.9em',
-                    textAlign: 'center'
+                    borderRadius: '5px',
                 }
             }
         );
@@ -764,7 +778,7 @@ export default function OfficesView(props) {
                     </Grid>
                     <Grid item xs={12} className={classes.container}>
                         <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
-                            titleAccessor = {handleTitleAccessor}
+                            titleAccessor={handleTitleAccessor}
                             localizer={localizer}
                             views={['month', 'week', 'day']}
                             view={viewCalendar}
@@ -799,16 +813,40 @@ export default function OfficesView(props) {
                                         Cancel
                                     </Button>
                                     <Button onClick={() => {
-                                        ReserveEvent.title = viewCalendar !== 'month' ? 'Reserved' : '✘';
+                                        ReserveEvent.title = 'Reserved by you';
+                                        ReserveEvent.titleweek = 'Reserved';
                                         ReserveEvent.color = '#8ab6d6';
                                         ReserveEvent.borderColor = 'blue';
-                                        ReserveEvent.AvailableState = false;
+                                        ReserveEvent.AvailableState = null;
                                         callTakeReserve(ReserveConfirmOpen);
                                         handleReserveConfirmClose();
                                     }}
                                         style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm
-                                </Button>
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                        }
+                        {UnreserveEvent &&
+                            <Dialog fullWidth open={UnreserveConfirmOpen} TransitionComponent={Transition} keepMounted onClose={handleUnreserveConfirmClose}>
+                                <DialogTitle>{"Unreserve Confirmation"}</DialogTitle>
+                                <DialogContent><DialogContentText>Are you sure you want to cancel your visit time on {UnreserveEvent.start.toLocaleString()} ?</DialogContentText></DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleUnreserveConfirmClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={() => {
+                                        UnreserveEvent.title = ' ';
+                                        UnreserveEvent.titleweek = '✔';
+                                        UnreserveEvent.color = 'lightgreen';
+                                        UnreserveEvent.borderColor = 'green';
+                                        UnreserveEvent.AvailableState = true;
+                                        callRemoveReserve(UnreserveConfirmOpen);
+                                        handleUnreserveConfirmClose();
+                                    }}
+                                        style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                        Confirm
+                                    </Button>
                                 </DialogActions>
                             </Dialog>
                         }
