@@ -42,7 +42,8 @@ const ViewProfile = (event) => {
         { isvieweddoctor: 'true', 
         viewedusername: event.resource.doctor_username, 
         viewedOffice: event.resource.office.id, 
-        viewedEvent: event.resource.event_id});
+        viewedEvent: event.resource.event_id,
+        viewedEventDate: event.resource.event_date});
 
 }
 
@@ -337,6 +338,7 @@ function CalendarPage({ isRemembered }) {
                                                 "#90ee90",
                                             spec: event.doctor.filed_of_specialization,
                                             event_id: event.id,
+                                            event_date: event.start_time,
                                         }
                                     }
                                 }) : []
