@@ -509,7 +509,7 @@ function Explore({ signOut }) {
 
     const [sent, setSent] = useState(false);
     if (!sent) {
-        //callGetAPI();
+        callGetAPI();
         setSent(true);
     }
     useEffect(() => {
