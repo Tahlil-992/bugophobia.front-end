@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewProfile = (username) => {
-    setLocalStorage({ isvieweddoctor: 'false', viewedusername: username });
+    setLocalStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '' });
 }
 
 const EventButton = ({ children }) => {
