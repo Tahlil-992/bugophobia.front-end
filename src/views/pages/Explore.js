@@ -559,7 +559,7 @@ function Explore({ signOut }) {
         setOpen(false);
     };
     const ViewProfile = (username) => {
-        setLocalStorage({ isvieweddoctor: 'true', viewedusername: username });
+        setLocalStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '' });
     }
     const ToCalendar = () => {
         setLocalStorage({ username: username });

@@ -3,9 +3,7 @@ import "../../style.css";
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { AppBar, Avatar, Button, Chip, Container, IconButton, Link, makeStyles, Paper, Toolbar } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
-import InputAdornment from "@material-ui/core/InputAdornment";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import BookmarkIcon from '@material-ui/icons/Bookmark';
 import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder';
@@ -16,8 +14,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import PropTypes from 'prop-types';
 import CommentSection from './commentSection';
-import StarRating from "./RatingComponent/rating";
-import Modal from "@material-ui/core/Modal";
 // import Tooltip from '@material-ui/core/Tooltip';
 import Snackbar from "@material-ui/core/Snackbar";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
@@ -31,7 +27,6 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, } from '@material-ui/pickers';
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import About from './About'
 import OfficesView from './OfficesView';
 
@@ -158,6 +153,16 @@ const newRateCallAPI = ({ doctor_id, amount }, isRemembered) => {
     }
 }
 
+const callGetOfficeAPI = async (doctorid, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/auth/office-list/${doctorid}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -176,8 +181,6 @@ const useStyles = makeStyles((theme) => ({
         marginTop: "0rem",
     },
     onetab: {
-        //backgroundColor: 'rgba(138, 182, 214, 0.57)',
-        //border: "1px solid #C5CAEA",
         color: "#555",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
@@ -196,7 +199,6 @@ const useStyles = makeStyles((theme) => ({
     },
     seltab: {
         backgroundColor: "#ebebeb",
-        //border: "3px solid #16E",
         borderTopRightRadius: "10px",
         borderTopLeftRadius: "10px",
         borderTop: "3px solid #16E",
@@ -614,13 +616,68 @@ export default function Profile() {
     const [monthEvents, setMonthEvents] = useState([]);
     const [monthEventsMapper, setMonthEventsMapper] = useState({});
     const [currentEvents, setCurrentEvents] = useState([]);
-    
+    const [offices, setOffices] = useState([]);
+    const [redirected, setRedirected] = useState(false);
+    const [re, setRe] = useState(true);
 
+    const callGetOffice = async () => {
+        try {
+            var mainIndex = -1;
+            const response = await callGetOfficeAPI(doctorid, isRemembered);
+            if (response.status === 200) {
+                const payload = response.payload;
+                var newOffices = [];
+                payload.map((office, index) => {
+                    var newOffice = {};
+                    newOffice.id = office.id;
+                    newOffice.title = office.title;
+                    newOffice.address = office.address;
+                    var newPhone = [];
+                    office.phone.map((phone, index) => {
+                        newPhone.push(phone.phone);
+                    });
+                    newOffice.phone = newPhone;
+                    newOffices.push(newOffice);
+                    if (office.id === Number(localStorage.getItem("viewedOffice"))) {
+                        mainIndex = index;
+                        setOfficeid(office.id);
+                    }
+                });
+                setOffices(newOffices);
+                setOfficeIndex(mainIndex);
+                setCalendarMode(true);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    if (!redirected && localStorage.getItem("viewedOffice") && doctorid) {
+        setRedirected(true);
+        setTabValue(1);
+        callGetOffice();
+    }
+
+    const getBackRef = () => {
+        if (!isViewedDoctor) {
+            return '/DoctorCalendar/';
+        }
+        else {
+            if (localStorage.getItem("viewedOffice")) {
+                return '/Calendar/';
+            }
+            else {
+                return `/${str}/explore/`;
+            }
+        }
+    }
+    
     return (
         <div style={{ backgroundColor: '#8ab6d6' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
-                    <Link href={!isViewedDoctor ? `/DoctorCalendar/` : `/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+                    <Link href={getBackRef()}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
                     <Typography variant="h6" color="inherit" noWrap>View Profile</Typography>
                 </Toolbar>
             </AppBar>
@@ -647,6 +704,9 @@ export default function Profile() {
                     monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
                     monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
                     currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                    offices={offices}                           setOffices={setOffices}
+                    callGetOffice={callGetOffice}
+                    re={re}                                     setRe={setRe}
                 />
             </div>
             </Container>
@@ -687,28 +747,6 @@ export default function Profile() {
                                         :
                                         <></>
                                     }
-                                    {/* <TextField style={{ width: '100%', marginBottom: '0.5em', marginTop: '1em' }}
-                                        className={classes.margin}
-                                        id="input-with-icon-textfield"
-                                        value={"  " + VisitTimeDuration}
-                                        InputProps={{
-                                            readOnly: true,
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <AccessTimeIcon />
-                                                    <span>&nbsp;&nbsp;</span>Visit Time Duration :
-                                                </InputAdornment>
-                                            ),
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    minutes
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                        SelectProps={{
-                                            native: true,
-                                        }}
-                                    /> */}
                                     {isViewedDoctor && !VisitTimeClick ?
                                         <Grid item xs>
                                             <Button 
@@ -722,45 +760,19 @@ export default function Profile() {
                                         :
                                         <></>
                                     }
-                                    {VisitTimeClick &&
-                                        <MuiPickersUtilsProvider Toolbar={{ backgroundColor: 'red' }} utils={DateFnsUtils}>
-                                            <Grid container style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-                                                <ThemeProvider theme={defaultMaterialTheme}>
-                                                    <KeyboardDatePicker
-                                                        style={{ width: '55%', headerColor: 'red' }}
-                                                        margin="normal"
-                                                        id="date-picker-dialog"
-                                                        label="Date"
-                                                        format="MM/dd/yyyy"
-                                                        value={selectedDate}
-                                                        disablePast={true}
-                                                        onChange={handleDateChange}
-                                                        KeyboardButtonProps={{
-                                                            'aria-label': 'change date',
-                                                        }}
-                                                    />
-                                                    <KeyboardTimePicker
-                                                        style={{ width: '45%' }}
-                                                        margin="normal"
-                                                        id="time-picker"
-                                                        label="Time"
-                                                        disablePast={true}
-                                                        ampm={true}
-                                                        value={selectedDate}
-                                                        onChange={handleDateChange}
-                                                        KeyboardButtonProps={{
-                                                            'aria-label': 'change time',
-                                                        }}
-                                                        minutesStep={5}
-                                                    />
-                                                </ThemeProvider>
-                                                <Grid display="flex" alignItems="center" justifyContent="space-between" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                    <Button onClick={() => setVisitTimeClick(false)} className={classes.button} className={classes.submitButton} style={{ width: '49%', marginRight: '1%' }}>Submit</Button>
-                                                    <Button onClick={() => setVisitTimeClick(false)} className={classes.button} className={classes.cancelButton} style={{ width: '49%', marginLeft: '1%' }}>Cancel</Button>
-                                                </Grid>
-                                            </Grid>
-                                        </MuiPickersUtilsProvider>
-                                    }
+                                    {/* <KeyboardDatePicker
+                                        style={{ width: '55%', headerColor: 'red' }}
+                                        margin="normal"
+                                        id="date-picker-dialog"
+                                        label="Date"
+                                        format="MM/dd/yyyy"
+                                        value={selectedDate}
+                                        disablePast={true}
+                                        onChange={handleDateChange}
+                                        KeyboardButtonProps={{
+                                            'aria-label': 'change date',
+                                        }}
+                                    /> */}
                                 </Grid>
                                 <Grid item xs={9}>
                                     {isViewedDoctor ? (
@@ -914,6 +926,9 @@ export default function Profile() {
                                         monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
                                         monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
                                         currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                                        offices={offices}                           setOffices={setOffices}
+                                        callGetOffice={callGetOffice}
+                                        re={re}                                     setRe={setRe}
                                         />
                                 </TabPanel>
                                 <TabPanel value={tabValue} index={2}>
