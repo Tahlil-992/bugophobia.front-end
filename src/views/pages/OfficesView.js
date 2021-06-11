@@ -11,7 +11,7 @@ import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-ca
 import moment from 'moment';
 import "../../style.css";
 import { callListAllReservationsAvailableToPatients } from '../../core/modules/calendarAPICalls';
-import { callGetDoctorRerservationsList, callGetReservationAPI } from '../../core/modules/calendarAPICalls';
+import { callUnreserveAPI, callGetReservationAPI } from '../../core/modules/calendarAPICalls';
 import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import Dialog from '@material-ui/core/Dialog';
@@ -29,7 +29,7 @@ const MyTextField = withStyles({
     }
 })(TextField);
 
- const callGetOfficeAPI = async (doctorid, isRemembered) => {
+const callGetOfficeAPI = async (doctorid, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/office-list/${doctorid}/` }, true, isRemembered);
         return response;
@@ -206,7 +206,19 @@ export default function OfficesView(props) {
         }
         catch (error) {
             console.log(error);
+        }
+    }
 
+    const callUnreserve = async (event) => {
+        try {
+            const response = await callUnreserveAPI({id: event.id}, isRemembered);
+            if (response.status === 200) {
+                const payload = response.payload;
+                event.id = payload.id;
+            }
+        }
+        catch (error) {
+            console.log(error);
         }
     }
 
@@ -833,6 +845,7 @@ export default function OfficesView(props) {
                                         UnreserveEvent.AvailableState = true;
                                         callRemoveReserve(UnreserveConfirmOpen);
                                         handleUnreserveConfirmClose();
+                                        callUnreserve(UnreserveEvent);
                                     }}
                                         style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm

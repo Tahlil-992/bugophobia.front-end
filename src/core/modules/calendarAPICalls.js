@@ -107,3 +107,15 @@ export const callListPatientReservations = async({from_date, to_date}, isRemembe
         throw e;
     }
 }
+
+export const callUnreserveAPI = async({id}, isRemembered) => {
+    try
+    {
+        const response = await callAPIHandler({method: "GET", url: `/schedule/unreserve/${id}/`}, true, isRemembered);
+        return response;
+    }
+    catch (e)
+    {
+        throw e;
+    }
+}
