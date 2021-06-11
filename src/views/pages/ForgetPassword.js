@@ -18,6 +18,13 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import EmailIcon from '@material-ui/icons/Email';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import { LoadingSpinner } from "../../assets/loading.spinner";
+import Paper from '@material-ui/core/Paper';
+import Snackbar from '@material-ui/core/Snackbar';
+import Modal from '@material-ui/core/Modal';
+import CloseIcon from '@material-ui/icons/Close';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import { makeStyles } from '@material-ui/core';
 
 const processStates = {
     SUBMIT_EMAIL_ADDRESS: 1,
@@ -51,9 +58,24 @@ const confirmResetPasswordAPICall = async({token, password}) => {
 const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
 
+const useStyles = makeStyles((theme) => ({
+    modal: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modalPaper: {
+      backgroundColor: '#86E08C',
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+    },
+}));
+
 export default function ForgetPass() {
 
     const history = useHistory();
+    const classes = useStyles();
 
     const [processState, setProcessState] = useState(processStates.SUBMIT_EMAIL_ADDRESS);
     const [email, setEmail] = useState("");
@@ -76,6 +98,10 @@ export default function ForgetPass() {
     const [isLoading, setIsLoading] = useState(false);
 
     const {verify} = useParams();
+
+    const [message, setMessage] = useState();
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
 
     useEffect (() => {
         if (verify === "verify") {
@@ -144,6 +170,15 @@ export default function ForgetPass() {
     const checkConfigPass = (configPass) => {
         const res = (configPass === password);
         setIsConfigPassValid(res);
+    }
+
+    const handleClose = () => {
+        setOpenSnackBar(false);
+        setMessage("");
+    }
+
+    const goToLogin = () => {
+        history.replace("/login");
     }
 
     const callForgotPasswordAPI = async() => {
@@ -314,6 +349,42 @@ export default function ForgetPass() {
                     </div>
                 </Container>
             </Box>
+            <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={handleClose}
+          resumeHideDuration={0}
+        >
+          <Paper style={{ backgroundColor: "#f9a099", borderRadius: "7px" }} elevation={3}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              px={"1em"} py={"1em"}>
+              <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
+              <Box>
+                {message && message.split("\n").map((item) =>
+                  <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
+                )}
+              </Box>
+              <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
+                <CloseIcon style={{ color: "#611a15" }} />
+              </IconButton>
+            </Box>
+          </Paper>
+        </Snackbar>
+        <Modal className={classes.modal} open={openModal} onClose={() => goToLogin()}>
+          <Box className={classes.modalPaper}>
+            <Box style={{ display: "flex", alignItems: "center" }}>
+              <CheckCircleIcon style={{ marginRight: "1em" }} />
+              <h2>SignUp was Successful!</h2>
+            </Box>
+            <Box style={{ display: "flex" }} justifyContent="flex-end">
+              <Button onClick={() => goToLogin()}>Dismiss</Button>
+            </Box>
+          </Box>
+        </Modal>
         </React.Fragment>
     );
 }
