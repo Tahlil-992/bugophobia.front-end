@@ -128,6 +128,13 @@ export default function ForgetPass() {
     }, [isConfigPassValid]);
 
     useEffect(() => {
+        if (isEmailValid)
+          setemailhelper("");
+        else
+          setemailhelper("Email is invalid");
+    }, [isEmailValid]);
+
+    useEffect(() => {
         setIsLoading(true);
         if (onSubmitEmail)
         {
@@ -150,11 +157,12 @@ export default function ForgetPass() {
 
     const handleSubmitEmail = () => {
         setOnSubmitEmail(true);
+        setOpenModal(false);
     }
 
     const handleSubmitCode = () => {
         setOnSubmitCode(true);
-        alert("ALL OK!");
+        setOpenModal(false);
     }
 
     const checkEmail = (email) => {
