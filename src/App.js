@@ -70,7 +70,10 @@ function App({ setIsDoctor, login, rememberMe }) {
             <Route exact path="/sign-up">
               <SignUpForm />
             </Route>
-            <Route exact path="/forget-password">
+            <Route exact path="/forget-password/">
+              <ForgetPassword />
+            </Route>
+            <Route exact path="/forget-password/:verify">
               <ForgetPassword />
             </Route>
             <Route exact path="/login">
