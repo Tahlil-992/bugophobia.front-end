@@ -59,6 +59,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import { DirectionsRailway } from '@material-ui/icons';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -94,6 +95,16 @@ const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
 const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const getSortedRatingListCallAPI = (isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/auth/top-doctor-list/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -453,14 +464,24 @@ function Explore({ signOut }) {
             default: return '';
         }
     }
+
+    const [a, seta] = useState(0);
+    useEffect(() => {
+        seta(0);
+    }, [a]);
+
     const [username, setUsername] = useState("");
     const [got, setGot] = useState(false);
     const [rateAvg, setRateAvg] = useState({});
     const [rateCount, setRateCount] = useState({});
+    const [sortedList, setSortedList] = useState({});
+    
     const callGetAPI = async () => {
         try {
             const response1 = await callTopDoctorsAPI();
-            setcards(response1.payload);
+            
+            await getSortedRatingList(response1.payload);
+            
             const response2 = await callProfileAPI(isDoctor, isRemembered);
             if (response2.status === 200) {
                 setUsername(response2.payload.user.username);
@@ -472,7 +493,29 @@ function Explore({ signOut }) {
         }
     }
 
-    const callProfilePictureGetAPI = async () => {
+    const getSortedRatingList = async (oldCards) => {
+        try {
+            await callProfilePictureGetAPI(oldCards);
+            const response = await getSortedRatingListCallAPI(isRemembered);
+            if (response.status === 200) {
+                var newCards = Array(oldCards.length);
+                response.payload.map((doctor, index) => {
+                    sortedList[doctor.user] = index;
+                    rateCount[doctor.user] = (doctor.number);
+                    rateAvg[doctor.user] = (doctor.avg);
+                });
+                oldCards.map((doctor) => {
+                    newCards[sortedList[doctor.user.id]] = doctor;
+                });
+            }
+            setcards(newCards);
+        }
+        catch(error) {
+
+        }
+    }
+
+    const callProfilePictureGetAPI = async (cards) => {
         try {
             cards.map(async (card, index) => {
                 const uname = card.user.username;
@@ -480,27 +523,15 @@ function Explore({ signOut }) {
                 if (response.status === 200) {
                     let pro_picture = response.payload.pro_picture;
                     if (pro_picture === null) {
-                        proPictures[card.user.username] = (card.user.is_doctor ? DoctorImage : PatientImage);
+                        proPictures[card.user.id] = (card.user.is_doctor ? DoctorImage : PatientImage);
                     }
                     else {
-                        proPictures[card.user.username] = (pro_picture);
+                        proPictures[card.user.id] = (pro_picture);
                     }
-                    try {
-                        const response = await getRatingDetailCallAPI({ doctor_id: card.user.id });
-                        if (response.status == 200) {
-                            const payload = response.payload;
-                            rateCount[card.user.username] = (payload.number);
-                            rateAvg[card.user.username] = (payload.avg);
-                            setSent(!sent);
-                        }
-                        setSent(!sent);
-                    }
-                    catch (e) {
-                        console.log(e);
-                    }
+                    //seta(a+1);
                 }
             });
-            setSent(!sent);
+            seta(a+1);
         }
         catch (error) {
             console.log(error);
@@ -508,18 +539,14 @@ function Explore({ signOut }) {
         }
     }
     const [sent, setSent] = useState(false);
-    if (!sent) {
-        callGetAPI();
-        setSent(true);
-    }
+    
     useEffect(() => {
-        callGetAPI();
-    }, []);
-    useEffect(() => {
-        if (got) {
-            callProfilePictureGetAPI();
+        if (sent === false) {
+            callGetAPI();
+            setSent(true);
         }
-    }, [got]);
+    }, [sent]);
+
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleDrawerOpen = () => {
@@ -692,7 +719,7 @@ function Explore({ signOut }) {
                                                 }}>
                                                 <Paper style={{ borderRadius: "5px" }}>
                                                     <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
-                                                        <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0 }}>
+                                                        <MenuList property={{style: {borderTopLeftRadius: '0px', borderTopRightRadius: '50px'}}} autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0,  }}>
                                                             {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{ padding: 0 }}>
                                                                 <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
                                                                     <Card
@@ -700,7 +727,7 @@ function Explore({ signOut }) {
                                                                         style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
                                                                         <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
                                                                             <Grid item xs={5} container justify='center'>
-                                                                                <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.username]} />
+                                                                                <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.id]} />
                                                                             </Grid>
                                                                             <Grid item xs={7}>
                                                                                 <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
@@ -723,7 +750,7 @@ function Explore({ signOut }) {
                                                             </MenuItem>
                                                             ))}
                                                             {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{ padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0" }}>
-                                                                <Card style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
+                                                                <Card elevation={0} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
                                                                     <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
                                                                         Record Not found
                                                                     </Typography>
@@ -881,7 +908,7 @@ function Explore({ signOut }) {
                                                     <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
                                                         <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                <Avatar className={classes.cardMedia} src={proPictures[card.user.username]} />
+                                                                <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
                                                                 <CardContent className={classes.cardContent}>
                                                                     <Typography gutterBottom variant="h5" component="h2">
                                                                         {card.user.username}
@@ -893,7 +920,7 @@ function Explore({ signOut }) {
                                                                         <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
                                                                             <StarRating val={card.rate_avg} />
                                                                             <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
-                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[card.user.username]}</Typography>
+                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[card.user.id]}</Typography>
                                                                         </Paper>
                                                                     </Box>
                                                                 </CardContent>

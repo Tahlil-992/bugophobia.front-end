@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Checkbox, FormControlLabel, Grid, IconButton, Link, makeStyles, Paper, TextField, Typography, withStyles } from "@material-ui/core";
+import { Box, Button, ButtonGroup, Checkbox, FormControlLabel, Grid, IconButton, Link, makeStyles, Paper, TextField, Typography, withStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -13,6 +13,9 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import EventAvailableIcon from '@material-ui/icons/EventAvailable';
 import EventBusyIcon from '@material-ui/icons/EventBusy';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -227,22 +230,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '0%',
         transition: 'all 0.15s linear',
         '&:hover': {
-            backgroundColor: "#f3f3f3",
-            transition: 'all 0s, width 0s',
-        },
-    },
-    textarea: {
-        maxWidth: '100%',
-        minWidth: '100%',
-        maxHeight: '16em',
-        minHeight: '8em',
-        borderRadius: '3px',
-        marginLeft: '0%',
-        marginRight: '0%',
-        backgroundColor: 'inherit',
-        transition: 'all 0.15s linear',
-        '&:hover': {
-            backgroundColor: "#f3f3f3",
+            backgroundColor: "#f9f9f9",
             transition: 'all 0s, width 0s',
         },
     },
@@ -275,7 +263,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '0%',
         transition: 'all 0.15s linear',
         '&:hover': {
-            backgroundColor: "#f3f3f3",
+            backgroundColor: "#f9f9f9",
             transition: 'all 0s, width 0s',
         },
         "& .MuiInputAdornment-positionStart": {
@@ -317,12 +305,41 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: "#9099A1",
         },
     },
+    submitButton2: {
+        textTransform: "none",
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
+        padding: '1em 2em 1em 2em',
+        margin: '1em 0em 1em 0em',
+       // minWidth: '12em',
+        "&:hover": {
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
+        },
+    },
+    cancelButton2: {
+        textTransform: "none",
+        backgroundColor: "#bdc1c5",
+        padding: '1em 2em 1em 2em',
+        margin: '1em 0em 1em 0em',
+        //minWidth: '12em',
+        "&:hover": {
+            backgroundColor: "#9099A1",
+        },
+    },
+    underline: {
+        "&&&:before": {
+            borderBottom: "none"
+        },
+        "&&:after": {
+            borderBottom: "none"
+        }
+    },
 }));
 
 export default function Offices(props) {
 
     const isRemembered = props.isRemembered;
-    const VisitTimeDuration = props.VisitTimeDuration;
+    const mainVisitTimeDuration =props.mainVisitTimeDuration;
+    const callChangeVisitDurationTime = props.callChangeVisitDurationTime;
     const doctorid = props.doctorid;
     const got = props.got;
     const mainUsername = props.mainUsername;
@@ -348,6 +365,8 @@ export default function Offices(props) {
     const [offices, setOffices] = useState([]);
     const [a, seta] = useState(0);
     const [page, setPage] = useState(0);
+
+    const [VisitTimeDuration, setVisitTimeDuration] = useState(mainVisitTimeDuration);
 
     const callAddOffice = async (data) => {
         try {
@@ -1211,8 +1230,51 @@ export default function Offices(props) {
         <Redirect to='view-profile'/>
     )
 
-    return (officeIndex === -1 ?
+    return (officeIndex === -1 ? 
         <Grid container direction='row' justify='center' alignItems='center' style={{marginTop: '1em'}}>
+            <Grid item container style={{maxWidth: '20em'}}>
+                <Grid item xs={12}>
+                    <TextField value={"Visit Time: " + VisitTimeDuration + " minutes"} style={{ width: '73%', height: '1em' }} size="small"
+                        InputProps={{
+                            className: classes.underline,
+                            readOnly: true,
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <AccessTimeIcon />
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    <ButtonGroup style={{ width: '25%', height: '90%', paddingTop: '1%' }}>
+                        <Button
+                            onClick={() => {
+                                setVisitTimeDuration(Math.max(VisitTimeDuration - 5, 0));
+                            }}>
+                            <KeyboardArrowDownIcon fontSize="small" />
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setVisitTimeDuration(VisitTimeDuration + 5);
+                            }}>
+                            <KeyboardArrowUpIcon fontSize="small" />
+                        </Button>
+                    </ButtonGroup>
+                </Grid>
+                <Grid item xs={12} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
+                    <Button className={classes.submitButton2} style={{ width: '49%', marginRight: '1%' }}
+                        disabled={VisitTimeDuration === mainVisitTimeDuration}
+                        onClick={() => {
+                            callChangeVisitDurationTime(VisitTimeDuration);
+                        }}>
+                        Apply Changes
+                    </Button>
+                    <Button className={classes.cancelButton2} style={{ width: '49%', marginLeft: '1%' }}
+                        disabled={VisitTimeDuration === mainVisitTimeDuration}
+                        onClick={() => { setVisitTimeDuration(mainVisitTimeDuration); }}>
+                        Cancel
+                    </Button>
+                </Grid>
+            </Grid>
             {offices.map((office, index) => (
                 <>
                     <Grid item xs={11} style={{ padding: '0.5em 1em' }}>
@@ -1220,7 +1282,7 @@ export default function Offices(props) {
                             <Paper className={classes.paper}
                                 onMouseEnter={() => setPaperElav(index)}
                                 onMouseLeave={() => setPaperElav(-1)}
-                                elevation={paperElav === index ? 10 : 1}
+                                elevation={paperElav === index ? 3 : 1}
                             >
                                 <Typography className={classes.title} align='center'>{office.title}</Typography>
                             </Paper>
@@ -1242,7 +1304,7 @@ export default function Offices(props) {
                     <Paper className={classes.pluspaper}
                         onMouseEnter={() => setPaperElav(offices.length)}
                         onMouseLeave={() => setPaperElav(-1)}
-                        elevation={paperElav === offices.length ? 10 : 1}
+                        elevation={1}
                     >
                         <Typography className={classes.title} align='center'>
                             {paperElav === offices.length ? '+ Add a new office' : '+'}
