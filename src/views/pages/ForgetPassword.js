@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import { Link } from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import LockIcon from '@material-ui/icons/Lock';
@@ -52,6 +52,9 @@ const passwordRegex = RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}
 const emailRegex = RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
 
 export default function ForgetPass() {
+
+    const history = useHistory();
+
     const [processState, setProcessState] = useState(processStates.SUBMIT_EMAIL_ADDRESS);
     const [email, setEmail] = useState("");
     const [code, setCode] = useState("");
@@ -71,6 +74,18 @@ export default function ForgetPass() {
     const [onSubmitCode, setOnSubmitCode] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const {verify} = useParams();
+
+    useEffect (() => {
+        if (verify === "verify") {
+            setProcessState(processStates.SUBMIT_EMAIL_CODE);
+            history.push("/forget-password/verify")
+        }
+        else {
+            setProcessState(processStates.SUBMIT_EMAIL_ADDRESS);
+        }
+    }, [verify])
 
     useEffect(() => {
         if (ispasswordValid)
@@ -139,6 +154,7 @@ export default function ForgetPass() {
             {
                 console.log(response.payload);
                 setProcessState(processStates.SUBMIT_EMAIL_CODE);
+                history.push("/forget-password/verify");
             }
         }
         catch (e)
