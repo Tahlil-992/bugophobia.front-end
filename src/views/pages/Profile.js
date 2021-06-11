@@ -422,7 +422,6 @@ export default function Profile() {
                         callChangeVisitDurationTimeAPI({ visit_duration_time: 30 }, isRemembered);
                     }
                     else {
-                        setVisitTimeDuration(payload.visit_duration_time);
                         setMainVisitTimeDuration(payload.visit_duration_time);
                     }
                 }
@@ -695,9 +694,22 @@ export default function Profile() {
         event.target.value = null;
     }
 
-    const [VisitTimeDuration, setVisitTimeDuration] = useState(30);
     const [mainVisitTimeDuration, setMainVisitTimeDuration] = useState(30);
-    const [ChangeVisitTimeDuration, setChangeVisitTimeDuration] = useState(false);
+
+    const callChangeVisitDurationTime = async (VisitTimeDuration) => {
+        try {
+            const response = await callChangeVisitDurationTimeAPI({ visit_duration_time: VisitTimeDuration }, isRemembered);
+            if (response.status === 200) {
+                setMainVisitTimeDuration(VisitTimeDuration);
+                setMessage("Visit duration time changed successfully!");
+                setSnackColor([SUCCESS_BACKGROUND, SUCCESS_COLOR]);
+                setOpenSnackBar(true);
+            }
+        }
+        catch(error) {
+
+        }
+    }
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -751,7 +763,8 @@ export default function Profile() {
             <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                 <Offices 
                     isRemembered={isRemembered} 
-                    VisitTimeDuration={mainVisitTimeDuration} 
+                    mainVisitTimeDuration={mainVisitTimeDuration}
+                    callChangeVisitDurationTime={callChangeVisitDurationTime} 
                     doctorid={doctorid} 
                     got={got}
                     mainUsername={mainUsername}
@@ -826,61 +839,10 @@ export default function Profile() {
                                         <input id="myInput" type="file" accept={fileTypes} onChange={onFileChange} onClick={onFileReset} style={{ marginBottom: "1em", display: 'none' }} />
                                     </Grid>
                                 </Grid>
-                                {isDoctor &&
-                                    <Grid item xs={9}>
-                                        <TextField value={"Visit Time: " + VisitTimeDuration + " minutes"} style={{ width: '73%', height: '1em' }} size="small"
-                                            InputProps={{
-                                                className: classes.underline,
-                                                readOnly: true,
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <AccessTimeIcon />
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
-                                        <ButtonGroup style={{ width: '25%', height: '90%', paddingTop: '1%' }}>
-                                            <Button
-                                                onClick={() => {
-                                                    setVisitTimeDuration(Math.max(VisitTimeDuration - 5, 0));
-                                                    setChangeVisitTimeDuration(true);
-                                                }}>
-                                                <KeyboardArrowDownIcon fontSize="small" />
-                                            </Button>
-                                            <Button
-                                                onClick={() => {
-                                                    setVisitTimeDuration(VisitTimeDuration + 5);
-                                                    setChangeVisitTimeDuration(true);
-                                                }}>
-                                                <KeyboardArrowUpIcon fontSize="small" />
-                                            </Button>
-                                        </ButtonGroup>
-                                    </Grid>
-                                }
-                                {isDoctor &&
-                                    <Grid item xs={9} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
-                                        <Button className={classes.applyButton} style={{ width: '49%', marginRight: '1%' }}
-                                            disabled={!ChangeVisitTimeDuration || VisitTimeDuration === mainVisitTimeDuration}
-                                            onClick={() => {
-                                                setChangeVisitTimeDuration(false);
-                                                callChangeVisitDurationTimeAPI({ visit_duration_time: VisitTimeDuration }, isRemembered);
-                                                setMainVisitTimeDuration(VisitTimeDuration);
-                                                setMessage("Visit duration time changed successfully!");
-                                                setSnackColor([SUCCESS_BACKGROUND, SUCCESS_COLOR]);
-                                                setOpenSnackBar(true);
-                                            }}>
-                                            Apply Changes
-                                        </Button>
-                                        <Button className={classes.cancelButton} style={{ width: '49%', marginLeft: '1%' }}
-                                            disabled={!ChangeVisitTimeDuration || VisitTimeDuration === mainVisitTimeDuration}
-                                            onClick={() => { setChangeVisitTimeDuration(false); }}>
-                                            Cancel
-                                        </Button>
-                                    </Grid>
-                                }
                                 <Grid item xs={9} >
                                     {isDoctor ? (
                                         <Box >
+                                            <hr />
                                             <Typography className={classes.subtext} >{"Name:"}</Typography>
                                             <Typography className={classes.text}  >{mainName}</Typography>
                                             <hr />
@@ -1015,7 +977,8 @@ export default function Profile() {
                                     {isDoctor ?
                                         <Offices 
                                             isRemembered={isRemembered} 
-                                            VisitTimeDuration={mainVisitTimeDuration} 
+                                            mainVisitTimeDuration={mainVisitTimeDuration}
+                                            callChangeVisitDurationTime={callChangeVisitDurationTime}  
                                             doctorid={doctorid} 
                                             got={got}
                                             mainUsername={mainUsername}
