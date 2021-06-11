@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
+import '../../index.css';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -141,7 +143,6 @@ const callDeleteAccountAPI = async (username, isdoctor, isRemembered) => {
         throw e;
     }
 }
-
 const drawerWidth = 240;
 const collapsedSearchWidth = '12rem';
 const expandedSearchWidth = '18rem';
@@ -347,6 +348,20 @@ const useStyles = makeStyles((theme) => ({
     fullList: {
         width: 'auto',
     },
+    bottomPushClose: {
+        position: "fixed",
+        width: theme.spacing(9),
+        bottom: 0,
+        textAlign: "center",
+        paddingBottom: 10,
+    },
+    bottomPushOpen: {
+        position: "fixed",
+        width: drawerWidth,
+        bottom: 0,
+        textAlign: "center",
+        paddingBottom: 10,
+    },
 }));
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -475,13 +490,13 @@ function Explore({ signOut }) {
     const [rateAvg, setRateAvg] = useState({});
     const [rateCount, setRateCount] = useState({});
     const [sortedList, setSortedList] = useState({});
-    
+
     const callGetAPI = async () => {
         try {
             const response1 = await callTopDoctorsAPI();
-            
+
             await getSortedRatingList(response1.payload);
-            
+
             const response2 = await callProfileAPI(isDoctor, isRemembered);
             if (response2.status === 200) {
                 setUsername(response2.payload.user.username);
@@ -510,7 +525,7 @@ function Explore({ signOut }) {
             }
             setcards(newCards);
         }
-        catch(error) {
+        catch (error) {
 
         }
     }
@@ -531,7 +546,7 @@ function Explore({ signOut }) {
                     //seta(a+1);
                 }
             });
-            seta(a+1);
+            seta(a + 1);
         }
         catch (error) {
             console.log(error);
@@ -539,7 +554,7 @@ function Explore({ signOut }) {
         }
     }
     const [sent, setSent] = useState(false);
-    
+
     useEffect(() => {
         if (sent === false) {
             callGetAPI();
@@ -548,7 +563,7 @@ function Explore({ signOut }) {
     }, [sent]);
 
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -664,280 +679,282 @@ function Explore({ signOut }) {
     };
 
     return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <AppBar ref={filterAnchorRef} position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-                <Toolbar className={classes.toolbar}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>Home Page</Typography>
-                    <div className={classes.search}>
-                        <div className={classes.searchIcon}>
-                            <SearchIcon />
+        <ThemeProvider theme={theme}>
+            <div className={classes.root}>
+                <CssBaseline />
+                <AppBar ref={filterAnchorRef} position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+                    <Toolbar className={classes.toolbar}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>Home Page</Typography>
+                        <div className={classes.search}>
+                            <div className={classes.searchIcon}>
+                                <SearchIcon />
+                            </div>
+                            <div>
+                                <div ref={anchorRef}>
+                                    <ClickAwayListener onClickAway={(event) => { handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth) }}>
+                                        <InputBase
+                                            placeholder="Search…"
+                                            classes={{
+                                                root: classes.inputRoot,
+                                                input: classes.inputInput,
+                                            }}
+                                            inputProps={{ 'aria-label': 'search' }}
+                                            onClick={(event) => { handleClickListItem(event); setLimitedWidth(expandedSearchWidth) }}
+                                            value={limitedSearchInput}
+                                            onChange={handleOnLimitedSearchInputChange}
+                                            onFocus={onFocus}
+                                            onBlur={onBlur}
+                                        />
+                                    </ClickAwayListener>
+                                </div>
+                                <Box style={{ display: "flex" }}>
+                                    <Container maxWidth={false} disableGutters style={{ width: focused ? expandedSearchWidth : collapsedSearchWidth }}>
+                                        <Popper
+                                            open={showLimitedMenu}
+                                            anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
+                                            className={classes.limitedPopper}
+                                            role={undefined}
+                                            transition
+                                            disablePortal
+                                            placement="bottom-start"
+                                            style={{ width: "100%" }}>
+                                            {({ TransitionProps, placement }) => (
+                                                <Grow
+                                                    {...TransitionProps}
+                                                    style={{
+                                                        transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                                                        width: "100%"
+                                                    }}>
+                                                    <Paper style={{ borderRadius: "5px" }}>
+                                                        <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
+                                                            <MenuList property={{ style: { borderTopLeftRadius: '0px', borderTopRightRadius: '50px' } }} autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0, }}>
+                                                                {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{ padding: 0 }}>
+                                                                    <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
+                                                                        <Card
+                                                                            className={classes.limitedCard}
+                                                                            style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
+                                                                            <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
+                                                                                <Grid item xs={5} container justify='center'>
+                                                                                    <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.id]} />
+                                                                                </Grid>
+                                                                                <Grid item xs={7}>
+                                                                                    <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
+                                                                                        <Typography align='left' variant="h6">
+                                                                                            {list.user.username}
+                                                                                        </Typography>
+                                                                                        <Typography align='left'>
+                                                                                            {specializationMap(list.filed_of_specialization)}
+                                                                                        </Typography>
+                                                                                        <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
+                                                                                            <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                                                <StarRating val={list.rate_avg} />
+                                                                                            </Paper>
+                                                                                        </Box>
+                                                                                    </CardContent>
+                                                                                </Grid>
+                                                                            </Grid>
+                                                                        </Card>
+                                                                    </Button>
+                                                                </MenuItem>
+                                                                ))}
+                                                                {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{ padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0" }}>
+                                                                    <Card elevation={0} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
+                                                                        <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
+                                                                            Record Not found
+                                                                    </Typography>
+                                                                    </Card>
+                                                                </Box>}
+                                                                {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{ backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px" }}>
+                                                                    <Button
+                                                                        onClick={() => { setOpenFilters(true); setShowLimitedMenu(false); }}
+                                                                        style={{ textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": { backgroundColor: "#10217d" } }}>
+                                                                        <Typography style={{ color: "#FFF", margin: "0.5em 0" }}>
+                                                                            Advanced Search
+                                                                    </Typography>
+                                                                    </Button>
+                                                                </Box>}
+                                                            </MenuList>
+                                                        </ClickAwayListener>
+                                                    </Paper>
+                                                </Grow>)}
+                                        </Popper>
+                                    </Container>
+                                </Box>
+                            </div>
                         </div>
                         <div>
-                            <div ref={anchorRef}>
-                                <ClickAwayListener onClickAway={(event) => { handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth) }}>
-                                    <InputBase
-                                        placeholder="Search…"
-                                        classes={{
-                                            root: classes.inputRoot,
-                                            input: classes.inputInput,
-                                        }}
-                                        inputProps={{ 'aria-label': 'search' }}
-                                        onClick={(event) => { handleClickListItem(event); setLimitedWidth(expandedSearchWidth) }}
-                                        value={limitedSearchInput}
-                                        onChange={handleOnLimitedSearchInputChange}
-                                        onFocus={onFocus}
-                                        onBlur={onBlur}
-                                    />
-                                </ClickAwayListener>
-                            </div>
-                            <Box style={{ display: "flex" }}>
-                                <Container maxWidth={false} disableGutters style={{ width: focused ? expandedSearchWidth : collapsedSearchWidth }}>
-                                    <Popper
-                                        open={showLimitedMenu}
-                                        anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
-                                        className={classes.limitedPopper}
-                                        role={undefined}
-                                        transition
-                                        disablePortal
-                                        placement="bottom-start"
-                                        style={{ width: "100%" }}>
-                                        {({ TransitionProps, placement }) => (
-                                            <Grow
-                                                {...TransitionProps}
-                                                style={{
-                                                    transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-                                                    width: "100%"
-                                                }}>
-                                                <Paper style={{ borderRadius: "5px" }}>
-                                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
-                                                        <MenuList property={{style: {borderTopLeftRadius: '0px', borderTopRightRadius: '50px'}}} autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0,  }}>
-                                                            {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{ padding: 0 }}>
-                                                                <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
-                                                                    <Card
-                                                                        className={classes.limitedCard}
-                                                                        style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
-                                                                        <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
-                                                                            <Grid item xs={5} container justify='center'>
-                                                                                <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.id]} />
-                                                                            </Grid>
-                                                                            <Grid item xs={7}>
-                                                                                <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
-                                                                                    <Typography align='left' variant="h6">
-                                                                                        {list.user.username}
-                                                                                    </Typography>
-                                                                                    <Typography align='left'>
-                                                                                        {specializationMap(list.filed_of_specialization)}
-                                                                                    </Typography>
-                                                                                    <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
-                                                                                        <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                                            <StarRating val={list.rate_avg} />
-                                                                                        </Paper>
-                                                                                    </Box>
-                                                                                </CardContent>
-                                                                            </Grid>
-                                                                        </Grid>
-                                                                    </Card>
-                                                                </Button>
-                                                            </MenuItem>
-                                                            ))}
-                                                            {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{ padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0" }}>
-                                                                <Card elevation={0} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
-                                                                    <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
-                                                                        Record Not found
-                                                                    </Typography>
-                                                                </Card>
-                                                            </Box>}
-                                                            {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{ backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px" }}>
-                                                                <Button
-                                                                    onClick={() => { setOpenFilters(true); setShowLimitedMenu(false); }}
-                                                                    style={{ textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": { backgroundColor: "#10217d" } }}>
-                                                                    <Typography style={{ color: "#FFF", margin: "0.5em 0" }}>
-                                                                        Advanced Search
-                                                                    </Typography>
-                                                                </Button>
-                                                            </Box>}
-                                                        </MenuList>
-                                                    </ClickAwayListener>
-                                                </Paper>
-                                            </Grow>)}
-                                    </Popper>
-                                </Container>
-                            </Box>
+                            <React.Fragment key={'right'}>
+                                <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
+                                    <Badge badgeContent={1} color="secondary">
+                                        <NotificationsIcon />
+                                    </Badge>
+                                </IconButton>
+                                <SwipeableDrawer
+                                    anchor='right'
+                                    open={Drawerstate['right']}
+                                    onClose={toggleDrawer('right', false)}
+                                    onOpen={toggleDrawer('right', true)}>
+                                    {list('right')}
+                                </SwipeableDrawer>
+                            </React.Fragment>
                         </div>
+                    </Toolbar>
+                </AppBar>
+                <Drawer variant="permanent"
+                    classes={{ paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose), }} open={open}>
+                    <div className={classes.toolbarIcon}>
+                        <Typography component="h2" variant="h6" gutterBottom style={{ width: '80%', marginLeft: '10px' }}>
+                            {username}
+                        </Typography>
+                        <IconButton onClick={handleDrawerClose} style={{ width: '20%' }}>
+                            <ChevronLeftIcon />
+                        </IconButton>
                     </div>
-                    <div>
-                        <React.Fragment key={'right'}>
-                            <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
-                                <Badge badgeContent={1} color="secondary">
-                                    <NotificationsIcon />
-                                </Badge>
-                            </IconButton>
-                            <SwipeableDrawer
-                                anchor='right'
-                                open={Drawerstate['right']}
-                                onClose={toggleDrawer('right', false)}
-                                onOpen={toggleDrawer('right', true)}>
-                                {list('right')}
-                            </SwipeableDrawer>
-                        </React.Fragment>
-                    </div>
-                </Toolbar>
-            </AppBar>
-            <Drawer variant="permanent"
-                classes={{ paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose), }} open={open}>
-                <div className={classes.toolbarIcon}>
-                    <Typography component="h2" variant="h6" gutterBottom style={{ width: '80%', marginLeft: '10px' }}>
-                        {username}
-                    </Typography>
-                    <IconButton onClick={handleDrawerClose} style={{ width: '20%' }}>
-                        <ChevronLeftIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <List>
-                    <div>
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/profile">
-                            <ListItem button>
-                                <ListItemIcon>
-                                    <AccountCircleIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Profile" />
-                            </ListItem>
-                        </Link>
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to={isDoctor ? "/DoctorCalendar" : "/Calendar"}>
-                            <ListItem button onClick={ToCalendar}>
-                                <ListItemIcon>
-                                    <EventIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Calendar" />
-                            </ListItem>
-                        </Link>
-                        {!isDoctor &&
-                            <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
+                    <Divider />
+                    <List>
+                        <div>
+                            <Link style={{ textDecoration: 'none', color: 'black' }} to="/profile">
                                 <ListItem button>
                                     <ListItemIcon>
-                                        <BookmarksIcon />
+                                        <AccountCircleIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Saved accounts" />
+                                    <ListItemText primary="Profile" />
                                 </ListItem>
                             </Link>
-                        }
-                    </div>
-                </List>
-                <List>
-                    <div>
-                        <Divider style={{ marginTop: '26rem' }} />
-                        <ListItem button onClick={handleClickSignoutOpen}>
-                            <ListItemIcon>
-                                <ExitToAppIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Sign out" />
-                        </ListItem>
-                        <Dialog fullWidth open={SignoutOpen} TransitionComponent={Transition} keepMounted onClose={handleSignoutClose}>
-                            <DialogTitle>{"Sign out"}</DialogTitle>
-                            <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
-                                    Confirm
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
-                        <ListItem button onClick={handleDelAccountOpen}>
-                            <ListItemIcon>
-                                <DeleteIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Delete Account" />
-                        </ListItem>
-                        <Dialog fullWidth open={DelAccountOpen} TransitionComponent={Transition} keepMounted onClose={handleDelAccountClose}>
-                            <DialogTitle>{"Delete Account"}</DialogTitle>
-                            <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
-                                    Cancel
-                                </Button>
-                                <Link style={{ textDecoration: 'none' }} to="/">
-                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
-                                        Confirm
-                                    </Button>
+                            <Link style={{ textDecoration: 'none', color: 'black' }} to={isDoctor ? "/DoctorCalendar" : "/Calendar"}>
+                                <ListItem button onClick={ToCalendar}>
+                                    <ListItemIcon>
+                                        <EventIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Calendar" />
+                                </ListItem>
+                            </Link>
+                            {!isDoctor &&
+                                <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
+                                    <ListItem button>
+                                        <ListItemIcon>
+                                            <BookmarksIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Saved accounts" />
+                                    </ListItem>
                                 </Link>
-                            </DialogActions>
-                        </Dialog>
-                    </div>
-                </List>
-            </Drawer>
-            <main className={classes.content}>
-                <div className={classes.appBarSpacer} />
-                <SearchFiltersFragment proPictures={proPictures} anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
-                <Container maxWidth="lg" className={classes.container}>
-                    <Grid container>
-                        <Grid item xs={12}>
-                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px' }}>
-                                <React.Fragment>
-                                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                                        <Box flex={1}>
-                                            <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
-                                                {title}
-                                            </Typography>
+                            }
+                        </div>
+                    </List>
+                    <List>
+                        <div className={open ? classes.bottomPushOpen : classes.bottomPushClose}>
+                            <Divider />
+                            <ListItem button onClick={handleClickSignoutOpen}>
+                                <ListItemIcon>
+                                    <ExitToAppIcon />
+                                </ListItemIcon>
+                                {open && <ListItemText primary="Sign out" />}
+                            </ListItem>
+                            <Dialog fullWidth open={SignoutOpen} TransitionComponent={Transition} keepMounted onClose={handleSignoutClose}>
+                                <DialogTitle>{"Sign out"}</DialogTitle>
+                                <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                        Cancel
+                                </Button>
+                                    <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                        Confirm
+                                </Button>
+                                </DialogActions>
+                            </Dialog>
+                            <ListItem button onClick={handleDelAccountOpen}>
+                                <ListItemIcon>
+                                    <DeleteIcon />
+                                </ListItemIcon>
+                                {open && <ListItemText primary="Delete Account" />}
+                            </ListItem>
+                            <Dialog fullWidth open={DelAccountOpen} TransitionComponent={Transition} keepMounted onClose={handleDelAccountClose}>
+                                <DialogTitle>{"Delete Account"}</DialogTitle>
+                                <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                        Cancel
+                                </Button>
+                                    <Link style={{ textDecoration: 'none' }} to="/">
+                                        <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                            Confirm
+                                    </Button>
+                                    </Link>
+                                </DialogActions>
+                            </Dialog>
+                        </div>
+                    </List>
+                </Drawer>
+                <main className={classes.content}>
+                    <div className={classes.appBarSpacer} />
+                    <SearchFiltersFragment proPictures={proPictures} anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
+                    <Container maxWidth="lg" className={classes.container}>
+                        <Grid container>
+                            <Grid item xs={12}>
+                                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px' }}>
+                                    <React.Fragment>
+                                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                                            <Box flex={1}>
+                                                <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
+                                                    {title}
+                                                </Typography>
+                                            </Box>
+                                            <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end" paddingRight="4em">
+                                                {title === "Search Results" && <Pagination
+                                                    page={searchPage}
+                                                    pageCount={searchPageCount}
+                                                    onBackwardFirstPage={() => setAllSearchParams({ ...allSearchParams, page: 1 })}
+                                                    onBackwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage - 1 })}
+                                                    onForwardLastPage={() => setAllSearchParams({ ...allSearchParams, page: searchPageCount })}
+                                                    onForwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage + 1 })} />}
+                                            </Box>
                                         </Box>
-                                        <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end" paddingRight="4em">
-                                            {title === "Search Results" && <Pagination
-                                                page={searchPage}
-                                                pageCount={searchPageCount}
-                                                onBackwardFirstPage={() => setAllSearchParams({ ...allSearchParams, page: 1 })}
-                                                onBackwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage - 1 })}
-                                                onForwardLastPage={() => setAllSearchParams({ ...allSearchParams, page: searchPageCount })}
-                                                onForwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage + 1 })} />}
-                                        </Box>
-                                    </Box>
-                                    <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
-                                        <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
-                                            {cards.map((card, index) => (
-                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
-                                                    <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
-                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
-                                                            <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
-                                                                <CardContent className={classes.cardContent}>
-                                                                    <Typography gutterBottom variant="h5" component="h2">
-                                                                        {card.user.username}
-                                                                    </Typography>
-                                                                    <Typography>
-                                                                        {specializationMap(card.filed_of_specialization)}
-                                                                    </Typography>
-                                                                    <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
-                                                                        <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                            <StarRating val={card.rate_avg} />
-                                                                            <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
-                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[card.user.id]}</Typography>
-                                                                        </Paper>
-                                                                    </Box>
-                                                                </CardContent>
-                                                            </Grid>
-                                                        </Card>
-                                                    </Button>
-                                                </Grid>
-                                            ))}
-                                        </Grid>
-                                    </Container>
-                                </React.Fragment>
-                            </div>
+                                        <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
+                                            <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
+                                                {cards.map((card, index) => (
+                                                    <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
+                                                        <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                            <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                                <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                    <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
+                                                                    <CardContent className={classes.cardContent}>
+                                                                        <Typography gutterBottom variant="h5" component="h2">
+                                                                            {card.user.username}
+                                                                        </Typography>
+                                                                        <Typography>
+                                                                            {specializationMap(card.filed_of_specialization)}
+                                                                        </Typography>
+                                                                        <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
+                                                                            <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                                <StarRating val={card.rate_avg} />
+                                                                                <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
+                                                                                <Typography style={{ color: 'inherit' }}>{rateCount[card.user.id]}</Typography>
+                                                                            </Paper>
+                                                                        </Box>
+                                                                    </CardContent>
+                                                                </Grid>
+                                                            </Card>
+                                                        </Button>
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        </Container>
+                                    </React.Fragment>
+                                </div>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Container>
-            </main>
-        </div>
+                    </Container>
+                </main>
+            </div>
+        </ThemeProvider>
     );
 }
 

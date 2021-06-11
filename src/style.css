@@ -88,6 +88,25 @@
     padding: 1.2em;
     transform: translateY(-50%);
 }
+::-webkit-scrollbar {
+  background: #ddd;
+  width: 15px;
+  height: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+background: #5ca0d3;
+border-radius: 10px;
+box-shadow: inset 0 0 10px #10217d;
+}
+::-webkit-scrollbar-track {
+background: #8ab6d6;
+border-radius: 0px;
+box-shadow: inset 0 0 10px #aaa;
+}
+::-webkit-scrollbar-corner {
+background: #ffffff;
+}
 
 .rbc-btn {
   color: inherit;
