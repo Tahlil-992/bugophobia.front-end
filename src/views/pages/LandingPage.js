@@ -229,7 +229,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                 </div>
             </Grid>
             <footer className={classes.footer} style={{ backgroundColor: '#E0E0E0', padding: "2em 0 1em 0" }}>
-                <Grid container style={{padding: "0 100px"}}>
+                <Grid container style={{padding: "0 150px"}}>
                 <Grid container item sm={12}>
                     <Grid item sm={6} style={{ padding: "0 1.5em"}}>
                         <Grid>
@@ -250,7 +250,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                 If you are facing any problem in using the website, or you want to share
                                 an issue with us, you can send and email to this address:
                                 <br/>
-                                <Link style={{color: "blue"}}>
+                                <Link style={{color: "#6589bb"}}>
                                     bugophobia.support@gmail.com
                                 </Link>
                             </Typography>
@@ -273,15 +273,19 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                 </Grid>  
                 <Grid item xs={12}>
                     <br/>
-                    <Divider style={{color: "red"}}/>
+                    <br/>
+                    <br/>
+                    <br/>
                     <br/>
                 </Grid>               
                 <Grid item xs={12}>
                     <Box dsiplay="flex" justifyContent="center">
-                        <Typography align="center" variant={"subtitle2"}>
+                        <Typography align="center" variant={"subtitle2"} color={"#6589bb"}>
                             &copy; All rights reserved by Bugophobia.
                         </Typography>
                     </Box>
+                    <br/>
+                    <br/>
                 </Grid>                  
                 </Grid>
             </footer>
