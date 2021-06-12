@@ -249,10 +249,10 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                             {isLoading && <LoadingSpinner />}
                         </Grid>
                         <Grid>
-                            <Link class="link" to="/forget-password">Forget password?</Link>
+                            <Link class="link" to="/forget-password" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Forget password?</Link>
                         </Grid>
                         <Grid>
-                            <Link class="link" to="/sign-up">Don't have an account? Sign Up</Link>
+                            <Link class="link" to="/sign-up" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Don't have an account? Sign Up</Link>
                         </Grid>
                         <Snackbar
                             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}

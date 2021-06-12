@@ -305,8 +305,8 @@ export default function Profile() {
 
     const str = isDoctor ? "doctor" : "patient";
 
-    const [isViewedDoctor, setIsViewedDoctor] = useState(((localStorage.getItem("isvieweddoctor") === "true") ? true : false));
-    const [viewedUsername, setViewedUsername] = useState((localStorage.getItem("viewedusername")));
+    const [isViewedDoctor, setIsViewedDoctor] = useState(((sessionStorage.getItem("isvieweddoctor") === "true") ? true : false));
+    const [viewedUsername, setViewedUsername] = useState((sessionStorage.getItem("viewedusername")));
 
     const [isSaved, setIsSaved] = useState(false);
     const [id, setId] = useState(0);
@@ -638,7 +638,7 @@ export default function Profile() {
                     });
                     newOffice.phone = newPhone;
                     newOffices.push(newOffice);
-                    if (office.id === Number(localStorage.getItem("viewedOffice"))) {
+                    if (office.id === Number(sessionStorage.getItem("viewedOffice"))) {
                         mainIndex = index;
                         setOfficeid(office.id);
                     }
@@ -653,7 +653,7 @@ export default function Profile() {
         }
     }
 
-    if (!redirected && localStorage.getItem("viewedOffice") && doctorid) {
+    if (!redirected && sessionStorage.getItem("viewedOffice") && doctorid) {
         setRedirected(true);
         setTabValue(1);
         callGetOffice();
@@ -661,10 +661,15 @@ export default function Profile() {
 
     const getBackRef = () => {
         if (!isViewedDoctor) {
-            return '/DoctorCalendar/';
+            if (sessionStorage.getItem("from") === 'profile') {
+                return '/profile/';
+            }
+            else {
+                return '/DoctorCalendar/';
+            }
         }
         else {
-            if (localStorage.getItem("viewedOffice")) {
+            if (sessionStorage.getItem("viewedOffice")) {
                 return '/Calendar/';
             }
             else {

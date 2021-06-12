@@ -6,12 +6,21 @@ import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
 //import reportWebVitals from './reportWebVitals';
 import './index.css';
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+
+const defaultMaterialTheme = createMuiTheme({
+  typography: {
+      fontFamily: `'Josefin Sans', sans-serif`,
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
-        <App/>
+        <ThemeProvider theme={defaultMaterialTheme}>
+          <App/>
+        </ThemeProvider>
       </Router>
     </Provider>
   </React.StrictMode>,

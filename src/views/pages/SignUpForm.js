@@ -468,13 +468,13 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
               {isLoading && <LoadingSpinner />}
             </Grid>
             <Grid>
-              {!isdoctor && <Link class="link" onClick={changeToDoctor}>Are you a doctor? Sign up as a doctor</Link>}
+              {!isdoctor && <Link class="link" onClick={changeToDoctor} style={{fontFamily: `'Josefin Sans', sans-serif`}}>Are you a doctor? Sign up as a doctor</Link>}
             </Grid>
             <Grid>
-              {isdoctor && <Link class="link" onClick={changeToPatient}>Are you a patient? Sign up as a patient</Link>}
+              {isdoctor && <Link class="link" onClick={changeToPatient} style={{fontFamily: `'Josefin Sans', sans-serif`}}>Are you a patient? Sign up as a patient</Link>}
             </Grid>
             <Grid>
-              <Link class="link" to="/login">Already have an account? Log in</Link>
+              <Link class="link" to="/login" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Already have an account? Log in</Link>
             </Grid>
           </div>
         </Grid>

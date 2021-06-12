@@ -18,7 +18,7 @@ import "../../style.css";
 import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { connect } from "react-redux";
 import { getDate, set } from 'date-fns';
-import { setLocalStorage } from '../../core/modules/storageManager';
+import { setSessionStorage } from '../../core/modules/storageManager';
 import Select from '@material-ui/core/Select';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import FormControl from '@material-ui/core/FormControl';
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewProfile = (username) => {
-    setLocalStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '' });
+    setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '' });
 }
 
 const EventButton = ({ children }) => {
@@ -166,7 +166,8 @@ function DoctorCalendarPage({ isRemembered }) {
                         'AvailableState': false,
                         'id': -2,
                         'events': [],
-                        'color': '#fb3640',
+                        'color': 'rgba(199,37,0,0.25)',
+                        'textColor': 'rgba(213,39,0,0.7)',
                         'borderColor': 'red',
                     }
                 );
@@ -183,7 +184,8 @@ function DoctorCalendarPage({ isRemembered }) {
                 'id': -1,
                 'greens': 0,
                 'events': newEvents,
-                'color': '#fb3640',
+                'color': 'rgba(199,37,0,0.25)',
+                'textColor': 'rgba(213,39,0,0.7)',
                 'borderColor': 'red',
                 'height': '5em',
             }); 
@@ -209,7 +211,8 @@ function DoctorCalendarPage({ isRemembered }) {
                     if (monthEvents[index].greens === 0) {
                         monthEvents[index].title = 'Available';
                         monthEvents[index].AvailableState = true;
-                        monthEvents[index].color = 'lightgreen';
+                        monthEvents[index].color = 'rgba(35,199,0,0.17)';
+                        monthEvents[index].textColor = 'rgba(124,196,107,1)';
                         monthEvents[index].borderColor = 'green';
                     }
                     monthEvents[index].greens += 1;
@@ -241,7 +244,8 @@ function DoctorCalendarPage({ isRemembered }) {
                         'AvailableState': true,
                         'id': reserve.id,
                         'events': [],
-                        'color': 'lightgreen',
+                        'color': 'rgba(35,199,0,0.17)',
+                        'textColor': 'rgba(124,196,107,1)',
                         'borderColor': 'green',
                     }
                 );
@@ -324,9 +328,9 @@ function DoctorCalendarPage({ isRemembered }) {
         }
     }
 
-    useEffect(() => {
+    /* useEffect(() => {
         handleRangeAndViewChange(view, range);
-    }, [view, range]);
+    }, [view, range]); */
 
     const [offices, setoffices] = useState([]);
     const [officeState, setofficeState] = useState(0);
@@ -376,7 +380,8 @@ function DoctorCalendarPage({ isRemembered }) {
             {
                 style: {
                     backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    //borderColor: event.borderColor,
+                    color: event.textColor,
                     height: event.height,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -390,7 +395,8 @@ function DoctorCalendarPage({ isRemembered }) {
             {
                 style: {
                     backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    //borderColor: event.borderColor,
+                    color: event.textColor,
                     height: event.height,
                     alignSelf: 'center',
                     justifySelf: 'center',
@@ -413,7 +419,7 @@ function DoctorCalendarPage({ isRemembered }) {
     const handleTitleAccessor = (event) => {
         if (view === 'month') {
             if (event.greens > 0) {
-                return event.title + '(' + event.greens + ')';
+                return event.title;// + '(' + event.greens + ')';
             }
             else {
                 return event.title;
@@ -463,7 +469,7 @@ function DoctorCalendarPage({ isRemembered }) {
                                     ))}
                                 </Select>
                             </FormControl>
-                            <Calendar style={{ minHeight: '37rem' }}
+                            <Calendar style={{ minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`, }}
                                 localizer={localizer}
                                 titleAccessor={handleTitleAccessor}
                                 view={view}

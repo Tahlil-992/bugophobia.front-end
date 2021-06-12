@@ -18,7 +18,7 @@ import "../../style.css";
 import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { connect } from "react-redux";
 import { getDate } from 'date-fns';
-import { setLocalStorage } from '../../core/modules/storageManager';
+import { setSessionStorage } from '../../core/modules/storageManager';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -38,8 +38,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewProfile = (event) => {
-    setLocalStorage(
+    setSessionStorage(
         { isvieweddoctor: 'true', 
+        from: '',
         viewedusername: event.resource.doctor_username, 
         viewedOffice: event.resource.office.id, 
         viewedEvent: event.resource.event_id,
@@ -297,8 +298,8 @@ function CalendarPage({ isRemembered }) {
             <Container maxWidth="lg" className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
-                        <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
-                            <Calendar style={{ height : '37rem' }}
+                        <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em',  }}>
+                            <Calendar style={{ minHeight : '37rem', fontFamily: `'Josefin Sans', sans-serif`, }}
                                 localizer={localizer}
                                 view={view}
                                 views={[calendar_views.month, calendar_views.week, calendar_views.day, calendar_views.agenda]}

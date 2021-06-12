@@ -285,7 +285,8 @@ export default function OfficesView(props) {
                         'AvailableState': false,
                         'id': -2,
                         'events': [],
-                        'color': '#fb3640',
+                        'color': 'rgba(199,37,0,0.25)',
+                        'textColor': 'rgba(213,39,0,0.7)',
                         'borderColor': 'red',
                     }
                 );
@@ -302,7 +303,8 @@ export default function OfficesView(props) {
                 'id': -1,
                 'greens': 0,
                 'events': newEvents,
-                'color': '#fb3640',
+                'color': 'rgba(199,37,0,0.25)',
+                'textColor': 'rgba(213,39,0,0.7)',
                 'borderColor': 'red',
                 'height': '5em',
             });
@@ -327,7 +329,8 @@ export default function OfficesView(props) {
                     if (monthEvents[index].greens === 0) {
                         monthEvents[index].title = 'Available';
                         monthEvents[index].AvailableState = true;
-                        monthEvents[index].color = 'lightgreen';
+                        monthEvents[index].color = 'rgba(35,199,0,0.17)';
+                        monthEvents[index].textColor = 'rgba(124,196,107,1)';
                         monthEvents[index].borderColor = 'green';
                     }
                     monthEvents[index].greens += 1;
@@ -340,7 +343,8 @@ export default function OfficesView(props) {
                         'AvailableState': true,
                         'id': reserve.id,
                         'events': [],
-                        'color': 'lightgreen',
+                        'color': 'rgba(35,199,0,0.17)',
+                        'textColor': 'rgba(124,196,107,1)',
                         'borderColor': 'green',
                     });
                 }
@@ -535,7 +539,7 @@ export default function OfficesView(props) {
     const handleTitleAccessor = (event) => {
         if (viewCalendar === 'month') {
             if (event.greens > 0) {
-                return event.title + '(' + event.greens + ')';
+                return event.title;// + '(' + event.greens + ')';
             }
             else {
                 return event.title;
@@ -563,24 +567,24 @@ export default function OfficesView(props) {
     }
 
     if (re) {
-        if (redirected === 0 && localStorage.getItem("viewedOffice") && officeIndex >= 0) {
+        if (redirected === 0 && sessionStorage.getItem("viewedOffice") && officeIndex >= 0) {
             setRedirected(1);
             goToOffice(officeIndex);
         }
 
-        if (redirected === 1 && localStorage.getItem("viewedOffice") && officeIndex >= 0) {
+        if (redirected === 1 && sessionStorage.getItem("viewedOffice") && officeIndex >= 0) {
             setRedirected(2);
-            const md = getDateElements(localStorage.getItem("viewedEventDate"));
+            const md = getDateElements(sessionStorage.getItem("viewedEventDate"));
             const myDate = new Date(md.year, md.month-1, md.day, md.hour, md.minute);
             handleOnRangeChange([myDate]);
             handleOnView('day');
             handleOnNavigate(myDate);
         }
 
-        if (redirected === 2 && localStorage.getItem("viewedOffice") && bottomRef.current) {
+        if (redirected === 2 && sessionStorage.getItem("viewedOffice") && bottomRef.current) {
             setRedirected(3);
             setRe(false);
-            const md = getDateElements(localStorage.getItem("viewedEventDate"));
+            const md = getDateElements(sessionStorage.getItem("viewedEventDate"));
             const myDate = new Date(md.year, md.month-1, md.day, md.hour, md.minute);
             bottomRef.current.scrollIntoView({
                 behavior: "smooth",
@@ -611,9 +615,10 @@ export default function OfficesView(props) {
             {
                 style: {
                     backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    //borderColor: event.borderColor,
+                    color: event.textColor,
                     height: event.height,
-                    fontSize: '0.9em',
+                    //fontSize: '0.9em',
                     borderRadius: '5px',
                 }
             }
@@ -622,7 +627,8 @@ export default function OfficesView(props) {
             {
                 style: {
                     backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    //borderColor: event.borderColor,
+                    color: event.textColor,
                     height: event.height,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -779,7 +785,8 @@ export default function OfficesView(props) {
                         />
                     </Grid>
                     <Grid item xs={12} className={classes.container} ref={bottomRef}>
-                        <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}} 
+                        <Calendar style={{ minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`, }} 
+                            formats={viewCalendar === 'week' ? formats : {}} 
                             titleAccessor={handleTitleAccessor}
                             localizer={localizer}
                             views={['month', 'week', 'day']}
@@ -818,6 +825,7 @@ export default function OfficesView(props) {
                                         ReserveEvent.title = 'Reserved by you';
                                         ReserveEvent.titleweek = 'Reserved';
                                         ReserveEvent.color = '#8ab6d6';
+                                        ReserveEvent.textColor = '';
                                         ReserveEvent.borderColor = 'blue';
                                         ReserveEvent.AvailableState = null;
                                         callTakeReserve(ReserveConfirmOpen);
@@ -840,7 +848,8 @@ export default function OfficesView(props) {
                                     <Button onClick={() => {
                                         UnreserveEvent.title = ' ';
                                         UnreserveEvent.titleweek = '✔';
-                                        UnreserveEvent.color = 'lightgreen';
+                                        UnreserveEvent.color = 'rgba(35,199,0,0.17)';
+                                        UnreserveEvent.textColor = 'rgba(124,196,107,1)';
                                         UnreserveEvent.borderColor = 'green';
                                         UnreserveEvent.AvailableState = true;
                                         callRemoveReserve(UnreserveConfirmOpen);
