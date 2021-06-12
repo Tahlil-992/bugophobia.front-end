@@ -19,10 +19,15 @@ import Collapse from '@material-ui/core/Collapse';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import IconButton from '@material-ui/core/IconButton';
-import Divider from '@material-ui/core/Divider';
 import EventAvailableIcon from '@material-ui/icons/EventAvailable';
 import SearchIcon from '@material-ui/icons/Search';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import DevInfo from './devsProfileSection/devContactUsInfo';
+import Rajabi from '../../assets/images/devs/M.Rajabi.jfif';
+import Kia from '../../assets/images/devs/M.Kia.jfif';
+import Fata from '../../assets/images/devs/A.Fata.jfif';
+import Eskandari from '../../assets/images/devs/S.Eskandari.jfif';
+import Roudgar from '../../assets/images/devs/A.Roudgar.jfif';
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -122,7 +127,7 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Container>
                 </div>
             </Grid>
-            <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center', backgroundColor: "rgba(16,33,125, 0.3)", margin: "0 8%" }}>
+            <Grid item xs={12} style={{ height:'60%', justifyContent:'center', alignItems:'center', backgroundColor: "rgba(16,33,125, 0.3)", margin: "0 100px" }}>
                 <div 
                     className={classes.heroContent} 
                     style={{ 
@@ -223,12 +228,9 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                 </div>
             </Grid>
             <footer className={classes.footer} style={{ backgroundColor: '#E0E0E0', padding: "2em 0" }}>
-                {/* <Typography variant="h6" align="center" gutterBottom>Footer</Typography>
-                <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Something here to give the footer a purpose!</Typography>
-                <Link class="link" style={{ display: 'flex', justifyContent: 'center', fontSize: '1.25em' }}>about us</Link> */}
                 <Grid container>
                 <Grid item sm={3}>
-                    <Typography style={{ color:"#444444", fontWeight: 900, fontSize: "1.5em" }} align="center">BOX</Typography>
+                    <Typography style={{ color:"#444444", fontWeight: 900, fontSize: "1.5em" }} align="center">LOGO</Typography>
                 </Grid>
                 <Grid container item sm={9}>
                     <Grid item sm={6} style={{ padding: "0 1.5em"}}>
@@ -236,11 +238,23 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                             <Typography style={{ color:"black", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
                         </Grid>
                         <Grid>
-                            <Typography style={{ color: "#333333", marginTop: "1em" }}>
-                                Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
-                                Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
-                                toen een onbekende drukker een zethaak met letters nam en ze 
-                                door elkaar husselde om een font-catalogus te maken. 
+                            <Typography style={{ color:"black", fontWeight: 600, fontSize: "1em" }}>Our team:</Typography>
+                            <Grid style={{marginLeft: "0.5em"}}>
+                                <DevInfo picture={Rajabi} name={"Mohammadhossein Rajabi Ghouzlu"} role={"Backend Developer"}/>
+                                <DevInfo picture={Eskandari} name={"Sina Eskandari"} role={"Backend Developer"}/>
+                                <DevInfo picture={Fata} name={"Ali Fata"} role={"Frontend Developer"}/>
+                                <DevInfo picture={Kia} name={"Mohammadreza Kia"} role={"Frontend Developer"}/>
+                                <DevInfo picture={Roudgar} name={"Amirhossein Roudgar"} role={"Frontend Developer"}/>
+                            </Grid>
+                        </Grid>
+                        <Grid>
+                            <Typography style={{ color: "#333333", marginTop: "1em" }} variant={"subtitle2"}>
+                                If you are facing any problem in using the website, or you want to share
+                                an issue with us, you can send and email to this address:
+                                <br/>
+                                <Link style={{color: "blue"}}>
+                                    bugophobia.support@gmail.com
+                                </Link>
                             </Typography>
                         </Grid>
                     </Grid>
@@ -250,10 +264,14 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                         </Grid>
                         <Grid>
                             <Typography style={{ color: "#333333", marginTop: "1em" }}>
-                                Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen.
-                                Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, 
-                                toen een onbekende drukker een zethaak met letters nam en ze 
-                                door elkaar husselde om een font-catalogus te maken. 
+                                One of our main priorities is the privacy of our visitors. 
+                                This Privacy Policy document contains types of information that is collected and recorded by Website Name and how we use it.
+                                <br/>
+                                If you have additional questions or require more information about our Privacy Policy, 
+                                do not hesitate to contact us through email at: &nbsp;                               
+                                <Link style={{color: "blue"}}>
+                                        bugophobia.support@gmail.com
+                                </Link>
                             </Typography>
                         </Grid>
                     </Grid>
