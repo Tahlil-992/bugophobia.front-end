@@ -7,10 +7,11 @@ const callAPI = async (request, sendToken = true) => {
     // console.log(request.data);
     // console.log("n\n" + request.data || {})
     try {
+        console.log("PROCESS\n", process)
         const response = await axios({
             url: request.url,
             method: request.method,
-            baseURL: request.baseURL || "http://localhost:8000",
+            baseURL: request.baseURL || process.env.REACT_APP_DOMAIN,
             headers: {
                 ...request.headers,
                 ...authorization,
