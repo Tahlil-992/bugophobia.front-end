@@ -267,12 +267,12 @@ export default function ForgetPass() {
                             <>
                             <Grid container spacing={2}>
                                 <Grid>
-                                    <label>
+                                    <Typography>
                                     Hey,<br />
                                     Enter your email address.<br />
                                     We will send you a code,<br />
                                     so, you can reset your password.<br /><br />
-                                    </label>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
@@ -296,16 +296,16 @@ export default function ForgetPass() {
                             <Button type="submit" fullWidth variant="contained" class="button" onClick={() => handleSubmitEmail()}>Submit</Button>
                             {isLoading && <LoadingSpinner/>}
                             <Grid>
-                                <Link class="link" to="/login">Back to login form</Link>
+                                <Link class="link" to="/login" style={{fontFamily: "Josefin-sans"}}>Back to login form</Link>
                             </Grid>
                             </>}
                             {processState === processStates.SUBMIT_EMAIL_CODE &&
                             <>
                             <Grid container spacing={2}>
                                 <Grid>
-                                    <label>
+                                    <Typography>
                                     Please, enter the code we sent to your email.<br /><br />
-                                    </label>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
@@ -321,9 +321,9 @@ export default function ForgetPass() {
                                     />
                                 </Grid>
                                 <Grid>
-                                    <label>
+                                    <Typography>
                                     Please, enter your new password.<br /><br />
-                                    </label>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
@@ -374,10 +374,10 @@ export default function ForgetPass() {
                                     />
                                 </Grid>
                             </Grid>
-                            <Button type="submit" fullWidth variant="contained" class="button" onClick={() => handleSubmitCode()}>Submit</Button>
+                            <Button type="submit" fullWidth variant="contained" class="button" onClick={() => handleSubmitCode()} style={{fontFamily: "Josefin-Sans"}}>Submit</Button>
                             {isLoading && <LoadingSpinner/>}
                             <Grid>
-                                <Link class="link" to="/login">Back to login form</Link>
+                                <Link class="link" to="/login" style={{fontFamily: "Josefin-sans"}}>Back to login form</Link>
                             </Grid>
                             </>}
                         </div>
@@ -400,7 +400,7 @@ export default function ForgetPass() {
               <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
               <Box>
                 {message && message.split("\n").map((item) =>
-                  <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
+                  <Typography style={{ color: "#611a15", fontFamily: "Josefin-sans" }} display="block">{item}</Typography>
                 )}
               </Box>
               <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
