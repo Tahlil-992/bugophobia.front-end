@@ -601,10 +601,10 @@ function Explore({ signOut }) {
         setOpen(false);
     };
     const ViewProfile = (username) => {
-        setLocalStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '' });
+        setSessionStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '' });
     }
     const ToCalendar = () => {
-        setLocalStorage({ username: username });
+        setSessionStorage({ username: username });
     }
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
     var isDoctor = false;

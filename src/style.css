@@ -102,7 +102,7 @@ box-shadow: inset 0 0 10px #10217d;
 ::-webkit-scrollbar-track {
 background: #8ab6d6;
 border-radius: 0px;
-box-shadow: inset 0 0 10px #aaa;
+/* box-shadow: inset 0 0 10px #aaa; */
 }
 ::-webkit-scrollbar-corner {
 background: #ffffff;
@@ -219,6 +219,7 @@ button.rbc-input::-moz-focus-inner {
     padding: 0 10px;
     text-align: center; }
   .rbc-toolbar button {
+    font-family: 'Josefin Sans', sans-serif;
     color: #373a3c;
     display: inline-block;
     margin: 0;
@@ -295,7 +296,7 @@ button.rbc-input::-moz-focus-inner {
   .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event {
     background-color: #79a3b1; }
   .rbc-event:focus, .rbc-day-slot .rbc-background-event:focus {
-    outline: 5px auto #3b99fc; }
+    outline: 0px auto #3b99fc; }
 
 .rbc-event-label {
   font-size: 80%; }
@@ -484,7 +485,7 @@ button.rbc-input::-moz-focus-inner {
       left: 10px;
       right: 0; }
   .rbc-day-slot .rbc-event, .rbc-day-slot .rbc-background-event {
-    border: 1px solid #265985;
+    border: 0px solid rgba(0,0,0,0.66);
     display: flex;
     max-height: 100%;
     min-height: 20px;

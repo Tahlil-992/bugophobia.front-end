@@ -24,7 +24,7 @@ import Popper from '@material-ui/core/Popper';
 import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorOfficeRerservationsList, callCreateMultipleReservationAPI } from "../../core/modules/calendarAPICalls";
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import { callAPIHandler } from "../../core/modules/refreshToken";
-import { setLocalStorage } from '../../core/modules/storageManager';
+import { setSessionStorage } from '../../core/modules/storageManager';
 import  { Redirect } from 'react-router-dom';
 //import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -483,7 +483,8 @@ export default function Offices(props) {
                         'AvailableState': false,
                         'id': -2,
                         'events': [],
-                        'color': '#fb3640',
+                        'color': 'rgba(199,37,0,0.25)',
+                        'textColor': 'rgba(213,39,0,0.7)',
                         'borderColor': 'red',
                     }
                 );
@@ -500,7 +501,8 @@ export default function Offices(props) {
                 'id': -1,
                 'greens': 0,
                 'events': newEvents,
-                'color': '#fb3640',
+                'color': 'rgba(199,37,0,0.25)',
+                'textColor': 'rgba(213,39,0,0.7)',
                 'borderColor': 'red',
                 'height': '5em',
             }); 
@@ -522,18 +524,31 @@ export default function Offices(props) {
             var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
             if (index !== undefined) {
                 const patient = reserve.patient;
-                if (!patient) {
+                if (!patient && monthEvents[index].events[startIndex].AvailableState !== true) {
                     if (monthEvents[index].greens === 0) {
                         monthEvents[index].title = 'Available';
                         monthEvents[index].AvailableState = true;
-                        monthEvents[index].color = 'lightgreen';
+                        monthEvents[index].color = 'rgba(35,199,0,0.17)';
+                        monthEvents[index].textColor = 'rgba(124,196,107,1)';
                         monthEvents[index].borderColor = 'green';
                     }
                     monthEvents[index].greens += 1;
+                    monthEvents[index].events[startIndex] = ({
+                        'title': '',
+                        'titleweek': '✔',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': true,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': 'rgba(35,199,0,0.17)',
+                        'textColor': 'rgba(124,196,107,1)',
+                        'borderColor': 'green',
+                    });
                 }
-                monthEvents[index].events[startIndex] = patient ?
-                (
-                    {
+                else if (patient && monthEvents[index].events[startIndex].AvailableState !== null) {
+                    monthEvents[index].events[startIndex] = ({
                         'title': 'Reserved by ' + patient.user.username,
                         'titleweek': 'Reserved',
                         'allDay': false,
@@ -545,24 +560,8 @@ export default function Offices(props) {
                         'events': [],
                         'color': '#8ab6d6',
                         'borderColor': 'blue',
-                    }
-                )
-                :
-                (
-                    {
-                        'title': '',
-                        'titleweek': '✔',
-                        'allDay': false,
-                        'start': sd,
-                        'end': ed,
-                        'AvailableState': true,
-                        'id': reserve.id,
-                        'events': [],
-                        'color': 'lightgreen',
-                        'borderColor': 'green',
-                    }
-                );
-                
+                    });
+                }  
             }
         });
         //seta(a+1); 
@@ -589,7 +588,8 @@ export default function Offices(props) {
                 if (event) {
                     event.title = event.id === -1 ? 'Unavailable' : '';
                     event.titleweek = '✘';
-                    event.color = '#fb3640';
+                    event.color = 'rgba(199,37,0,0.25)';
+                    event.textColor = 'rgba(213,39,0,0.7)';
                     event.borderColor = 'red';
                     event.AvailableState = false;
                     seta(a + 1);
@@ -598,7 +598,8 @@ export default function Offices(props) {
                     event2.greens = event2.greens - 1;
                     if (event2.greens === 0) {
                         event2.title = `Unavailable`;
-                        event2.color = '#fb3640';
+                        event2.color = 'rgba(199,37,0,0.25)';
+                        event.textColor = 'rgba(213,39,0,0.7)';
                         event2.borderColor = 'red';
                         event2.AvailableState = false;
                     }
@@ -647,7 +648,8 @@ export default function Offices(props) {
                 if (event) {
                     event.title = event.id === -1 ? 'Available' : '';
                     event.titleweek = '✔';
-                    event.color = 'lightgreen';
+                    event.color = 'rgba(35,199,0,0.17)';
+                    event.textColor = 'rgba(124,196,107,1)';
                     event.borderColor = 'green';
                     event.AvailableState = true;
                     seta(a + 1);
@@ -655,7 +657,8 @@ export default function Offices(props) {
                 if (event2) {
                     event2.greens = event2.greens + 1;
                     event2.title = `Available`;
-                    event2.color = 'lightgreen';
+                    event2.color = 'rgba(35,199,0,0.17)';
+                    event.textColor = 'rgba(124,196,107,1)';
                     event2.borderColor = 'green';
                     event2.AvailableState = true;
                     seta(a + 1);
@@ -746,7 +749,8 @@ export default function Offices(props) {
             }
             else {
                 event.title = 'Unavailable';
-                event.color = '#fb3640';
+                event.color = 'rgba(199,37,0,0.25)';
+                event.textColor = 'rgba(213,39,0,0.7)';
                 event.borderColor = 'red';
                 event.AvailableState = false;
                 event.greens = 0;
@@ -756,7 +760,7 @@ export default function Offices(props) {
                         callDeleteReserve(e.id, e, event);
                         e.title = '';
                         e.titleweek = '✘';
-                        e.color = '#fb3640';
+                        e.color = 'rgba(199,37,0,0.25)';
                         e.borderColor = 'red';
                         e.id = -2;
                     }
@@ -768,14 +772,16 @@ export default function Offices(props) {
             if (selectable === 1) {
                 event.title = '';
                 event.titleweek = '✔';
-                event.color = 'lightgreen';
+                event.color = 'rgba(35,199,0,0.17)';
+                event.textColor = 'rgba(124,196,107,1)';
                 event.borderColor = 'green';
                 event.AvailableState = true;
                 const startDate = event.start;
                 const index = monthEventsMapper['' + startDate.getFullYear() + TwoDigits(startDate.getMonth()) + TwoDigits(startDate.getDate())];
                 if (monthEvents[index].greens === 0) {
                     monthEvents[index].title = 'Available';
-                    monthEvents[index].color = 'lightgreen';
+                    monthEvents[index].color = 'rgba(35,199,0,0.17)';
+                    monthEvents[index].textColor = 'rgba(124,196,107,1)';
                     monthEvents[index].borderColor = 'green';
                 }
                 monthEvents[index].greens += 1;
@@ -786,7 +792,8 @@ export default function Offices(props) {
             if (selectable === 2) {
                 event.title = '';
                 event.titleweek = '✘';
-                event.color = '#fb3640';
+                event.color = 'rgba(199,37,0,0.25)';
+                event.textColor = 'rgba(213,39,0,0.7)';
                 event.borderColor = 'red';
                 event.AvailableState = false;
                 const startDate = event.start;
@@ -794,7 +801,8 @@ export default function Offices(props) {
                 monthEvents[index].greens -= 1;
                 if (monthEvents[index].greens === 0) {
                     monthEvents[index].title = 'Unavailable';
-                    monthEvents[index].color = '#fb3640';
+                    monthEvents[index].color = 'rgba(199,37,0,0.25)';
+                    monthEvents[index].textColor = 'rgba(213,39,0,0.7)';
                     monthEvents[index].borderColor = 'red';
                 }
                 callDeleteReserve(event.id, event, monthEvents[index]);
@@ -1085,20 +1093,22 @@ export default function Offices(props) {
         if (viewCalendar === 'month') return(
             {style: {
                 backgroundColor: event.color,
-                borderColor: event.borderColor,
+                //borderColor: event.borderColor,
                 height: event.height,
+                color: event.textColor,
                 alignItems: 'center',
                 justifyContent: 'center',
                 alignSelf: 'center',
                 justifySelf: 'center',
                 borderRadius:'5px',
-                fontSize: '0.9em',
+                //fontSize: '0.9em',
             }}
         );
         else if (viewCalendar === 'week' || viewCalendar === 'day') return(
             {style: {
                 backgroundColor: event.color,
-                borderColor: event.borderColor,
+                //borderColor: event.borderColor,
+                color: event.textColor,
                 height: event.height,
                 alignSelf: 'center',
                 justifySelf: 'center',
@@ -1110,7 +1120,7 @@ export default function Offices(props) {
     const handleTitleAccessor = (event) => {
         if (viewCalendar === 'month') {
             if (event.greens > 0) {
-                return event.title + '(' + event.greens + ')';
+                return event.title; // + '(' + event.greens + ')';
             }
             else {
                 return event.title;
@@ -1125,7 +1135,7 @@ export default function Offices(props) {
     }
 
     const ViewProfile = (username) => {
-        setLocalStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: ''});
+        setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: 'profile'});
     }
 
     useEffect(() => {
@@ -1137,6 +1147,9 @@ export default function Offices(props) {
     const defaultMaterialTheme = createMuiTheme({
         palette: {
             primary: blue,
+        },
+        typography: {
+            fontFamily: `'Josefin Sans', sans-serif`,
         },
     });
 
@@ -1232,7 +1245,7 @@ export default function Offices(props) {
 
     return (officeIndex === -1 ? 
         <Grid container direction='row' justify='center' alignItems='center' style={{marginTop: '1em'}}>
-            <Grid item container style={{maxWidth: '20em'}}>
+            <Grid item container style={{maxWidth: '24em'}}>
                 <Grid item xs={12}>
                     <TextField value={"Visit Time: " + VisitTimeDuration + " minutes"} style={{ width: '73%', height: '1em' }} size="small"
                         InputProps={{
@@ -1275,6 +1288,7 @@ export default function Offices(props) {
                     </Button>
                 </Grid>
             </Grid>
+            <hr  width='100%'/>
             {offices.map((office, index) => (
                 <>
                     <Grid item xs={11} style={{ padding: '0.5em 1em' }}>
@@ -1525,7 +1539,8 @@ export default function Offices(props) {
             </Grid>
             :
             <Grid item xs={12} className={classes.container}>
-                <Calendar style={{ minHeight: '37rem' }} formats={viewCalendar === 'week' ? formats : {}}
+                <Calendar style={{ minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`, }} 
+                    formats={viewCalendar === 'week' ? formats : {}}
                     titleAccessor = {handleTitleAccessor}
                     localizer={localizer}
                     id='clndr'

@@ -242,7 +242,7 @@ export default function About(props) {
                     variant="outlined"
                     className={classes.textfield}
                     label='Gender'
-                    value={gender}
+                    value={viewProfile ? genderMap(gender) : gender}
                     disabled={isDoctor || viewProfile}
                     select={!isDoctor && !viewProfile}
                     InputProps={{

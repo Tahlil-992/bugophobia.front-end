@@ -10,17 +10,10 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Link } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import getDay from 'date-fns/getDay';
 import "../../style.css";
-import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 import { connect } from "react-redux";
-import { getDate, set } from 'date-fns';
-import { setLocalStorage } from '../../core/modules/storageManager';
+import { setSessionStorage } from '../../core/modules/storageManager';
 import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { callAPIHandler } from "../../core/modules/refreshToken";
@@ -43,10 +36,20 @@ const useStyles = makeStyles((theme) => ({
     container: {
         paddingTop: theme.spacing(4),
     },
+    submitButton: {
+        textTransform: "none",
+        backgroundColor: 'rgba(42, 172, 61, 0.6)',
+        padding: '1em 4em 1em 4em',
+        margin: '1em 0em 1em 0em',
+        minWidth: '12em',
+        "&:hover": {
+            backgroundColor: 'rgba(19, 145, 34, 0.7)',
+        },
+    },
 }));
 
 const ViewProfile = (username) => {
-    setLocalStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '' });
+    setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '' });
 }
 
 const EventButton = ({ children }) => {
@@ -88,29 +91,7 @@ function DoctorCalendarPage({ isRemembered }) {
     minTime.setHours(6, 0, 0);
     const maxTime = new Date();
     maxTime.setHours(23, 30, 0);
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
     const [view, setView] = useState(calendar_views.month);
-    const [events, setEvents] = useState(null);
-    const [range, setRange] = useState(null);
-
-    const handleRangeAndViewChange = (view, range_data) => {
-        if (range_data) {
-            if (view === calendar_views.month || view === calendar_views.agenda) {
-                setStartDate(range_data.start);
-                setEndDate(range_data.end);
-                console.log(range_data.end.getMonth());
-            }
-            else if (view === calendar_views.week) {
-                setStartDate(range_data[0]);
-                setEndDate(range_data[6]);
-            }
-            else if (view === calendar_views.day) {
-                setStartDate(range_data[0]);
-                setEndDate(moment(range_data[0]).add(1, 'days').toDate());
-            }
-        }
-    }
 
     const getDateElements = (date_time_str) => {
         const date_str = date_time_str.split("T")[0];
@@ -166,7 +147,8 @@ function DoctorCalendarPage({ isRemembered }) {
                         'AvailableState': false,
                         'id': -2,
                         'events': [],
-                        'color': '#fb3640',
+                        'color': 'rgba(199,37,0,0.25)',
+                        'textColor': 'rgba(213,39,0,0.7)',
                         'borderColor': 'red',
                     }
                 );
@@ -183,7 +165,8 @@ function DoctorCalendarPage({ isRemembered }) {
                 'id': -1,
                 'greens': 0,
                 'events': newEvents,
-                'color': '#fb3640',
+                'color': 'rgba(199,37,0,0.25)',
+                'textColor': 'rgba(213,39,0,0.7)',
                 'borderColor': 'red',
                 'height': '5em',
             }); 
@@ -209,7 +192,8 @@ function DoctorCalendarPage({ isRemembered }) {
                     if (monthEvents[index].greens === 0) {
                         monthEvents[index].title = 'Available';
                         monthEvents[index].AvailableState = true;
-                        monthEvents[index].color = 'lightgreen';
+                        monthEvents[index].color = 'rgba(35,199,0,0.17)';
+                        monthEvents[index].textColor = 'rgba(124,196,107,1)';
                         monthEvents[index].borderColor = 'green';
                     }
                     monthEvents[index].greens += 1;
@@ -241,7 +225,8 @@ function DoctorCalendarPage({ isRemembered }) {
                         'AvailableState': true,
                         'id': reserve.id,
                         'events': [],
-                        'color': 'lightgreen',
+                        'color': 'rgba(35,199,0,0.17)',
+                        'textColor': 'rgba(124,196,107,1)',
                         'borderColor': 'green',
                     }
                 );
@@ -324,10 +309,6 @@ function DoctorCalendarPage({ isRemembered }) {
         }
     }
 
-    useEffect(() => {
-        handleRangeAndViewChange(view, range);
-    }, [view, range]);
-
     const [offices, setoffices] = useState([]);
     const [officeState, setofficeState] = useState(0);
     const [a, seta] = useState(0);
@@ -352,14 +333,20 @@ function DoctorCalendarPage({ isRemembered }) {
             console.log(error);
         }
     }
-    const [Username, setUsername] = useState((localStorage.getItem("username")));
+    
     useEffect(() => {
         callGetAPI()
     }, []);
+
+    const [emptyOffice, setEmptyOffice] = useState(false);
+
     const callGetOffice = async (id, visit_duration_time) => {
         try {
             const response = await callGetOfficeAPI(id, isRemembered);
             if (response.status === 200) {
+                if (response.payload.length === 0) {
+                    setEmptyOffice(true);
+                }
                 response.payload.map((office) => {
                     offices.push([office.title, office.id]);
                 })
@@ -376,7 +363,8 @@ function DoctorCalendarPage({ isRemembered }) {
             {
                 style: {
                     backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    //borderColor: event.borderColor,
+                    color: event.textColor,
                     height: event.height,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -390,7 +378,8 @@ function DoctorCalendarPage({ isRemembered }) {
             {
                 style: {
                     backgroundColor: event.color,
-                    borderColor: event.borderColor,
+                    //borderColor: event.borderColor,
+                    color: event.textColor,
                     height: event.height,
                     alignSelf: 'center',
                     justifySelf: 'center',
@@ -402,7 +391,7 @@ function DoctorCalendarPage({ isRemembered }) {
     const ChangeEventState = (event) => {
         if (event.username) {
             ViewProfile(event.username);
-            setisRedirct(true);
+            setisRedirct(1);
         }
         else if (event.id === -1) {
             handleOnView('day');
@@ -413,7 +402,7 @@ function DoctorCalendarPage({ isRemembered }) {
     const handleTitleAccessor = (event) => {
         if (view === 'month') {
             if (event.greens > 0) {
-                return event.title + '(' + event.greens + ')';
+                return event.title;// + '(' + event.greens + ')';
             }
             else {
                 return event.title;
@@ -426,15 +415,23 @@ function DoctorCalendarPage({ isRemembered }) {
             return event.title;
         }
     }
+
+    const goToProfileOffice = () => {
+        setSessionStorage({ isvieweddoctor: 'false', viewedusername: '', viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: 'doctorCalendar' });
+        setisRedirct(2);
+    }
     
     useEffect(() => {
         seta(0);
     }, [a]);
 
-    const [isRedirct, setisRedirct] = useState(false);
+    const [isRedirct, setisRedirct] = useState(0);
 
-    if (isRedirct) {
-        return (<Redirect to="/view-profile" />);
+    if (isRedirct === 1) {
+        return (<Redirect to="/view-profile/" />);
+    }
+    else if (isRedirct === 2) {
+        return (<Redirect to="/profile/" />);
     }
 
     return (
@@ -448,54 +445,66 @@ function DoctorCalendarPage({ isRemembered }) {
             <Container maxWidth="lg" className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
-                        <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
-                            <FormControl className={classes.formControl}>
-                                <InputLabel shrink >Offices</InputLabel>
-                                <Select style={{ marginBottom: '2em', minWidth: '10em' }}
-                                    native
-                                    value={officeState}
-                                    onChange={handleOfficeChange}
-                                >
-                                    {offices.map((office, index) => (
-                                        <option value={office[1]}>
-                                            {office[0]}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <Calendar style={{ minHeight: '37rem' }}
-                                localizer={localizer}
-                                titleAccessor={handleTitleAccessor}
-                                view={view}
-                                views={['month', 'week', 'day']}
-                                date={date}
-                                events={currentEvents}
-                                step={VisitTimeDuration}
-                                showMultiDayTimes
-                                min={minTime}
-                                max={maxTime}
-                                startAccessor="start"
-                                endAccessor="end"
-                                components={{
-                                    eventWrapper: EventButton,
-                                }}
-                                eventPropGetter={handleEventProp}
-                                //onSelectEvent={(event) => { ViewProfile(event.resource.docotor_username); }}
-                                onSelectEvent={event => ChangeEventState(event)}
-                                onView={handleOnView}
-                                onNavigate={handleOnNavigate}
-                                onDrillDown={handleOnDrilldown}
-                                onRangeChange={handleOnRangeChange}
-                                popup
-                            /*tooltipAccessor={(event) => {
-                                const sh = event.start.getHours();
-                                const sm = event.start.getMinutes();
-                                const eh = event.end.getHours();
-                                const em = event.end.getMinutes();
-                                return `${event.title}\nTime: ${sh < 10 ? `0${sh}` : sh}:${sm < 10 ? `0${sm}` : sm}-${eh < 10 ? `0${eh}` : eh}:${em < 10 ? `0${em}` : em}`;
-                            }}*/
-                            />
-                        </div>
+                        {emptyOffice ?
+                            <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
+                                <Grid container direction='column' justify='center' alignItems='center'>
+                                    <Grid item xs={12}>
+                                        <Typography align='center'>
+                                            You don't have any offices; Please add an office first.
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <Button 
+                                            className={classes.submitButton}
+                                            onClick={goToProfileOffice}
+                                            >
+                                                Add an Office
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </div>
+                            :
+                            <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel shrink >Offices</InputLabel>
+                                    <Select style={{ marginBottom: '2em', minWidth: '10em' }}
+                                        native
+                                        value={officeState}
+                                        onChange={handleOfficeChange}
+                                    >
+                                        {offices.map((office, index) => (
+                                            <option value={office[1]}>
+                                                {office[0]}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <Calendar style={{ minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`, }}
+                                    localizer={localizer}
+                                    titleAccessor={handleTitleAccessor}
+                                    view={view}
+                                    views={['month', 'week', 'day']}
+                                    date={date}
+                                    events={currentEvents}
+                                    step={VisitTimeDuration}
+                                    showMultiDayTimes
+                                    min={minTime}
+                                    max={maxTime}
+                                    startAccessor="start"
+                                    endAccessor="end"
+                                    components={{
+                                        eventWrapper: EventButton,
+                                    }}
+                                    eventPropGetter={handleEventProp}
+                                    onSelectEvent={event => ChangeEventState(event)}
+                                    onView={handleOnView}
+                                    onNavigate={handleOnNavigate}
+                                    onDrillDown={handleOnDrilldown}
+                                    onRangeChange={handleOnRangeChange}
+                                    popup
+                                />
+                            </div>
+                        }
                     </Grid>
                 </Grid>
             </Container>
