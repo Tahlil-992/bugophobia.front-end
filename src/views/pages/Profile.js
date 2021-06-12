@@ -29,6 +29,7 @@ import ChangePassword from './ChangePassword';
 import Offices from './Offices';
 import { callChangeVisitDurationTimeAPI } from "../../core/modules/calendarAPICalls";
 import { callCreateReservationAPI } from "../../core/modules/calendarAPICalls";
+import { setSessionStorage } from '../../core/modules/storageManager';
 
 function TabPanel2(props) {
     const { children, value, index, ...other } = props;
@@ -750,11 +751,33 @@ export default function Profile() {
     const [weekSchedule, setWeekSchedule] = useState([true, true, true, true, true, true, true]);
     const [daySchedule, setDaySchedule] = useState([new Date(2021, 1, 1, 6, 0), new Date(2021, 1, 1, 23, 30)]);
 
+    const [redirected, setRedirected] = useState(false);
+
+    if (!redirected && sessionStorage.getItem("from") === 'doctorCalendar') {
+        setRedirected(true);
+        setTabValue2(3);
+    }
+
+    useEffect(() => {
+        if (redirected) {
+            setSessionStorage({from: ''});
+        }
+    }, [redirected]);
+
+    const getBackRef = () => {
+        if (redirected) {
+            return '/DoctorCalendar/';
+        }
+        else {
+            return `/${str}/explore/`;
+        }
+    }
+
     return (
         <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
-                    <Link href={`/${str}/explore/`}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+                    <Link href={getBackRef()}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
                     <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
                 </Toolbar>
             </AppBar>
@@ -899,7 +922,6 @@ export default function Profile() {
                                         <Tab label="Comments"  {...a11yProps2(1)} className={(tabValue2 === 1) ? classes.seltab : classes.onetab} />
                                         <Tab label="Change Password"  {...a11yProps2(2)} className={(tabValue2 === 2) ? classes.seltab : classes.onetab} />
                                         <Tab label="Offices"  {...a11yProps2(3)} className={(tabValue2 === 3) ? classes.seltab : classes.onetab} />
-                                        <Tab label="Notifications"  {...a11yProps2(4)} className={(tabValue2 === 4) ? classes.seltab : classes.onetab} />
                                     </Tabs>
                                     :
                                     <Tabs
@@ -974,41 +996,30 @@ export default function Profile() {
                                     }
                                 </TabPanel2>
                                 <TabPanel2 value={tabValue2} index={3}>
-                                    {isDoctor ?
-                                        <Offices 
-                                            isRemembered={isRemembered} 
-                                            mainVisitTimeDuration={mainVisitTimeDuration}
-                                            callChangeVisitDurationTime={callChangeVisitDurationTime}  
-                                            doctorid={doctorid} 
-                                            got={got}
-                                            mainUsername={mainUsername}
-                                            fullscreenMode={fullscreenMode}             setFullscreenMode={setFullscreenMode}
-                                            officeIndex={officeIndex}                   setOfficeIndex={setOfficeIndex}
-                                            calendarMode={calendarMode}                 setCalendarMode={setCalendarMode}
-                                            viewCalendar={viewCalendar}                 setViewCalendar={setViewCalendar}
-                                            date={date}                                 setDate={setDate}
-                                            title={title}                               setTitle={setTitle}
-                                            address={address}                           setAddress={setAddress}
-                                            phoneNos={phoneNos}                         setPhoneNos={setPhoneNos}
-                                            isChanged={isChanged}                       setIsChanged={setIsChanged}
-                                            paperElav={paperElav}                       setPaperElav={setPaperElav}
-                                            monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
-                                            monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
-                                            currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
-                                            selectable={selectable}                     setSelectable={setSelectable}
-                                            weekSchedule={weekSchedule}                 setWeekSchedule={setWeekSchedule}
-                                            daySchedule={daySchedule}                   setDaySchedule={setDaySchedule}
-                                            />
-                                        :
-                                        <Typography>Notifications</Typography>
-                                    }
-                                </TabPanel2>
-                                <TabPanel2 value={tabValue2} index={4}>
-                                    {isDoctor ?
-                                        <Typography>Notifications</Typography>
-                                        :
-                                        <></>
-                                    }
+                                    <Offices 
+                                        isRemembered={isRemembered} 
+                                        mainVisitTimeDuration={mainVisitTimeDuration}
+                                        callChangeVisitDurationTime={callChangeVisitDurationTime}  
+                                        doctorid={doctorid} 
+                                        got={got}
+                                        mainUsername={mainUsername}
+                                        fullscreenMode={fullscreenMode}             setFullscreenMode={setFullscreenMode}
+                                        officeIndex={officeIndex}                   setOfficeIndex={setOfficeIndex}
+                                        calendarMode={calendarMode}                 setCalendarMode={setCalendarMode}
+                                        viewCalendar={viewCalendar}                 setViewCalendar={setViewCalendar}
+                                        date={date}                                 setDate={setDate}
+                                        title={title}                               setTitle={setTitle}
+                                        address={address}                           setAddress={setAddress}
+                                        phoneNos={phoneNos}                         setPhoneNos={setPhoneNos}
+                                        isChanged={isChanged}                       setIsChanged={setIsChanged}
+                                        paperElav={paperElav}                       setPaperElav={setPaperElav}
+                                        monthEvents={monthEvents}                   setMonthEvents={setMonthEvents}
+                                        monthEventsMapper={monthEventsMapper}       setMonthEventsMapper={setMonthEventsMapper}
+                                        currentEvents={currentEvents}               setCurrentEvents={setCurrentEvents}
+                                        selectable={selectable}                     setSelectable={setSelectable}
+                                        weekSchedule={weekSchedule}                 setWeekSchedule={setWeekSchedule}
+                                        daySchedule={daySchedule}                   setDaySchedule={setDaySchedule}
+                                        />
                                 </TabPanel2>
                             </Grid>
                         </Grid>

@@ -524,7 +524,7 @@ export default function Offices(props) {
             var index = monthEventsMapper['' + sd.getFullYear() + TwoDigits(sd.getMonth()) + TwoDigits(sd.getDate())];
             if (index !== undefined) {
                 const patient = reserve.patient;
-                if (!patient) {
+                if (!patient && monthEvents[index].events[startIndex].AvailableState !== true) {
                     if (monthEvents[index].greens === 0) {
                         monthEvents[index].title = 'Available';
                         monthEvents[index].AvailableState = true;
@@ -533,26 +533,7 @@ export default function Offices(props) {
                         monthEvents[index].borderColor = 'green';
                     }
                     monthEvents[index].greens += 1;
-                }
-                monthEvents[index].events[startIndex] = patient ?
-                (
-                    {
-                        'title': 'Reserved by ' + patient.user.username,
-                        'titleweek': 'Reserved',
-                        'allDay': false,
-                        'start': sd,
-                        'end': ed,
-                        'AvailableState': null,
-                        'username': patient.user.username,
-                        'id': reserve.id,
-                        'events': [],
-                        'color': '#8ab6d6',
-                        'borderColor': 'blue',
-                    }
-                )
-                :
-                (
-                    {
+                    monthEvents[index].events[startIndex] = ({
                         'title': '',
                         'titleweek': '✔',
                         'allDay': false,
@@ -564,9 +545,23 @@ export default function Offices(props) {
                         'color': 'rgba(35,199,0,0.17)',
                         'textColor': 'rgba(124,196,107,1)',
                         'borderColor': 'green',
-                    }
-                );
-                
+                    });
+                }
+                else if (patient && monthEvents[index].events[startIndex].AvailableState !== null) {
+                    monthEvents[index].events[startIndex] = ({
+                        'title': 'Reserved by ' + patient.user.username,
+                        'titleweek': 'Reserved',
+                        'allDay': false,
+                        'start': sd,
+                        'end': ed,
+                        'AvailableState': null,
+                        'username': patient.user.username,
+                        'id': reserve.id,
+                        'events': [],
+                        'color': '#8ab6d6',
+                        'borderColor': 'blue',
+                    });
+                }  
             }
         });
         //seta(a+1); 
@@ -1152,6 +1147,9 @@ export default function Offices(props) {
     const defaultMaterialTheme = createMuiTheme({
         palette: {
             primary: blue,
+        },
+        typography: {
+            fontFamily: `'Josefin Sans', sans-serif`,
         },
     });
 
