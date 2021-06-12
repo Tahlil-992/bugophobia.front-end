@@ -106,12 +106,17 @@ export default function ForgetPass() {
     useEffect (() => {
         if (verify === "verify") {
             setProcessState(processStates.SUBMIT_EMAIL_CODE);
-            history.push("/forget-password/verify")
         }
         else {
             setProcessState(processStates.SUBMIT_EMAIL_ADDRESS);
         }
     }, [verify])
+
+    useEffect(() => {
+        if (processState === processStates.SUBMIT_EMAIL_CODE) {
+            history.push("/forget-password/verify");
+        }
+    }, [processState])
 
     useEffect(() => {
         if (ispasswordValid)
@@ -135,18 +140,18 @@ export default function ForgetPass() {
     }, [isEmailValid]);
 
     useEffect(() => {
-        setIsLoading(true);
         if (onSubmitEmail)
         {
+            setIsLoading(true);
             callForgotPasswordAPI();
         }
         setOnSubmitEmail(false);
     }, [onSubmitEmail])
 
     useEffect(() => {
-        setIsLoading(true);
         if (onSubmitCode)
         {
+            setIsLoading(true);
             callConfirmResetPasswordAPI();
         }
         setOnSubmitCode(false);
@@ -197,12 +202,20 @@ export default function ForgetPass() {
             {
                 console.log(response.payload);
                 setProcessState(processStates.SUBMIT_EMAIL_CODE);
-                history.push("/forget-password/verify");
             }
         }
         catch (e)
         {
+            setOpenSnackBar(true);
             console.log("FORGOT_PASSWORD_ERROR\n", e);
+            if (e.status === 404)
+            {
+                setMessage("There is no user registered with this email address.");
+            }
+            else
+            {
+                setMessage("Something went wrong while trying to send you an email.");
+            }
         }
         finally
         {
@@ -216,12 +229,25 @@ export default function ForgetPass() {
             const response = await confirmResetPasswordAPICall({token: code, password: password});
             if (response.status === 200)
             {
-                console.log(response.payload);
+                setOpenModal(true);
             }
         }
         catch (e)
         {
+            setOpenSnackBar(true);
             console.log("CONFIRM_RESET_PASSWORD\n", e);
+            if (e.status === 404)
+            {
+                setMessage("This code is invalid.");
+            }
+            else
+            {
+                setMessage("Something went wrong while trying to change your password.");
+            }
+        }
+        finally
+        {
+            setIsLoading(false);
         }
     }
 
@@ -349,6 +375,7 @@ export default function ForgetPass() {
                                 </Grid>
                             </Grid>
                             <Button type="submit" fullWidth variant="contained" class="button" onClick={() => handleSubmitCode()}>Submit</Button>
+                            {isLoading && <LoadingSpinner/>}
                             <Grid>
                                 <Link class="link" to="/login">Back to login form</Link>
                             </Grid>
@@ -386,7 +413,7 @@ export default function ForgetPass() {
           <Box className={classes.modalPaper}>
             <Box style={{ display: "flex", alignItems: "center" }}>
               <CheckCircleIcon style={{ marginRight: "1em" }} />
-              <h2>SignUp was Successful!</h2>
+              <h2>Your password was changed successfully!</h2>
             </Box>
             <Box style={{ display: "flex" }} justifyContent="flex-end">
               <Button onClick={() => goToLogin()}>Dismiss</Button>
