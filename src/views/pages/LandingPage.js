@@ -28,6 +28,7 @@ import Kia from '../../assets/images/devs/M.Kia.jfif';
 import Fata from '../../assets/images/devs/A.Fata.jfif';
 import Eskandari from '../../assets/images/devs/S.Eskandari.jfif';
 import Roudgar from '../../assets/images/devs/A.Roudgar.jfif';
+import Divider from '@material-ui/core/Divider';
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -227,12 +228,9 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                     </Grid>
                 </div>
             </Grid>
-            <footer className={classes.footer} style={{ backgroundColor: '#E0E0E0', padding: "2em 0" }}>
-                <Grid container>
-                <Grid item sm={3}>
-                    <Typography style={{ color:"#444444", fontWeight: 900, fontSize: "1.5em" }} align="center">LOGO</Typography>
-                </Grid>
-                <Grid container item sm={9}>
+            <footer className={classes.footer} style={{ backgroundColor: '#E0E0E0', padding: "2em 0 1em 0" }}>
+                <Grid container style={{padding: "0 100px"}}>
+                <Grid container item sm={12}>
                     <Grid item sm={6} style={{ padding: "0 1.5em"}}>
                         <Grid>
                             <Typography style={{ color:"black", fontWeight: 900, fontSize: "1.5em" }}>CONTATCT US</Typography>
@@ -268,14 +266,23 @@ const LandingPage = ({ isdoctor, setIsDoctor }) => {
                                 This Privacy Policy document contains types of information that is collected and recorded by Website Name and how we use it.
                                 <br/>
                                 If you have additional questions or require more information about our Privacy Policy, 
-                                do not hesitate to contact us through email at: &nbsp;                               
-                                <Link style={{color: "blue"}}>
-                                        bugophobia.support@gmail.com
-                                </Link>
+                                do not hesitate to contact us.
                             </Typography>
                         </Grid>
                     </Grid>
-                </Grid>                    
+                </Grid>  
+                <Grid item xs={12}>
+                    <br/>
+                    <Divider style={{color: "red"}}/>
+                    <br/>
+                </Grid>               
+                <Grid item xs={12}>
+                    <Box dsiplay="flex" justifyContent="center">
+                        <Typography align="center" variant={"subtitle2"}>
+                            &copy; All rights reserved by Bugophobia.
+                        </Typography>
+                    </Box>
+                </Grid>                  
                 </Grid>
             </footer>
             </Grid>
