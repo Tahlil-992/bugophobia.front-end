@@ -48,13 +48,18 @@ function App({ setIsDoctor, login, rememberMe }) {
         }
         if (accessToken) {
           login({ accessToken: accessToken, refreshToken: refreshToken, email: email });
+          await localStorage.setItem("in", "true");
           setIsDoctor(isdoctor);
           if (remembered)
             rememberMe();
         }
         else {
-          signOut();
-          history.replace("/"); 
+          const inside = await localStorage.getItem("in");
+          if (inside === "true") {
+            await localStorage.setItem("in", "false");
+            signOut();
+            history.replace("/"); 
+          }
         }
       } catch (e) {
         console.error('Error while token management!\n' + e);
