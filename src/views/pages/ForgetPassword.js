@@ -70,6 +70,24 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
     },
+    Btn: {
+        backgroundColor: '#40bad5',
+        textAlign: 'center',
+        fontSize: '1.05em',
+        borderRadius: '10px',
+        textTransform: 'none',
+        height: '2.5em',
+        '&:hover': {
+            backgroundColor: '#5f939a',
+        },
+        marginTop: "1em",
+    },
+    paper: {
+        margin: theme.spacing(15, 3.5),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
 }));
 
 export default function ForgetPass() {
@@ -261,8 +279,8 @@ export default function ForgetPass() {
             </AppBar>
             <Box style={{ display: 'flex', backgroundColor: '#8ab6d6', height: '690px', alignItems: 'center' }}>
                 <Container component="main" maxWidth="xs">
-                    <div class="paper">
-                        <div className="form">
+                    <Paper className={classes.paper} style={{borderRadius: "10px"}} elevation={6} square>
+                        <div style={{backgroundColor: "#E0E0E0", borderRadius: "10px", padding: "50px"}}>
                             {processState === processStates.SUBMIT_EMAIL_ADDRESS && 
                             <>
                             <Grid container spacing={2}>
@@ -293,10 +311,12 @@ export default function ForgetPass() {
                                     />
                                 </Grid>
                             </Grid>
-                            <Button type="submit" fullWidth variant="contained" class="button" onClick={() => handleSubmitEmail()}>Submit</Button>
+                            <Grid item xs={12}>
+                                <Button fullWidth type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmitEmail()} style={{ marginBottom: '1.25em' }}>Submit</Button>
+                            </Grid>
                             {isLoading && <LoadingSpinner/>}
                             <Grid>
-                                <Link class="link" to="/login" style={{fontFamily: "Josefin-sans"}}>Back to login form</Link>
+                                <Link class="link" to="/login">Back to login form</Link>
                             </Grid>
                             </>}
                             {processState === processStates.SUBMIT_EMAIL_CODE &&
@@ -374,14 +394,16 @@ export default function ForgetPass() {
                                     />
                                 </Grid>
                             </Grid>
-                            <Button type="submit" fullWidth variant="contained" class="button" onClick={() => handleSubmitCode()} style={{fontFamily: "Josefin-Sans"}}>Submit</Button>
+                            <Grid item xs={12}>
+                                <Button fullWidth type="submit" variant="contained" className={classes.Btn} onClick={() => handleSubmitCode()} style={{ marginBottom: '1.25em' }}>Submit</Button>
+                            </Grid>
                             {isLoading && <LoadingSpinner/>}
                             <Grid>
-                                <Link class="link" to="/login" style={{fontFamily: "Josefin-sans"}}>Back to login form</Link>
+                                <Link class="link" to="/login">Back to login form</Link>
                             </Grid>
                             </>}
                         </div>
-                    </div>
+                    </Paper>
                 </Container>
             </Box>
             <Snackbar
@@ -400,7 +422,7 @@ export default function ForgetPass() {
               <ErrorOutlineIcon style={{ color: "#611a15", marginRight: "0.5em" }} />
               <Box>
                 {message && message.split("\n").map((item) =>
-                  <Typography style={{ color: "#611a15", fontFamily: "Josefin-sans" }} display="block">{item}</Typography>
+                  <Typography style={{ color: "#611a15" }} display="block">{item}</Typography>
                 )}
               </Box>
               <IconButton anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClick={handleClose}>
