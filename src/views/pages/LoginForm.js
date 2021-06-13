@@ -147,6 +147,7 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                     await setSessionStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
                     await resetLocalStorage();
                 }
+                await localStorage.setItem("in", "true");
                 history.replace("/")
             }
 
