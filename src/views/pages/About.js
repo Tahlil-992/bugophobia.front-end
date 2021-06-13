@@ -13,6 +13,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import BuildIcon from '@material-ui/icons/Build';
 import WorkIcon from '@material-ui/icons/Work';
 import AlarmIcon from '@material-ui/icons/Alarm';
+import AccessibilityIcon from '@material-ui/icons/Accessibility';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 
 const MyTextField = withStyles({
@@ -272,7 +273,7 @@ export default function About(props) {
                     value={age}
                     disabled={isDoctor || viewProfile}
                     InputProps={{
-                        startAdornment: (<InputAdornment position="start" > <AlarmIcon/> </InputAdornment>),
+                        startAdornment: (<InputAdornment position="start" > <AccessibilityIcon/> </InputAdornment>),
                     }}
                     onChange={
                         event => {

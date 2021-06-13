@@ -308,7 +308,7 @@ const useStyles = makeStyles((theme) => ({
     submitButton2: {
         textTransform: "none",
         backgroundColor: 'rgba(42, 172, 61, 0.6)',
-        padding: '1em 2em 1em 2em',
+        padding: '0.5em 2em',
         margin: '1em 0em 1em 0em',
        // minWidth: '12em',
         "&:hover": {
@@ -318,7 +318,7 @@ const useStyles = makeStyles((theme) => ({
     cancelButton2: {
         textTransform: "none",
         backgroundColor: "#bdc1c5",
-        padding: '1em 2em 1em 2em',
+        padding: '0.5em 2em',
         margin: '1em 0em 1em 0em',
         //minWidth: '12em',
         "&:hover": {
@@ -372,8 +372,20 @@ export default function Offices(props) {
         try {
             const response = await callAddOfficeAPI( data, isRemembered);
             if (response.status === 201) {
-                //alert(response.payload.id);
-                offices[offices.length - 1].id = response.payload.id;
+                const index = offices.length;
+                var newOffices = offices;
+                newOffices.push({
+                    id: response.payload.id,
+                    title: response.payload.title,
+                    address: response.payload.address,
+                    phone: response.payload.phone,
+                });
+                setOffices(newOffices);
+                setTitle(offices[index].title);
+                setAddress(offices[index].address);
+                setPhoneNos(offices[index].phone);
+                setOfficeIndex(index);
+                setPage(3);
                 callCreateNewReservations(response.payload.id);
                 
             }
@@ -701,6 +713,7 @@ export default function Offices(props) {
     }
 
     const callCreateNewReservations = async (officeid) => {
+        RedMaker();
         const startHour = daySchedule[0].getHours();
         const startMinute = daySchedule[0].getMinutes();
         const endHour = daySchedule[1].getHours();
@@ -708,7 +721,6 @@ export default function Offices(props) {
         if ((startHour*60 + startMinute) >= (endHour*60 + endMinute)) {
             return;
         }
-        RedMaker();
         const toDay = 30;
         var date = new Date();
         var year = date.getFullYear(); 
@@ -746,6 +758,7 @@ export default function Offices(props) {
                 else {
                     event.title = 'Available';
                 }
+                seta(a+1);
             }
             else {
                 event.title = 'Unavailable';
@@ -761,6 +774,7 @@ export default function Offices(props) {
                         e.title = '';
                         e.titleweek = '✘';
                         e.color = 'rgba(199,37,0,0.25)';
+                        e.textColor = 'rgba(213,39,0,0.7)';
                         e.borderColor = 'red';
                         e.id = -2;
                     }
@@ -829,26 +843,15 @@ export default function Offices(props) {
 
     const addOffice = () => {
         if (page === 0) {
+            setPaperElav(-1);
             setPage(1);
             return;
         }
         const index = offices.length;
-        var newOffices = offices;
-        newOffices.push({
-            id: 0,
-            title: 'Office ' + (index + 1),
-            address: 'Address',
-            phone: ['0'],
-        });
-        setOffices(newOffices);
-        setTitle(offices[index].title);
-        setAddress(offices[index].address);
-        setPhoneNos(offices[index].phone);
-        setOfficeIndex(index);
         const data = {
             doctor: doctorid,
             title: 'Office ' + (index + 1),
-            address: 'Address',
+            address: '-',
             location: 0,
             phone: [
                 {phone: '0'},
@@ -880,6 +883,7 @@ export default function Offices(props) {
         setAddress(offices[index].address);
         setPhoneNos(offices[index].phone);
         setOfficeIndex(index);
+        setPaperElav(-1);
         callGetDoctorRerserve(offices[index].id);
     };
 
@@ -897,7 +901,7 @@ export default function Offices(props) {
         setOffices(newOffices);
         setIsChanged(false);
         setAutoFocus(false);
-        setPaperElav(paperElav + 1);
+        seta(a+1);
         handlePopoverClose();
         const data = {
             id: offices[officeIndex].id,
@@ -916,7 +920,7 @@ export default function Offices(props) {
         setPhoneNos(offices[officeIndex].phone);
         setIsChanged(false);
         setAutoFocus(false);
-        setPaperElav(paperElav + 1);
+        seta(a+1);
         handlePopoverClose();
     };
 
@@ -947,7 +951,7 @@ export default function Offices(props) {
         newPhone[index]['phone'] = phone;
         setPhoneNos(newPhone);
         setIsChanged(true);
-        setPaperElav(paperElav + 1);
+        seta(a+1);
     };
 
     const addPhone = () => {
@@ -956,7 +960,7 @@ export default function Offices(props) {
         setPhoneNos(newPhone);
         setIsChanged(true);
         setAutoFocus(true);
-        setPaperElav(paperElav + 1);
+        seta(a+1);
         handlePopoverClose();
     };
 
@@ -968,7 +972,7 @@ export default function Offices(props) {
         setPhoneNos(newPhone);
         setIsChanged(true);
         setAutoFocus(false);
-        setPaperElav(paperElav + 1);
+        seta(a+1);
         handlePopoverClose();
     };
 
@@ -1040,6 +1044,7 @@ export default function Offices(props) {
                 const index = monthEventsMapper['' + slot.getFullYear() + TwoDigits(slot.getMonth()) + TwoDigits(slot.getDate())];
                 if (index !== undefined) {
                     ChangeEventState(monthEvents[index]);
+                    seta(a+1);
                 }
             });
         }
@@ -1154,6 +1159,15 @@ export default function Offices(props) {
     });
 
     const timepickerChange = (date, index) => {
+        var mydate = date;
+        if (mydate.getHours() < 6) {
+            mydate.setHours(6);
+            mydate.setMinutes(0);
+        }
+        else if (mydate.getHours() >= 23 && mydate.getMinutes() > 30) {
+            mydate.setHours(23);
+            mydate.setMinutes(30);
+        }
         daySchedule[index] = date;
         seta(a+1);
     }
@@ -1223,7 +1237,7 @@ export default function Offices(props) {
             <Grid item xs={6} container justify='flex-end'>
                 <Button 
                     className={classes.submitButton}
-                    onClick={() => {setPage(3); addOffice();}}
+                    onClick={() => {addOffice();}}
                     >
                         OK
                 </Button>
@@ -1273,7 +1287,7 @@ export default function Offices(props) {
                         </Button>
                     </ButtonGroup>
                 </Grid>
-                <Grid item xs={12} style={{ marginBottom: '1em', marginTop: '0.5em' }}>
+                <Grid item xs={12} style={{ marginBottom: '1em', marginTop: '0em' }}>
                     <Button className={classes.submitButton2} style={{ width: '49%', marginRight: '1%' }}
                         disabled={VisitTimeDuration === mainVisitTimeDuration}
                         onClick={() => {
