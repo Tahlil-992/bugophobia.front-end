@@ -82,7 +82,6 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
         throw e;
     }
 }
-
 const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
     try {
         const urlAddress = is_doctor ? "doctor" : "patient";
@@ -93,17 +92,15 @@ const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
         throw e;
     }
 }
-
-const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
+const getNotificationAPI = ({ patient }, isRemembered) => {
     try {
-        const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+        const response = callAPIHandler({ method: "GET", url: `/schedule/get-notification/${patient}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
         throw e;
     }
 }
-
 const getSortedRatingListCallAPI = (isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/top-doctor-list/` }, true, isRemembered);
@@ -113,7 +110,6 @@ const getSortedRatingListCallAPI = (isRemembered) => {
         throw e;
     }
 }
-
 const getAllSearchCallAPI = async (params, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "GET", url: "/search/all/", params: params }, true, isRemembered);
@@ -123,7 +119,6 @@ const getAllSearchCallAPI = async (params, isRemembered) => {
         throw e;
     }
 }
-
 const getLimitedSearchCallAPI = async (username, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "GET", url: "/search/limited/", params: { q: username } }, true, isRemembered);
@@ -133,7 +128,6 @@ const getLimitedSearchCallAPI = async (username, isRemembered) => {
         throw e;
     }
 }
-
 const callDeleteAccountAPI = async (username, isdoctor, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "DELETE", url: (isdoctor ? `/profile/doctor/update/${username}/` : `/profile/patient/update/${username}/`) }, true, isRemembered);
@@ -462,6 +456,7 @@ function Explore({ signOut }) {
     }
     const [cards, setcards] = useState([]);
     const [proPictures, setProPictures] = useState({});
+    const [notifications, setnotifications] = useState([]);
     const specializationMap = (spec) => {
         switch (spec) {
             case 'C': return 'Cardiologist';
@@ -494,12 +489,11 @@ function Explore({ signOut }) {
     const callGetAPI = async () => {
         try {
             const response1 = await callTopDoctorsAPI();
-
             await getSortedRatingList(response1.payload);
-
             const response2 = await callProfileAPI(isDoctor, isRemembered);
             if (response2.status === 200) {
                 setUsername(response2.payload.user.username);
+                callgetNotificationAPI(response2.payload.user.id);
             }
             setGot(true);
         }
@@ -553,6 +547,29 @@ function Explore({ signOut }) {
 
         }
     }
+
+
+
+    const callgetNotificationAPI = async (patient) => {
+        try {
+            const response = await getNotificationAPI({ patient }, isRemembered);
+            if (response.status === 200) {
+                Object.keys(response.payload).map((notif) => {
+                    var list = response.payload[notif].split(" ");
+                    var time = list[4].split(".")[0];
+                    list[4] = time;
+                    var str = list.join(" ");
+                    if (Number(list[2]) > 0)
+                        notifications.push(str);
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+        seta(a + 1);
+    }
+
     const [sent, setSent] = useState(false);
 
     useEffect(() => {
@@ -630,36 +647,20 @@ function Explore({ signOut }) {
             onClick={toggleDrawer(anchor, false)}
             onKeyDown={toggleDrawer(anchor, false)}>
             <List style={{ width: '100%', minHeight: '100vh' }}>
-                <ListItem>
-                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                        <CardContent ><ListItemText primary='notification 1' /></CardContent>
-                        <Box display="flex" flexDirection="row-reverse">
-                            <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
-                            </CardActions>
-                        </Box>
-                    </Card>
-                </ListItem>
-                <ListItem>
-                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                        <CardContent><ListItemText primary='notification 2' /></CardContent>
-                        <Box display="flex" flexDirection="row-reverse">
-                            <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
-                            </CardActions>
-                        </Box>
-                    </Card>
-                </ListItem>
-                <ListItem>
-                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                        <CardContent><ListItemText primary='notification 3' /></CardContent>
-                        <Box display="flex" flexDirection="row-reverse">
-                            <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
-                            </CardActions>
-                        </Box>
-                    </Card>
-                </ListItem>
+                {notifications.map((notif, index) => (
+                    <ListItem>
+                        <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                            <CardContent ><ListItemText primary={notif} /></CardContent>
+                            <Box display="flex" flexDirection="row-reverse">
+                                <CardActions>
+                                    <Link to="/view-profile" style={{textDecoration:'none'}}>
+                                        <Button onClick={() => ViewProfile(notif.split(" ").pop())} size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
+                                    </Link>
+                                </CardActions>
+                            </Box>
+                        </Card>
+                    </ListItem>
+                ))}
             </List>
         </div>
     );
@@ -793,7 +794,7 @@ function Explore({ signOut }) {
                         <div>
                             <React.Fragment key={'right'}>
                                 <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
-                                    <Badge badgeContent={1} color="secondary">
+                                    <Badge badgeContent={notifications.length} color="secondary">
                                         <NotificationsIcon />
                                     </Badge>
                                 </IconButton>
