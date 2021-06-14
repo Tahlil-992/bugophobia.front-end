@@ -31,6 +31,12 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, } from '@material-ui/pickers';
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
@@ -246,7 +252,8 @@ const useStyles = makeStyles((theme) => ({
     popoverpaper: {
         padding: '0.5em 1em',
         //transition: 'all 0.3s ease',
-        zIndex: -5000,
+        //position: 'relative',
+        //zIndex: 10,
     },
     arrow: {
         backgroundColor: '#fff',
@@ -888,22 +895,7 @@ export default function Offices(props) {
     };
 
     const saveChanges = () => {
-        var newOffices = offices;
-        if (!title) {
-            newOffices[officeIndex].title = 'Office ' + (officeIndex + 1);
-            setTitle('Office ' + (officeIndex + 1));
-        }
-        else {
-            newOffices[officeIndex].title = title;
-        }
-        newOffices[officeIndex].address = address;
-        newOffices[officeIndex].phone = phoneNos;
-        setOffices(newOffices);
-        setIsChanged(false);
-        setAutoFocus(false);
-        seta(a+1);
-        handlePopoverClose();
-        const data = {
+        var data = {
             id: offices[officeIndex].id,
             doctor: doctorid,
             title: title,
@@ -911,6 +903,39 @@ export default function Offices(props) {
             location: 0,
             phone: phoneNos,
         }
+        var newOffices = offices;
+        newOffices[officeIndex].title = title;
+        newOffices[officeIndex].address = address;
+        newOffices[officeIndex].phone = phoneNos;
+        if (!title) {
+            setTitle('Office ' + (officeIndex + 1));
+            data.title = 'Office ' + (officeIndex + 1);
+            newOffices[officeIndex].title = 'Office ' + (officeIndex + 1);
+        }
+        if (!address) {
+            setAddress('-');
+            data.address = '-';
+            newOffices[officeIndex].address = '-';
+        }
+        var newPhoneNos = [];
+        phoneNos.map((ph, index) => {
+            if (ph.phone) {
+                newPhoneNos.push(ph);
+            }
+        });
+        data.phone = newPhoneNos;
+        newOffices[officeIndex].phone = newPhoneNos;
+        if (newPhoneNos.length === 0) {
+            newPhoneNos = [{phone: '0', id: 0}];
+            data.phone = [{phone: '0', id: 0}];
+            newOffices[officeIndex].phone = [{phone: '0', id: 0}];
+        }
+        setPhoneNos(newPhoneNos);
+        setOffices(newOffices);
+        setIsChanged(false);
+        setAutoFocus(false);
+        seta(a+1);
+        handlePopoverClose();
         callEditOffice(offices[officeIndex].id, data);
     };
 
@@ -1140,7 +1165,7 @@ export default function Offices(props) {
     }
 
     const ViewProfile = (username) => {
-        setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: 'profile'});
+        setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '/profile/'});
     }
 
     useEffect(() => {
@@ -1160,13 +1185,27 @@ export default function Offices(props) {
 
     const timepickerChange = (date, index) => {
         var mydate = date;
-        if (mydate.getHours() < 6) {
-            mydate.setHours(6);
-            mydate.setMinutes(0);
+        if (index === 0) {
+            const yourdate = daySchedule[1];
+            if (mydate.getHours() < 6) {
+                mydate.setHours(6);
+                mydate.setMinutes(0);
+            }
+            else if (mydate.getHours() > yourdate.getHours() || (mydate.getHours() === yourdate.getHours() && mydate.getMinutes() > yourdate.getMinutes())) {
+                mydate.setHours(yourdate.getHours());
+                mydate.setMinutes(yourdate.getMinutes());
+            }
         }
-        else if (mydate.getHours() >= 23 && mydate.getMinutes() > 30) {
-            mydate.setHours(23);
-            mydate.setMinutes(30);
+        else if (index === 1) {
+            const yourdate = daySchedule[0];
+            if (mydate.getHours() < yourdate.getHours() || (mydate.getHours() === yourdate.getHours() && mydate.getMinutes() < yourdate.getMinutes())) {
+                mydate.setHours(yourdate.getHours());
+                mydate.setMinutes(yourdate.getMinutes());
+            }
+            else if (mydate.getHours() > 23 || (mydate.getHours() === 23 && mydate.getMinutes() > 30)) {
+                mydate.setHours(23);
+                mydate.setMinutes(30);
+            }
         }
         daySchedule[index] = date;
         seta(a+1);
@@ -1176,6 +1215,26 @@ export default function Offices(props) {
         weekSchedule[index] = !weekSchedule[index];
         seta(a+1);
     }
+
+    const [dialogOpen, setDialogOpen] = useState({});
+    
+    const handleDialogOpen = (index, title, text) => {
+        var item = {
+            open: true,
+            title: title,
+            text: text,
+            index: index, 
+        }
+        setDialogOpen(item);
+    };
+    
+    const handleDialogClose = () => {
+        setDialogOpen({});
+    };
+
+    const Transition = React.forwardRef(function Transition(props, ref) {
+        return <Slide direction="up" ref={ref} {...props} />;
+    });
 
     if (page === 1) return (
         <Grid container justify='center' alignItems='center' spacing={2} style={{padding: '2em'}}>
@@ -1304,7 +1363,7 @@ export default function Offices(props) {
             </Grid>
             <hr  width='100%'/>
             {offices.map((office, index) => (
-                <>
+                <Grid item xs={12} container direction='row' justify='flex-start' display='flex'>
                     <Grid item xs={11} style={{ padding: '0.5em 1em' }}>
                         <Button style={{ padding: '0em', margin: '0em 0em', textTransform: 'none', width: '100%' }} onClick={() => goToOffice(index)} key={index}>
                             <Paper className={classes.paper}
@@ -1316,39 +1375,41 @@ export default function Offices(props) {
                             </Paper>
                         </Button>
                     </Grid>
-                    <Grid item xs container justify='center' alignItems='center'>
+                    <Grid item xs={1} container justify='center' alignItems='center'>
                         <IconButton
-                            onClick={() => removeOffice(index)}
+                            onClick={() => handleDialogOpen(index, offices[index].title, `"${offices[index].title}"`)}
                             onMouseEnter={(event) => handlePopoverOpen(event, 'Remove "' + offices[index].title + '"')}
                             onMouseLeave={handlePopoverClose}
                         >
                             <DeleteIcon style={{ color: "#E03030" }} />
                         </IconButton>
                     </Grid>
-                </>
+                </Grid>
             ))}
-            <Grid item xs={11} style={{ padding: '0.5em 1em', borderBottom: '0px' }} >
-                <Button style={{ padding: '0em', margin: '0em 0em', width: '100%', textTransform: 'none' }} onClick={addOffice}>
-                    <Paper className={classes.pluspaper}
-                        onMouseEnter={() => setPaperElav(offices.length)}
-                        onMouseLeave={() => setPaperElav(-1)}
-                        elevation={1}
+            <Grid item xs={12} container direction='row' display='flex'>
+                <Grid item xs={11} style={{ padding: '0.5em 1em', borderBottom: '0px' }} >
+                    <Button style={{ padding: '0em', margin: '0em 0em', width: '100%', textTransform: 'none' }} onClick={addOffice}>
+                        <Paper className={classes.pluspaper}
+                            onMouseEnter={() => setPaperElav(offices.length)}
+                            onMouseLeave={() => setPaperElav(-1)}
+                            elevation={1}
+                        >
+                            <Typography className={classes.title} align='center'>
+                                {paperElav === offices.length ? '+ Add a new office' : '+'}
+                            </Typography>
+                        </Paper>
+                    </Button>
+                </Grid>
+                <Grid item xs={1} container justify='center' alignItems='center'>
+                    <IconButton
+                        onClick={() => handleDialogOpen(-1, 'All', 'all your offices')}
+                        onMouseEnter={(event) => handlePopoverOpen(event, 'Remove All')}
+                        onMouseLeave={handlePopoverClose}
+                        disabled={offices.length === 0}
                     >
-                        <Typography className={classes.title} align='center'>
-                            {paperElav === offices.length ? '+ Add a new office' : '+'}
-                        </Typography>
-                    </Paper>
-                </Button>
-            </Grid>
-            <Grid item xs container justify='center' alignItems='center'>
-                <IconButton
-                    onClick={() => removeOffice(-1)}
-                    onMouseEnter={(event) => handlePopoverOpen(event, 'Remove All')}
-                    onMouseLeave={handlePopoverClose}
-                    disabled={offices.length === 0}
-                >
-                    <DeleteForeverIcon style={{ color: offices.length === 0 ? 'gray' : "#E03030" }} />
-                </IconButton>
+                        <DeleteForeverIcon style={{ color: offices.length === 0 ? 'gray' : "#E03030" }} />
+                    </IconButton>
+                </Grid>
             </Grid>
             <Popper
                 id="mouse-over-popover"
@@ -1364,22 +1425,38 @@ export default function Offices(props) {
                 open={popoverOpen}
                 anchorEl={anchorEl}
                 onClose={handlePopoverClose}
-            >
-                {
-                    true &&
-                    <span className={classes.arrow} ref={handleArrowRef} />
-                }
-                <Paper elevation={5} className={classes.popoverpaper}>
-                    <Typography className={classes.text}>{popperText}</Typography>
-                </Paper>
+                >
+                    {
+                        true &&
+                        <span className={classes.arrow} ref={handleArrowRef} />
+                    }
+                    <Paper elevation={5} className={classes.popoverpaper}>
+                        <Typography className={classes.text}>{popperText}</Typography>
+                    </Paper>
             </Popper>
+            {dialogOpen.open ?
+                <Dialog fullWidth open={dialogOpen.open} TransitionComponent={Transition} keepMounted onClose={handleDialogClose}>
+                    <DialogTitle>{'Remove ' + dialogOpen.title}</DialogTitle>
+                    <DialogContent><DialogContentText>{`Are you sure you want to remove ${dialogOpen.text}?`}</DialogContentText></DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: '#9099A1', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                            Cancel
+                        </Button>
+                        <Button onClick={() => {removeOffice(dialogOpen.index); handleDialogClose();}} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                            Confirm
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                :
+                <></>
+            }
         </Grid>
         :
         <Grid container spacing={1} direction='row' className={classes.officegrid} justify='center'>
             <Grid item xs={12} container direction='row' className={classes.sidebar} justify='flex-start' alignItems='baseline' spacing={1}>
                 <Grid item>
                     <IconButton
-                        onClick={backToList}
+                        onClick={() => isChanged && !calendarMode ? handleDialogOpen(1, 'Back', 'Your changes will be lost. Are you want to save your changes?') : backToList()}
                         className={classes.backicon}
                         onMouseEnter={(event) => handlePopoverOpen(event, 'Back')}
                         onMouseLeave={handlePopoverClose}
@@ -1444,7 +1521,7 @@ export default function Offices(props) {
                         </Grid>
                         <Grid item>
                             <IconButton
-                                onClick={cancelChanges}
+                                onClick={() => handleDialogOpen(0, 'Cancel Changes', 'Are you sure you want to cancel your changes?')}
                                 className={classes.cancelicon}
                                 disabled={!isChanged}
                                 onMouseEnter={(event) => handlePopoverOpen(event, 'Cancel changes')}
@@ -1470,6 +1547,9 @@ export default function Offices(props) {
                             inputProps={{
                                 style: { textAlign: 'center', fontSize: 15 },
                                 startAdornment: (<InputAdornment position="start"> <TitleIcon /> </InputAdornment>),
+                            }}
+                            InputLabelProps={{
+                                style: {position: 'absolute', zIndex: 0},
                             }}
                             onChange={(event) => { setTitle(event.target.value); setIsChanged(true); }}
                         />
@@ -1611,6 +1691,36 @@ export default function Offices(props) {
                     <Typography className={classes.text}>{popperText}</Typography>
                 </Paper>
             </Popper>
+            {dialogOpen.open ?
+                <Dialog fullWidth open={dialogOpen.open} TransitionComponent={Transition} keepMounted onClose={handleDialogClose}>
+                    <DialogTitle>{dialogOpen.title}</DialogTitle>
+                    <DialogContent><DialogContentText>{dialogOpen.text}</DialogContentText></DialogContent>
+                    {dialogOpen.index === 0 ?
+                        <DialogActions>
+                            <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: '#9099A1', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                Cancel
+                            </Button>
+                            <Button onClick={() => {cancelChanges(); handleDialogClose();}} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                Confirm
+                            </Button>
+                        </DialogActions>
+                        :
+                        <DialogActions>
+                            <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: '#9099A1', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                Cancel
+                            </Button>
+                            <Button onClick={() => {cancelChanges(); handleDialogClose(); backToList();}} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                Don't Save
+                            </Button>
+                            <Button onClick={() => {saveChanges(); handleDialogClose(); backToList();}} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                Save
+                            </Button>
+                        </DialogActions>
+                    }
+                </Dialog>
+                :
+                <></>
+            }
         </Grid>
     );
 }

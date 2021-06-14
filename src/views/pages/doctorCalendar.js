@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ViewProfile = (username) => {
-    setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '' });
+    setSessionStorage({ isvieweddoctor: 'false', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '/DoctorCalendar/' });
 }
 
 const EventButton = ({ children }) => {
