@@ -62,6 +62,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import { DirectionsRailway } from '@material-ui/icons';
+import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -337,7 +338,7 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateZ(0)',
     },
     list: {
-        width: 300,
+        width: 350,
     },
     fullList: {
         width: 'auto',
@@ -557,10 +558,16 @@ function Explore({ signOut }) {
                 Object.keys(response.payload).map((notif) => {
                     var list = response.payload[notif].split(" ");
                     var time = list[4].split(".")[0];
+                    var day = list[2];
+                    var username = list.pop();
                     list[4] = time;
-                    var str = list.join(" ");
+                    var h = time.split(":")[0];
+                    var min = time.split(":")[1];
+                    var sec = time.split(":")[2];
+                    var str1 = `${day}d ${h}h ${min}min`;
+                    var str2 = `left till your appointment with doctor ${username}`;
                     if (Number(list[2]) > 0)
-                        notifications.push(str);
+                        notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2 });
                 });
             }
         }
@@ -620,6 +627,16 @@ function Explore({ signOut }) {
     const ViewProfile = (username) => {
         setSessionStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '' });
     }
+    const ViewProfile2 = (notif) => {
+        const username = notif.username;
+        const day = notif.day;
+        var start_time = new Date();
+        start_time.setDate(start_time.getDate() + day);
+        var end_time = new Date();
+        end_time.setDate(end_time.getDate() + (day + 1));
+        getPatientReservationsList(start_time, end_time, notif, username);
+
+    }
     const ToCalendar = () => {
         setSessionStorage({ username: username });
     }
@@ -642,7 +659,7 @@ function Explore({ signOut }) {
     };
     const list = (anchor) => (
         <div style={{ backgroundColor: 'rgba(138, 182, 214, 0.57)' }}
-            className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom', })}
+            className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom' })}
             role="presentation"
             onClick={toggleDrawer(anchor, false)}
             onKeyDown={toggleDrawer(anchor, false)}>
@@ -650,12 +667,16 @@ function Explore({ signOut }) {
                 {notifications.map((notif, index) => (
                     <ListItem>
                         <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                            <CardContent ><ListItemText primary={notif} /></CardContent>
+                            <CardContent>
+                                <font style={{ color: 'red', fontSize: 18 }}>{notif.str1 + " "}</font>
+                                <font style={{ color: 'black', fontSize: 15 }}>{notif.str2}</font>
+                            </CardContent>
                             <Box display="flex" flexDirection="row-reverse">
                                 <CardActions>
-                                    <Link to="/view-profile" style={{textDecoration:'none'}}>
-                                        <Button onClick={() => ViewProfile(notif.split(" ").pop())} size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
+                                    <Link to="/view-profile" style={{ textDecoration: 'none' }}>
+                                        <Button size="small" onClick={() => ViewProfile2(notif)} style={{ textTransform: 'none', backgroundColor: 'rgba(61,132,184,0.8)', color:'white'}}>View</Button>
                                     </Link>
+                                    <Button size="small" style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color:'white'}}>Delete</Button>
                                 </CardActions>
                             </Box>
                         </Card>
@@ -664,6 +685,36 @@ function Explore({ signOut }) {
             </List>
         </div>
     );
+    const getPatientReservationsList = async (start_date, end_date, notif, username) => {
+        const start_month = start_date.getMonth() + 1;
+        const end_month = end_date.getMonth() + 1;
+        const start_day = start_date.getDate();
+        const end_day = end_date.getDate();
+        const from_date = `${start_date.getFullYear()}${start_month < 10 ? `0${start_month}` : start_month}${start_day < 10 ? `0${start_day}` : start_day}`;
+        const to_date = `${end_date.getFullYear()}${end_month < 10 ? `0${end_month}` : end_month}${end_day < 10 ? `0${end_day}` : end_day}`;
+        try {
+            const response = await callListPatientReservations({ from_date: from_date, to_date: to_date }, isRemembered);
+            if (response.status === 200) {
+                var hour = notif.h;
+                var min = notif.min;
+                var sec = notif.sec;
+                var EventDate = start_date;
+                EventDate.setHours(EventDate.getHours() + hour - 4);
+                EventDate.setMinutes(EventDate.getMinutes() + min - 30);
+                EventDate.setSeconds(EventDate.getSeconds() + sec);
+                var MyReserve = null;
+                response.payload.map((reserve) => {
+                    if (reserve.start_time.getHours() === EventDate.getHours() && reserve.start_time.getMinutes() === EventDate.getMinutes())
+                        MyReserve = reserve;
+                });
+                var office_id = MyReserve.office.id;
+                setSessionStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: office_id, viewedEvent: MyReserve.id, viewedEventDate: MyReserve.start_time, from: '' });
+            }
+        }
+        catch (e) {
+            console.log("error on get reserve\n", e);
+        }
+    }
     const [SignoutOpen, setSignoutOpen] = useState(false);
     const handleClickSignoutOpen = () => {
         setSignoutOpen(true);
