@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const ViewProfile = (event) => {
     setSessionStorage(
         { isvieweddoctor: 'true', 
-        from: '',
+        from: '/Calendar/',
         viewedusername: event.resource.doctor_username, 
         viewedOffice: event.resource.office.id, 
         viewedEvent: event.resource.event_id,

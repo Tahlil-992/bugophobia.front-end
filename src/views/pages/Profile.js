@@ -753,7 +753,7 @@ export default function Profile() {
 
     const [redirected, setRedirected] = useState(false);
 
-    if (!redirected && sessionStorage.getItem("from") === 'doctorCalendar') {
+    if (!redirected && sessionStorage.getItem("from") === '/DoctorCalendar/') {
         setRedirected(true);
         setTabValue2(3);
     }
@@ -765,8 +765,8 @@ export default function Profile() {
     }, [redirected]);
 
     const getBackRef = () => {
-        if (redirected) {
-            return '/DoctorCalendar/';
+        if (sessionStorage.getItem("from")) {
+            return sessionStorage.getItem("from");
         }
         else {
             return `/${str}/explore/`;

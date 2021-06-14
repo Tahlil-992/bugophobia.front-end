@@ -316,7 +316,7 @@ export default function ForgetPass() {
                             </Grid>
                             {isLoading && <LoadingSpinner/>}
                             <Grid>
-                                <Link class="link" to="/login">Back to login form</Link>
+                                <Link class="link" to="/login" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Back to login form</Link>
                             </Grid>
                             </>}
                             {processState === processStates.SUBMIT_EMAIL_CODE &&
@@ -399,7 +399,7 @@ export default function ForgetPass() {
                             </Grid>
                             {isLoading && <LoadingSpinner/>}
                             <Grid>
-                                <Link class="link" to="/login">Back to login form</Link>
+                                <Link class="link" to="/login" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Back to login form</Link>
                             </Grid>
                             </>}
                         </div>

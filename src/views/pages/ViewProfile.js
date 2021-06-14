@@ -660,21 +660,11 @@ export default function Profile() {
     }
 
     const getBackRef = () => {
-        if (!isViewedDoctor) {
-            if (sessionStorage.getItem("from") === 'profile') {
-                return '/profile/';
-            }
-            else {
-                return '/DoctorCalendar/';
-            }
+        if (sessionStorage.getItem("from")) {
+            return sessionStorage.getItem("from");
         }
         else {
-            if (sessionStorage.getItem("viewedOffice")) {
-                return '/Calendar/';
-            }
-            else {
-                return `/${str}/explore/`;
-            }
+            return `/${str}/explore/`;
         }
     }
     

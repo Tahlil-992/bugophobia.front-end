@@ -37,6 +37,7 @@ import h6 from "../../assets/images/login-signup/h6.jpg";
 import h7 from "../../assets/images/login-signup/h7.jpg";
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import DoctorSignUpFragment from './DoctorSignUpFragment';
 
 const callSignUPAPI = async (data, isdoctor) => {
   try {
@@ -151,6 +152,7 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const [message, setMessage] = useState();
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openDoctorSignUpFragment, setOpenDoctorSignUpFragment] = useState(false);
 
   const [emailhelper, setemailhelper] = useState("");
   const [userhelper, setuserhelper] = useState("");
@@ -221,7 +223,12 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
       setIsLoading(false);
       if (response.status === 201) {
         setOpenSnackBar(false);
-        setOpenModal(true);
+        if (isdoctor) {
+          setOpenDoctorSignUpFragment(true);
+        }
+        else {
+          setOpenModal(true);
+        }
       }
     }
     catch (error) {
@@ -296,6 +303,11 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   const changeToDoctor = () => {
     setIsDoctor(true);
   }
+
+  if (openDoctorSignUpFragment) return (
+    <DoctorSignUpFragment FirstName={FirstName} LastName={LastName} />
+  );
+
   return (
     <React.Fragment >
       <AppBar position="relative">
