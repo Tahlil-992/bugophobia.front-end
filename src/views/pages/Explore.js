@@ -63,6 +63,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import { DirectionsRailway } from '@material-ui/icons';
 import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
+import addDays from 'date-fns/addDays';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -96,6 +97,15 @@ const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
 const getNotificationAPI = ({ patient }, isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/schedule/get-notification/${patient}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+const deleteNotificationAPI = ({ id }, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "DELETE", url: `/schedule/delete-notification/${id}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
@@ -550,39 +560,37 @@ function Explore({ signOut }) {
         }
     }
 
-
-
     const callgetNotificationAPI = async (patient) => {
         try {
             const response = await getNotificationAPI({ patient }, isRemembered);
             if (response.status === 200) {
-                Object.keys(response.payload).map((notif) => {
-                    if (response.payload[notif].includes("day")) {
-                        var list = response.payload[notif].split(" ");
+                response.payload.map((notif) => {
+                    if (notif.message.includes("day")) {
+                        var list = notif.message.split(" ");
                         var time = list[4].split(".")[0];
+                        list[4] = time;
                         var day = list[2];
                         var username = list.pop();
-                        list[4] = time;
                         var h = time.split(":")[0];
                         var min = time.split(":")[1];
                         var sec = time.split(":")[2];
                         var str1 = `${day}d ${h}h ${min}min`;
                         var str2 = `left till your appointment with doctor ${username}`;
-                        if (Number(list[2]) > 0)
-                            notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2 });
+                        if (Number(day) > 0)
+                            notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2, id: notif.id });
                     }
                     else {
-                        var list = response.payload[notif].split(" ");
+                        var list = notif.message.split(" ");
                         var time = list[2].split(".")[0];
+                        list[2] = time;
                         var day = 0;
                         var username = list.pop();
-                        list[2] = time;
                         var h = time.split(":")[0];
                         var min = time.split(":")[1];
                         var sec = time.split(":")[2];
                         var str1 = `${h}h ${min}min`;
                         var str2 = `left till your appointment with doctor ${username}`;
-                        notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2 });
+                        notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2, id: notif.id });
                     }
                 });
             }
@@ -591,6 +599,19 @@ function Explore({ signOut }) {
             console.log(error);
         }
         seta(a + 1);
+    }
+
+    const callDeleteNotificationAPI = async (id, index) => {
+        try {
+            const response = await deleteNotificationAPI({id: id}, isRemembered);
+            if (response.state === 204) {
+                notifications.splice(index, 1);
+                seta(a+1);
+            }
+        }
+        catch(error) {
+
+        }
     }
 
     const [sent, setSent] = useState(false);
@@ -645,7 +666,7 @@ function Explore({ signOut }) {
     }
     const ViewProfile2 = (notif) => {
         const username = notif.username;
-        const day = notif.day;
+        const day = Number(notif.day);
         var start_time = new Date();
         start_time.setDate(start_time.getDate() + day);
         var end_time = new Date();
@@ -691,7 +712,7 @@ function Explore({ signOut }) {
                             <Box display="flex" flexDirection="row-reverse">
                                 <CardActions>
                                     <Button size="small" onClick={() => ViewProfile2(notif)} style={{ textTransform: 'none', backgroundColor: 'rgba(61,132,184,0.8)', color: 'white' }}>View</Button>
-                                    <Button size="small" style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
+                                    <Button size="small" onClick={() => callDeleteNotificationAPI(notif.id, index)} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
                                 </CardActions>
                             </Box>
                         </Card>
