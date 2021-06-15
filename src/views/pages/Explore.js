@@ -289,6 +289,19 @@ const useStyles = makeStyles((theme) => ({
             transition: 'all 0.3s ease',
         },
     },
+    cardButton: {
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#e7e7e7',
+        transition: 'all 0.3s ease',
+        color: '#222',
+        "&:hover": {
+            transform: "scale3d(1.1, 1.1, 1)",
+            backgroundColor: '#f3f3f3',
+            transition: 'all 0.3s ease',
+        },
+    },
     limitedCard: {
         height: '100%',
         display: 'flex',
@@ -604,13 +617,13 @@ function Explore({ signOut }) {
     const callDeleteNotificationAPI = async (id, index) => {
         try {
             const response = await deleteNotificationAPI({id: id}, isRemembered);
-            if (response.state === 204) {
+            if (response.status === 204) {
                 notifications.splice(index, 1);
                 seta(a+1);
             }
         }
         catch(error) {
-
+            console.error("notification couldn't be deleted!");
         }
     }
 
@@ -689,7 +702,7 @@ function Explore({ signOut }) {
         isRemembered = true;
     }
     const theme = useTheme();
-    const [Drawerstate, setDrawerstate] = React.useState({ right: false });
+    const [Drawerstate, setDrawerstate] = useState({ right: false });
     const toggleDrawer = (anchor, open) => (event) => {
         if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) { return; }
         setDrawerstate({ ...Drawerstate, [anchor]: open });
@@ -698,7 +711,7 @@ function Explore({ signOut }) {
         <div style={{ backgroundColor: 'rgba(138, 182, 214, 0.57)' }}
             className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom' })}
             role="presentation"
-            onClick={toggleDrawer(anchor, false)}
+            onClick={toggleDrawer(anchor, true)}
             onKeyDown={toggleDrawer(anchor, false)}>
             <List style={{ width: '100%', minHeight: '100vh' }}>
                 {notifications.map((notif, index) => (
@@ -711,7 +724,7 @@ function Explore({ signOut }) {
                             <Box display="flex" flexDirection="row-reverse">
                                 <CardActions>
                                     <Button size="small" onClick={() => ViewProfile2(notif)} style={{ textTransform: 'none', backgroundColor: 'rgba(61,132,184,0.8)', color: 'white' }}>View</Button>
-                                    <Button size="small" onClick={() => callDeleteNotificationAPI(notif.id, index)} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
+                                    <Button size="small" onClick={() => {callDeleteNotificationAPI(notif.id, index); }} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
                                 </CardActions>
                             </Box>
                         </Card>
@@ -727,9 +740,8 @@ function Explore({ signOut }) {
             return true;
         return false;
     }
-    const [RedirectState, setRedirectState] = useState(false);
+    const history = useHistory();
     const getPatientReservationsList = async (start_date, end_date, notif, username) => {
-        alert(start_date + " " + end_date);
         const start_month = start_date.getMonth() + 1;
         const end_month = end_date.getMonth() + 1;
         const start_day = start_date.getDate();
@@ -743,17 +755,14 @@ function Explore({ signOut }) {
                 var min = Number(notif.min);
                 var sec = Number(notif.sec);
                 var EventDate = new Date(start_date.getFullYear(), start_month - 1, start_day, start_date.getHours() + hour, start_date.getMinutes() + min, start_date.getSeconds() + sec);
-                alert(hour + " " + min + " " + sec);
                 var MyReserve = null;
-                alert(response.payload.length);
                 response.payload.map((reserve) => {
-                    alert(new Date(reserve.start_time) + " " + EventDate);
                     if (almostEqual(new Date(reserve.start_time), EventDate))
                         MyReserve = reserve;
                 });
                 var office_id = MyReserve.office.id;
                 setSessionStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: office_id, viewedEvent: MyReserve.id, viewedEventDate: MyReserve.start_time, from: '' });
-                setRedirectState(true);
+                history.push("/view-profile");
             }
         }
         catch (e) {
@@ -774,8 +783,6 @@ function Explore({ signOut }) {
     const handleDelAccountClose = () => {
         setDelAccountOpen(false);
     };
-    if (RedirectState)
-        return (<Redirect to="/view-profile" />);
     return (
         <div className={classes.root}>
             <CssBaseline />
@@ -1018,8 +1025,8 @@ function Explore({ signOut }) {
                                         <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card, index) => (
                                                 <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
-                                                    <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
-                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                    <Button style={{ textTransform: 'none', padding:'0px', borderRadius: '10px', color:'rgba(0,0,0,0)' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
                                                                 <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
                                                                 <CardContent className={classes.cardContent}>

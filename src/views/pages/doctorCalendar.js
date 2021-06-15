@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, dateFnsLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import "../../style.css";
@@ -388,10 +388,11 @@ function DoctorCalendarPage({ isRemembered }) {
             }
         );
     }
+    const history = useHistory();
     const ChangeEventState = (event) => {
         if (event.username) {
             ViewProfile(event.username);
-            setisRedirct(1);
+            history.push("/view-profile");
         }
         else if (event.id === -1) {
             handleOnView('day');
@@ -417,22 +418,13 @@ function DoctorCalendarPage({ isRemembered }) {
     }
 
     const goToProfileOffice = () => {
-        setSessionStorage({ isvieweddoctor: 'false', viewedusername: '', viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: 'doctorCalendar' });
-        setisRedirct(2);
+        setSessionStorage({ isvieweddoctor: 'false', viewedusername: '', viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '/DoctorCalendar/' });
+        history.push("/profile");
     }
     
     useEffect(() => {
         seta(0);
     }, [a]);
-
-    const [isRedirct, setisRedirct] = useState(0);
-
-    if (isRedirct === 1) {
-        return (<Redirect to="/view-profile/" />);
-    }
-    else if (isRedirct === 2) {
-        return (<Redirect to="/profile/" />);
-    }
 
     return (
         <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
@@ -446,7 +438,7 @@ function DoctorCalendarPage({ isRemembered }) {
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
                         {emptyOffice ?
-                            <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
+                            <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '87.2vh' }}>
                                 <Grid container direction='column' justify='center' alignItems='center'>
                                     <Grid item xs={12}>
                                         <Typography align='center'>
@@ -464,7 +456,7 @@ function DoctorCalendarPage({ isRemembered }) {
                                 </Grid>
                             </div>
                             :
-                            <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em' }}>
+                            <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '80vh' }}>
                                 <FormControl className={classes.formControl}>
                                     <InputLabel shrink >Offices</InputLabel>
                                     <Select style={{ marginBottom: '2em', minWidth: '10em' }}
