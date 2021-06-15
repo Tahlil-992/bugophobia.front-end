@@ -29,6 +29,7 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
 import About from './About'
 import OfficesView from './OfficesView';
+import { useHistory } from "react-router-dom";
 
 const SUCCESS_COLOR = "#1e4620";
 const SUCCESS_BACKGROUND = "#c2fcc2";
@@ -667,12 +668,12 @@ export default function Profile() {
             return `/${str}/explore/`;
         }
     }
-    
+    let history = useHistory();
     return (
         <div style={{ backgroundColor: '#8ab6d6' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
-                    <Link href={getBackRef()}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+                    <Button onClick={() => history.goBack()} style={{ color: 'white' }}><ArrowBackIcon /></Button>
                     <Typography variant="h6" color="inherit" noWrap>View Profile</Typography>
                 </Toolbar>
             </AppBar>

@@ -30,6 +30,7 @@ import Offices from './Offices';
 import { callChangeVisitDurationTimeAPI } from "../../core/modules/calendarAPICalls";
 import { callCreateReservationAPI } from "../../core/modules/calendarAPICalls";
 import { setSessionStorage } from '../../core/modules/storageManager';
+import { useHistory } from "react-router-dom";
 
 function TabPanel2(props) {
     const { children, value, index, ...other } = props;
@@ -772,12 +773,12 @@ export default function Profile() {
             return `/${str}/explore/`;
         }
     }
-
+    let history = useHistory();
     return (
         <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
-                    <Link href={getBackRef()}><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
+                    <Button onClick={() => history.goBack()} style={{ color: 'white' }}><ArrowBackIcon /></Button>
                     <Typography variant="h6" color="inherit" noWrap>Profile</Typography>
                 </Toolbar>
             </AppBar>

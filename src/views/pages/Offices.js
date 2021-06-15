@@ -25,7 +25,7 @@ import { callCreateReservationAPI, callDeleteReservationAPI, callGetDoctorOffice
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import { callAPIHandler } from "../../core/modules/refreshToken";
 import { setSessionStorage } from '../../core/modules/storageManager';
-import  { Redirect } from 'react-router-dom';
+import  { Redirect, useHistory } from 'react-router-dom';
 //import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, } from '@material-ui/pickers';
@@ -743,11 +743,12 @@ export default function Offices(props) {
             day += 1;
         }
     }
-
+    const history = useHistory();
     const ChangeEventState = async (event) => {
         if (event.AvailableState === null || event.username) {
             ViewProfile(event.username);
             setPage(2);
+            history.push("/view-profile");
             return;
         }
         if (event.id === -1) {
@@ -1172,7 +1173,7 @@ export default function Offices(props) {
         seta(0);
     }, [a])
 
-    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thuesday', 'Friday', 'Saturday'];
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const defaultMaterialTheme = createMuiTheme({
         palette: {
@@ -1312,10 +1313,6 @@ export default function Offices(props) {
         </Grid>
     );
 
-    if (page === 2) return (
-        <Redirect to='view-profile'/>
-    )
-
     return (officeIndex === -1 ? 
         <Grid container direction='row' justify='center' alignItems='center' style={{marginTop: '1em'}}>
             <Grid item container style={{maxWidth: '24em'}}>
@@ -1439,10 +1436,10 @@ export default function Offices(props) {
                     <DialogTitle>{'Remove ' + dialogOpen.title}</DialogTitle>
                     <DialogContent><DialogContentText>{`Are you sure you want to remove ${dialogOpen.text}?`}</DialogContentText></DialogContent>
                     <DialogActions>
-                        <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: '#9099A1', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                        <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
                             Cancel
                         </Button>
-                        <Button onClick={() => {removeOffice(dialogOpen.index); handleDialogClose();}} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                        <Button onClick={() => {removeOffice(dialogOpen.index); handleDialogClose();}} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                             Confirm
                         </Button>
                     </DialogActions>
@@ -1456,7 +1453,7 @@ export default function Offices(props) {
             <Grid item xs={12} container direction='row' className={classes.sidebar} justify='flex-start' alignItems='baseline' spacing={1}>
                 <Grid item>
                     <IconButton
-                        onClick={() => isChanged && !calendarMode ? handleDialogOpen(1, 'Back', 'Your changes will be lost. Are you want to save your changes?') : backToList()}
+                        onClick={() => isChanged && !calendarMode ? handleDialogOpen(1, 'Back', 'Your changes will be lost. Do you want to save your changes?') : backToList()}
                         className={classes.backicon}
                         onMouseEnter={(event) => handlePopoverOpen(event, 'Back')}
                         onMouseLeave={handlePopoverClose}
@@ -1697,11 +1694,11 @@ export default function Offices(props) {
                     <DialogContent><DialogContentText>{dialogOpen.text}</DialogContentText></DialogContent>
                     {dialogOpen.index === 0 ?
                         <DialogActions>
-                            <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: '#9099A1', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
-                                Cancel
+                            <Button onClick={handleDialogClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                No
                             </Button>
-                            <Button onClick={() => {cancelChanges(); handleDialogClose();}} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
-                                Confirm
+                            <Button onClick={() => {cancelChanges(); handleDialogClose();}} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)' , color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                Yes
                             </Button>
                         </DialogActions>
                         :
