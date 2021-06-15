@@ -34,7 +34,7 @@ import { callAPIHandler } from "../../core/modules/refreshToken";
 import DoctorImage from "../../assets/images/doctor.png";
 import PatientImage from "../../assets/images/patient.png";
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { setLocalStorage, setSessionStorage, resetLocalStorage, resetSessionStorage } from "../../core/modules/storageManager";
 import { signOut } from '../../core/Authentication/action/authActions';
@@ -62,6 +62,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import { DirectionsRailway } from '@material-ui/icons';
+import { callListPatientReservations } from '../../core/modules/calendarAPICalls';
 
 const callTopDoctorsAPI = async () => {
     try {
@@ -82,7 +83,6 @@ const callProfileAPI = async (is_doctor, isRemembered) => {
         throw e;
     }
 }
-
 const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
     try {
         const urlAddress = is_doctor ? "doctor" : "patient";
@@ -93,17 +93,15 @@ const callProfilePictureAPI = async (mainUsername, is_doctor, isRemembered) => {
         throw e;
     }
 }
-
-const getRatingDetailCallAPI = ({ doctor_id }, isRemembered) => {
+const getNotificationAPI = ({ patient }, isRemembered) => {
     try {
-        const response = callAPIHandler({ method: "GET", url: `/auth/rate-detail/${doctor_id}/` }, true, isRemembered);
+        const response = callAPIHandler({ method: "GET", url: `/schedule/get-notification/${patient}/` }, true, isRemembered);
         return response;
     }
     catch (e) {
         throw e;
     }
 }
-
 const getSortedRatingListCallAPI = (isRemembered) => {
     try {
         const response = callAPIHandler({ method: "GET", url: `/auth/top-doctor-list/` }, true, isRemembered);
@@ -113,7 +111,6 @@ const getSortedRatingListCallAPI = (isRemembered) => {
         throw e;
     }
 }
-
 const getAllSearchCallAPI = async (params, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "GET", url: "/search/all/", params: params }, true, isRemembered);
@@ -123,7 +120,6 @@ const getAllSearchCallAPI = async (params, isRemembered) => {
         throw e;
     }
 }
-
 const getLimitedSearchCallAPI = async (username, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "GET", url: "/search/limited/", params: { q: username } }, true, isRemembered);
@@ -133,7 +129,6 @@ const getLimitedSearchCallAPI = async (username, isRemembered) => {
         throw e;
     }
 }
-
 const callDeleteAccountAPI = async (username, isdoctor, isRemembered) => {
     try {
         const response = await callAPIHandler({ method: "DELETE", url: (isdoctor ? `/profile/doctor/update/${username}/` : `/profile/patient/update/${username}/`) }, true, isRemembered);
@@ -343,7 +338,7 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateZ(0)',
     },
     list: {
-        width: 300,
+        width: 350,
     },
     fullList: {
         width: 'auto',
@@ -462,6 +457,7 @@ function Explore({ signOut }) {
     }
     const [cards, setcards] = useState([]);
     const [proPictures, setProPictures] = useState({});
+    const [notifications, setnotifications] = useState([]);
     const specializationMap = (spec) => {
         switch (spec) {
             case 'C': return 'Cardiologist';
@@ -494,12 +490,12 @@ function Explore({ signOut }) {
     const callGetAPI = async () => {
         try {
             const response1 = await callTopDoctorsAPI();
-
             await getSortedRatingList(response1.payload);
-
             const response2 = await callProfileAPI(isDoctor, isRemembered);
             if (response2.status === 200) {
                 setUsername(response2.payload.user.username);
+                if (!isDoctor)
+                    callgetNotificationAPI(response2.payload.user.id);
             }
             setGot(true);
         }
@@ -553,6 +549,50 @@ function Explore({ signOut }) {
 
         }
     }
+
+
+
+    const callgetNotificationAPI = async (patient) => {
+        try {
+            const response = await getNotificationAPI({ patient }, isRemembered);
+            if (response.status === 200) {
+                Object.keys(response.payload).map((notif) => {
+                    if (response.payload[notif].includes("day")) {
+                        var list = response.payload[notif].split(" ");
+                        var time = list[4].split(".")[0];
+                        var day = list[2];
+                        var username = list.pop();
+                        list[4] = time;
+                        var h = time.split(":")[0];
+                        var min = time.split(":")[1];
+                        var sec = time.split(":")[2];
+                        var str1 = `${day}d ${h}h ${min}min`;
+                        var str2 = `left till your appointment with doctor ${username}`;
+                        if (Number(list[2]) > 0)
+                            notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2 });
+                    }
+                    else {
+                        var list = response.payload[notif].split(" ");
+                        var time = list[2].split(".")[0];
+                        var day = 0;
+                        var username = list.pop();
+                        list[2] = time;
+                        var h = time.split(":")[0];
+                        var min = time.split(":")[1];
+                        var sec = time.split(":")[2];
+                        var str1 = `${h}h ${min}min`;
+                        var str2 = `left till your appointment with doctor ${username}`;
+                        notifications.push({ day: day, h: h, min: min, sec: sec, username: username, str1: str1, str2: str2 });
+                    }
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+        seta(a + 1);
+    }
+
     const [sent, setSent] = useState(false);
 
     useEffect(() => {
@@ -603,6 +643,16 @@ function Explore({ signOut }) {
     const ViewProfile = (username) => {
         setSessionStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: '', viewedEvent: '', viewedEventDate: '', from: '' });
     }
+    const ViewProfile2 = (notif) => {
+        const username = notif.username;
+        const day = notif.day;
+        var start_time = new Date();
+        start_time.setDate(start_time.getDate() + day);
+        var end_time = new Date();
+        end_time.setDate(end_time.getDate() + (day + 2));
+        getPatientReservationsList(start_time, end_time, notif, username);
+
+    }
     const ToCalendar = () => {
         setSessionStorage({ username: username });
     }
@@ -625,44 +675,71 @@ function Explore({ signOut }) {
     };
     const list = (anchor) => (
         <div style={{ backgroundColor: 'rgba(138, 182, 214, 0.57)' }}
-            className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom', })}
+            className={clsx(classes.list, { [classes.fullList]: anchor === 'top' || anchor === 'bottom' })}
             role="presentation"
             onClick={toggleDrawer(anchor, false)}
             onKeyDown={toggleDrawer(anchor, false)}>
             <List style={{ width: '100%', minHeight: '100vh' }}>
-                <ListItem>
-                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                        <CardContent ><ListItemText primary='notification 1' /></CardContent>
-                        <Box display="flex" flexDirection="row-reverse">
-                            <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
-                            </CardActions>
-                        </Box>
-                    </Card>
-                </ListItem>
-                <ListItem>
-                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                        <CardContent><ListItemText primary='notification 2' /></CardContent>
-                        <Box display="flex" flexDirection="row-reverse">
-                            <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
-                            </CardActions>
-                        </Box>
-                    </Card>
-                </ListItem>
-                <ListItem>
-                    <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
-                        <CardContent><ListItemText primary='notification 3' /></CardContent>
-                        <Box display="flex" flexDirection="row-reverse">
-                            <CardActions>
-                                <Button size="small" style={{ textTransform: 'none', backgroundColor: '#3d84b8', color: 'white' }}>View</Button>
-                            </CardActions>
-                        </Box>
-                    </Card>
-                </ListItem>
+                
+                {notifications.map((notif, index) => (
+                    <ListItem>
+                        <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
+                            <CardContent>
+                                <font style={{ color: 'rgba(61,132,184,1)', fontSize: 18 }}>{notif.str1 + " "}</font>
+                                <font style={{ color: 'black', fontSize: 15 }}>{notif.str2}</font>
+                            </CardContent>
+                            <Box display="flex" flexDirection="row-reverse">
+                                <CardActions>
+                                    <Button size="small" onClick={() => ViewProfile2(notif)} style={{ textTransform: 'none', backgroundColor: 'rgba(61,132,184,0.8)', color: 'white' }}>View</Button>
+                                    <Button size="small" style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
+                                </CardActions>
+                            </Box>
+                        </Card>
+                    </ListItem>
+                ))}
             </List>
-        </div>
+        </div >
     );
+    const almostEqual = (date1, date2) => {
+        const time1 = date1.getHours() * 60 + date1.getMinutes();
+        const time2 = date2.getHours() * 60 + date2.getMinutes();
+        if (Math.abs(time1 - time2) < 5)
+            return true;
+        return false;
+    }
+    const [RedirectState, setRedirectState] = useState(false);
+    const getPatientReservationsList = async (start_date, end_date, notif, username) => {
+        alert(start_date + " " + end_date);
+        const start_month = start_date.getMonth() + 1;
+        const end_month = end_date.getMonth() + 1;
+        const start_day = start_date.getDate();
+        const end_day = end_date.getDate();
+        const from_date = `${start_date.getFullYear()}${start_month < 10 ? `0${start_month}` : start_month}${start_day < 10 ? `0${start_day}` : start_day}`;
+        const to_date = `${end_date.getFullYear()}${end_month < 10 ? `0${end_month}` : end_month}${end_day < 10 ? `0${end_day}` : end_day}`;
+        try {
+            const response = await callListPatientReservations({ from_date: from_date, to_date: to_date }, isRemembered);
+            if (response.status === 200) {
+                var hour = Number(notif.h);
+                var min = Number(notif.min);
+                var sec = Number(notif.sec);
+                var EventDate = new Date(start_date.getFullYear(), start_month - 1, start_day, start_date.getHours() + hour, start_date.getMinutes() + min, start_date.getSeconds() + sec);
+                alert(hour + " " + min + " " + sec);
+                var MyReserve = null;
+                alert(response.payload.length);
+                response.payload.map((reserve) => {
+                    alert(new Date(reserve.start_time) + " " + EventDate);
+                    if (almostEqual(new Date(reserve.start_time), EventDate))
+                        MyReserve = reserve;
+                });
+                var office_id = MyReserve.office.id;
+                setSessionStorage({ isvieweddoctor: 'true', viewedusername: username, viewedOffice: office_id, viewedEvent: MyReserve.id, viewedEventDate: MyReserve.start_time, from: '' });
+                setRedirectState(true);
+            }
+        }
+        catch (e) {
+            console.log("error on get reserve\n", e);
+        }
+    }
     const [SignoutOpen, setSignoutOpen] = useState(false);
     const handleClickSignoutOpen = () => {
         setSignoutOpen(true);
@@ -677,284 +754,283 @@ function Explore({ signOut }) {
     const handleDelAccountClose = () => {
         setDelAccountOpen(false);
     };
-
+    if (RedirectState)
+        return (<Redirect to="/view-profile" />);
     return (
-        <ThemeProvider theme={theme}>
-            <div className={classes.root}>
-                <CssBaseline />
-                <AppBar ref={filterAnchorRef} position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-                    <Toolbar className={classes.toolbar}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>Home Page</Typography>
-                        <div className={classes.search}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon />
+        <div className={classes.root}>
+            <CssBaseline />
+            <AppBar ref={filterAnchorRef} position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+                <Toolbar className={classes.toolbar}>
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={handleDrawerOpen}
+                        className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>Home Page</Typography>
+                    <div className={classes.search}>
+                        <div className={classes.searchIcon}>
+                            <SearchIcon />
+                        </div>
+                        <div>
+                            <div ref={anchorRef}>
+                                <ClickAwayListener onClickAway={(event) => { handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth) }}>
+                                    <InputBase
+                                        placeholder="Search…"
+                                        classes={{
+                                            root: classes.inputRoot,
+                                            input: classes.inputInput,
+                                        }}
+                                        inputProps={{ 'aria-label': 'search' }}
+                                        onClick={(event) => { handleClickListItem(event); setLimitedWidth(expandedSearchWidth) }}
+                                        value={limitedSearchInput}
+                                        onChange={handleOnLimitedSearchInputChange}
+                                        onFocus={onFocus}
+                                        onBlur={onBlur}
+                                    />
+                                </ClickAwayListener>
                             </div>
-                            <div>
-                                <div ref={anchorRef}>
-                                    <ClickAwayListener onClickAway={(event) => { handleCloseLimitedPopper(event); setLimitedWidth(collapsedSearchWidth) }}>
-                                        <InputBase
-                                            placeholder="Search…"
-                                            classes={{
-                                                root: classes.inputRoot,
-                                                input: classes.inputInput,
-                                            }}
-                                            inputProps={{ 'aria-label': 'search' }}
-                                            onClick={(event) => { handleClickListItem(event); setLimitedWidth(expandedSearchWidth) }}
-                                            value={limitedSearchInput}
-                                            onChange={handleOnLimitedSearchInputChange}
-                                            onFocus={onFocus}
-                                            onBlur={onBlur}
-                                        />
-                                    </ClickAwayListener>
-                                </div>
-                                <Box style={{ display: "flex" }}>
-                                    <Container maxWidth={false} disableGutters style={{ width: focused ? expandedSearchWidth : collapsedSearchWidth }}>
-                                        <Popper
-                                            open={showLimitedMenu}
-                                            anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
-                                            className={classes.limitedPopper}
-                                            role={undefined}
-                                            transition
-                                            disablePortal
-                                            placement="bottom-start"
-                                            style={{ width: "100%" }}>
-                                            {({ TransitionProps, placement }) => (
-                                                <Grow
-                                                    {...TransitionProps}
-                                                    style={{
-                                                        transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-                                                        width: "100%"
-                                                    }}>
-                                                    <Paper style={{ borderRadius: "5px" }}>
-                                                        <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
-                                                            <MenuList property={{ style: { borderTopLeftRadius: '0px', borderTopRightRadius: '50px' } }} autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0, }}>
-                                                                {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{ padding: 0 }}>
-                                                                    <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
-                                                                        <Card
-                                                                            className={classes.limitedCard}
-                                                                            style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
-                                                                            <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
-                                                                                <Grid item xs={5} container justify='center'>
-                                                                                    <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.id]} />
-                                                                                </Grid>
-                                                                                <Grid item xs={7}>
-                                                                                    <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
-                                                                                        <Typography align='left' variant="h6">
-                                                                                            {list.user.username}
-                                                                                        </Typography>
-                                                                                        <Typography align='left'>
-                                                                                            {specializationMap(list.filed_of_specialization)}
-                                                                                        </Typography>
-                                                                                        <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
-                                                                                            <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                                                <StarRating val={list.rate_avg} />
-                                                                                            </Paper>
-                                                                                        </Box>
-                                                                                    </CardContent>
-                                                                                </Grid>
+                            <Box style={{ display: "flex" }}>
+                                <Container maxWidth={false} disableGutters style={{ width: focused ? expandedSearchWidth : collapsedSearchWidth }}>
+                                    <Popper
+                                        open={showLimitedMenu}
+                                        anchorEl={anchorRef && anchorRef.current ? anchorRef.current : null}
+                                        className={classes.limitedPopper}
+                                        role={undefined}
+                                        transition
+                                        disablePortal
+                                        placement="bottom-start"
+                                        style={{ width: "100%" }}>
+                                        {({ TransitionProps, placement }) => (
+                                            <Grow
+                                                {...TransitionProps}
+                                                style={{
+                                                    transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                                                    width: "100%"
+                                                }}>
+                                                <Paper style={{ borderRadius: "5px" }}>
+                                                    <ClickAwayListener onClickAway={handleCloseLimitedPopper} >
+                                                        <MenuList property={{ style: { borderTopLeftRadius: '0px', borderTopRightRadius: '50px' } }} autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} style={{ padding: 0, }}>
+                                                            {limitedSearchInput !== "" && limitedSearchResults && limitedSearchResults.length > 0 && limitedSearchResults.map((list, index) => (<MenuItem onClick={handleCloseLimitedPopper} style={{ padding: 0 }}>
+                                                                <Button style={{ textTransform: 'none', textAlign: 'center', padding: 0, width: "100%" }} component={Link} to="/view-profile" onClick={() => ViewProfile(list.user.username)} size="small" color="primary">
+                                                                    <Card
+                                                                        className={classes.limitedCard}
+                                                                        style={{ justifyContent: 'center', alignItems: 'center', borderRadius: (index === 0 ? '10px 10px 0 0' : '0'), height: '100%', width: "100%" }}>
+                                                                        <Grid style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-evenly", alignItems: "center", width: "100%" }}>
+                                                                            <Grid item xs={5} container justify='center'>
+                                                                                <Avatar className={classes.SearchCardMedia} src={proPictures[list.user.id]} />
                                                                             </Grid>
-                                                                        </Card>
-                                                                    </Button>
-                                                                </MenuItem>
-                                                                ))}
-                                                                {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{ padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0" }}>
-                                                                    <Card elevation={0} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
-                                                                        <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
-                                                                            Record Not found
-                                                                    </Typography>
+                                                                            <Grid item xs={7}>
+                                                                                <CardContent className={classes.limitedCardContent} style={{ padding: "1em 0" }}>
+                                                                                    <Typography align='left' variant="h6">
+                                                                                        {list.user.username}
+                                                                                    </Typography>
+                                                                                    <Typography align='left'>
+                                                                                        {specializationMap(list.filed_of_specialization)}
+                                                                                    </Typography>
+                                                                                    <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
+                                                                                        <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                                            <StarRating val={list.rate_avg} />
+                                                                                        </Paper>
+                                                                                    </Box>
+                                                                                </CardContent>
+                                                                            </Grid>
+                                                                        </Grid>
                                                                     </Card>
-                                                                </Box>}
-                                                                {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{ backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px" }}>
-                                                                    <Button
-                                                                        onClick={() => { setOpenFilters(true); setShowLimitedMenu(false); }}
-                                                                        style={{ textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": { backgroundColor: "#10217d" } }}>
-                                                                        <Typography style={{ color: "#FFF", margin: "0.5em 0" }}>
-                                                                            Advanced Search
+                                                                </Button>
+                                                            </MenuItem>
+                                                            ))}
+                                                            {limitedSearchInput !== "" && limitedSearchResults !== null && limitedSearchResults.length === 0 && <Box style={{ padding: 0, backgroundColor: "#f9a099", display: "flex", justifyContent: "center", borderRadius: "5px 5px 0 0" }}>
+                                                                <Card elevation={0} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: "#f9a099", height: '100%', width: 'auto' }}>
+                                                                    <Typography style={{ color: "#611a15", margin: "0.5em 0" }}>
+                                                                        Record Not found
                                                                     </Typography>
-                                                                    </Button>
-                                                                </Box>}
-                                                            </MenuList>
-                                                        </ClickAwayListener>
-                                                    </Paper>
-                                                </Grow>)}
-                                        </Popper>
-                                    </Container>
-                                </Box>
-                            </div>
+                                                                </Card>
+                                                            </Box>}
+                                                            {limitedSearchInput !== "" && limitedSearchResults !== null && <Box style={{ backgroundColor: "rgba(48, 150, 164, 1)", height: '100%', width: "auto", justifyContent: "center", borderRadius: "0 0 10px 10px" }}>
+                                                                <Button
+                                                                    onClick={() => { setOpenFilters(true); setShowLimitedMenu(false); }}
+                                                                    style={{ textTransform: "none", backgroundColor: "rgba(48, 150, 164, 1)", textAlign: "center", padding: 0, width: "100%", "&:hover": { backgroundColor: "#10217d" } }}>
+                                                                    <Typography style={{ color: "#FFF", margin: "0.5em 0" }}>
+                                                                        Advanced Search
+                                                                    </Typography>
+                                                                </Button>
+                                                            </Box>}
+                                                        </MenuList>
+                                                    </ClickAwayListener>
+                                                </Paper>
+                                            </Grow>)}
+                                    </Popper>
+                                </Container>
+                            </Box>
                         </div>
-                        <div>
-                            <React.Fragment key={'right'}>
-                                <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
-                                    <Badge badgeContent={1} color="secondary">
-                                        <NotificationsIcon />
-                                    </Badge>
-                                </IconButton>
-                                <SwipeableDrawer
-                                    anchor='right'
-                                    open={Drawerstate['right']}
-                                    onClose={toggleDrawer('right', false)}
-                                    onOpen={toggleDrawer('right', true)}>
-                                    {list('right')}
-                                </SwipeableDrawer>
-                            </React.Fragment>
-                        </div>
-                    </Toolbar>
-                </AppBar>
-                <Drawer variant="permanent"
-                    classes={{ paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose), }} open={open}>
-                    <div className={classes.toolbarIcon}>
-                        <Typography component="h2" variant="h6" gutterBottom style={{ width: '80%', marginLeft: '10px' }}>
-                            {username}
-                        </Typography>
-                        <IconButton onClick={handleDrawerClose} style={{ width: '20%' }}>
-                            <ChevronLeftIcon />
-                        </IconButton>
                     </div>
-                    <Divider />
-                    <List>
-                        <div>
-                            <Link style={{ textDecoration: 'none', color: 'black' }} to="/profile">
+                    <div>
+                        <React.Fragment key={'right'}>
+                            <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
+                                <Badge badgeContent={notifications.length} color="secondary">
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                            <SwipeableDrawer
+                                anchor='right'
+                                open={Drawerstate['right']}
+                                onClose={toggleDrawer('right', false)}
+                                onOpen={toggleDrawer('right', true)}>
+                                {list('right')}
+                            </SwipeableDrawer>
+                        </React.Fragment>
+                    </div>
+                </Toolbar>
+            </AppBar>
+            <Drawer variant="permanent"
+                classes={{ paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose), }} open={open}>
+                <div className={classes.toolbarIcon}>
+                    <Typography component="h2" variant="h6" gutterBottom style={{ width: '80%', marginLeft: '10px' }}>
+                        {username}
+                    </Typography>
+                    <IconButton onClick={handleDrawerClose} style={{ width: '20%' }}>
+                        <ChevronLeftIcon />
+                    </IconButton>
+                </div>
+                <Divider />
+                <List>
+                    <div>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to="/profile">
+                            <ListItem button>
+                                <ListItemIcon>
+                                    <AccountCircleIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Profile" />
+                            </ListItem>
+                        </Link>
+                        <Link style={{ textDecoration: 'none', color: 'black' }} to={isDoctor ? "/DoctorCalendar" : "/Calendar"}>
+                            <ListItem button onClick={ToCalendar}>
+                                <ListItemIcon>
+                                    <EventIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Calendar" />
+                            </ListItem>
+                        </Link>
+                        {!isDoctor &&
+                            <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
                                 <ListItem button>
                                     <ListItemIcon>
-                                        <AccountCircleIcon />
+                                        <BookmarksIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="Profile" />
+                                    <ListItemText primary="Saved accounts" />
                                 </ListItem>
                             </Link>
-                            <Link style={{ textDecoration: 'none', color: 'black' }} to={isDoctor ? "/DoctorCalendar" : "/Calendar"}>
-                                <ListItem button onClick={ToCalendar}>
-                                    <ListItemIcon>
-                                        <EventIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Calendar" />
-                                </ListItem>
-                            </Link>
-                            {!isDoctor &&
-                                <Link style={{ textDecoration: 'none', color: 'black' }} to="/SavedAccounts">
-                                    <ListItem button>
-                                        <ListItemIcon>
-                                            <BookmarksIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Saved accounts" />
-                                    </ListItem>
-                                </Link>
-                            }
-                        </div>
-                    </List>
-                    <List>
-                        <div className={open ? classes.bottomPushOpen : classes.bottomPushClose}>
-                            <Divider />
-                            <ListItem button onClick={handleClickSignoutOpen}>
-                                <ListItemIcon>
-                                    <ExitToAppIcon />
-                                </ListItemIcon>
-                                {open && <ListItemText primary="Sign out" />}
-                            </ListItem>
-                            <Dialog fullWidth open={SignoutOpen} TransitionComponent={Transition} keepMounted onClose={handleSignoutClose}>
-                                <DialogTitle>{"Sign out"}</DialogTitle>
-                                <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
-                                        Cancel
+                        }
+                    </div>
+                </List>
+                <List>
+                    <div className={open ? classes.bottomPushOpen : classes.bottomPushClose}>
+                        <Divider />
+                        <ListItem button onClick={handleClickSignoutOpen}>
+                            <ListItemIcon>
+                                <ExitToAppIcon />
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Sign out" />}
+                        </ListItem>
+                        <Dialog fullWidth open={SignoutOpen} TransitionComponent={Transition} keepMounted onClose={handleSignoutClose}>
+                            <DialogTitle>{"Sign out"}</DialogTitle>
+                            <DialogContent><DialogContentText>Are you sure you want to sign out ?</DialogContentText></DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleSignoutClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                    Cancel
                                 </Button>
-                                    <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                <Button onClick={handleSignOut} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
+                                    Confirm
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        <ListItem button onClick={handleDelAccountOpen}>
+                            <ListItemIcon>
+                                <DeleteIcon />
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Delete Account" />}
+                        </ListItem>
+                        <Dialog fullWidth open={DelAccountOpen} TransitionComponent={Transition} keepMounted onClose={handleDelAccountClose}>
+                            <DialogTitle>{"Delete Account"}</DialogTitle>
+                            <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
+                                    Cancel
+                                </Button>
+                                <Link style={{ textDecoration: 'none' }} to="/">
+                                    <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm
-                                </Button>
-                                </DialogActions>
-                            </Dialog>
-                            <ListItem button onClick={handleDelAccountOpen}>
-                                <ListItemIcon>
-                                    <DeleteIcon />
-                                </ListItemIcon>
-                                {open && <ListItemText primary="Delete Account" />}
-                            </ListItem>
-                            <Dialog fullWidth open={DelAccountOpen} TransitionComponent={Transition} keepMounted onClose={handleDelAccountClose}>
-                                <DialogTitle>{"Delete Account"}</DialogTitle>
-                                <DialogContent><DialogContentText>Are you sure you want to delete your account ?</DialogContentText></DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleDelAccountClose} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginBottom: '0.5em' }}>
-                                        Cancel
-                                </Button>
-                                    <Link style={{ textDecoration: 'none' }} to="/">
-                                        <Button onClick={handeDeleteAccount} style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
-                                            Confirm
                                     </Button>
-                                    </Link>
-                                </DialogActions>
-                            </Dialog>
-                        </div>
-                    </List>
-                </Drawer>
-                <main className={classes.content}>
-                    <div className={classes.appBarSpacer} />
-                    <SearchFiltersFragment proPictures={proPictures} anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
-                    <Container maxWidth="lg" className={classes.container}>
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px' }}>
-                                    <React.Fragment>
-                                        <Box display="flex" alignItems="center" justifyContent="space-between">
-                                            <Box flex={1}>
-                                                <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
-                                                    {title}
-                                                </Typography>
-                                            </Box>
-                                            <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end" paddingRight="4em">
-                                                {title === "Search Results" && <Pagination
-                                                    page={searchPage}
-                                                    pageCount={searchPageCount}
-                                                    onBackwardFirstPage={() => setAllSearchParams({ ...allSearchParams, page: 1 })}
-                                                    onBackwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage - 1 })}
-                                                    onForwardLastPage={() => setAllSearchParams({ ...allSearchParams, page: searchPageCount })}
-                                                    onForwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage + 1 })} />}
-                                            </Box>
+                                </Link>
+                            </DialogActions>
+                        </Dialog>
+                    </div>
+                </List>
+            </Drawer>
+            <main className={classes.content}>
+                <div className={classes.appBarSpacer} />
+                <SearchFiltersFragment proPictures={proPictures} anchorEl={filterAnchorRef} setOnFilters={(value) => { setAllSearchParams(value); }} open={openFilters} setOpen={(value) => setOpenFilters(value)} />
+                <Container maxWidth="lg" className={classes.container}>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px' }}>
+                                <React.Fragment>
+                                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                                        <Box flex={1}>
+                                            <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
+                                                {title}
+                                            </Typography>
                                         </Box>
-                                        <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
-                                            <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
-                                                {cards.map((card, index) => (
-                                                    <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
-                                                        <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
-                                                            <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
-                                                                <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                    <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
-                                                                    <CardContent className={classes.cardContent}>
-                                                                        <Typography gutterBottom variant="h5" component="h2">
-                                                                            {card.user.username}
-                                                                        </Typography>
-                                                                        <Typography>
-                                                                            {specializationMap(card.filed_of_specialization)}
-                                                                        </Typography>
-                                                                        <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
-                                                                            <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                                <StarRating val={card.rate_avg} />
-                                                                                <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
-                                                                                <Typography style={{ color: 'inherit' }}>{rateCount[card.user.id]}</Typography>
-                                                                            </Paper>
-                                                                        </Box>
-                                                                    </CardContent>
-                                                                </Grid>
-                                                            </Card>
-                                                        </Button>
-                                                    </Grid>
-                                                ))}
-                                            </Grid>
-                                        </Container>
-                                    </React.Fragment>
-                                </div>
-                            </Grid>
+                                        <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end" paddingRight="4em">
+                                            {title === "Search Results" && <Pagination
+                                                page={searchPage}
+                                                pageCount={searchPageCount}
+                                                onBackwardFirstPage={() => setAllSearchParams({ ...allSearchParams, page: 1 })}
+                                                onBackwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage - 1 })}
+                                                onForwardLastPage={() => setAllSearchParams({ ...allSearchParams, page: searchPageCount })}
+                                                onForwardPage={() => setAllSearchParams({ ...allSearchParams, page: searchPage + 1 })} />}
+                                        </Box>
+                                    </Box>
+                                    <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
+                                        <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
+                                            {cards.map((card, index) => (
+                                                <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
+                                                    <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                            <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
+                                                                <CardContent className={classes.cardContent}>
+                                                                    <Typography gutterBottom variant="h5" component="h2">
+                                                                        {card.user.username}
+                                                                    </Typography>
+                                                                    <Typography>
+                                                                        {specializationMap(card.filed_of_specialization)}
+                                                                    </Typography>
+                                                                    <Box display="flex" flexDirection="row" style={{ marginTop: "0.5em", color: 'inherit' }} alignItems="center" justifyContent="flex-start">
+                                                                        <Paper elevation={0} style={{ backgroundColor: "inherit", display: 'flex', flexDirection: 'row', color: 'inherit' }}>
+                                                                            <StarRating val={card.rate_avg} />
+                                                                            <VisibilityIcon style={{ color: "inherit", marginLeft: '0.5em', marginRight: '0.2em' }} />
+                                                                            <Typography style={{ color: 'inherit' }}>{rateCount[card.user.id]}</Typography>
+                                                                        </Paper>
+                                                                    </Box>
+                                                                </CardContent>
+                                                            </Grid>
+                                                        </Card>
+                                                    </Button>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    </Container>
+                                </React.Fragment>
+                            </div>
                         </Grid>
-                    </Container>
-                </main>
-            </div>
-        </ThemeProvider>
+                    </Grid>
+                </Container>
+            </main>
+        </div>
     );
 }
 
