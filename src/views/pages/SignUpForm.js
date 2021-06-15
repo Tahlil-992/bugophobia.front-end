@@ -185,9 +185,37 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   }
 
   const handleSubmit = () => {
-    setOpenSnackBar(false);
-    setIsLoading(true);
-    setOnSubmit(true);
+    if (!isdoctor)
+    {
+      if (email === "" || username === "" || password === "" || configPass === "")
+      {
+        setOpenSnackBar(true);
+        setMessage("Please fill all the fields!");
+        setIsLoading(false);        
+      }
+      else
+      {
+        setOpenSnackBar(false);
+        setIsLoading(true);
+        setOnSubmit(true);        
+      }
+    }
+    else
+    {
+      if (email === "" || username === "" || password === "" || configPass === "" || FirstName === "" || LastName === ""
+        || gmcNum === "" || Specialization === "")
+      {
+        setOpenSnackBar(true);
+        setMessage("Please fill all the fields!");
+        setIsLoading(false);        
+      }
+      else
+      {
+        setOpenSnackBar(false);
+        setIsLoading(true);
+        setOnSubmit(true);        
+      }      
+    }
   }
 
   const handleClose = () => {
