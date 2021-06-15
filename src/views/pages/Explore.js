@@ -680,11 +680,12 @@ function Explore({ signOut }) {
             onClick={toggleDrawer(anchor, false)}
             onKeyDown={toggleDrawer(anchor, false)}>
             <List style={{ width: '100%', minHeight: '100vh' }}>
+                
                 {notifications.map((notif, index) => (
                     <ListItem>
                         <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
                             <CardContent>
-                                <font style={{ color: 'red', fontSize: 18 }}>{notif.str1 + " "}</font>
+                                <font style={{ color: 'rgba(61,132,184,1)', fontSize: 18 }}>{notif.str1 + " "}</font>
                                 <font style={{ color: 'black', fontSize: 15 }}>{notif.str2}</font>
                             </CardContent>
                             <Box display="flex" flexDirection="row-reverse">
