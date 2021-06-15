@@ -680,7 +680,6 @@ function Explore({ signOut }) {
             onClick={toggleDrawer(anchor, false)}
             onKeyDown={toggleDrawer(anchor, false)}>
             <List style={{ width: '100%', minHeight: '100vh' }}>
-                
                 {notifications.map((notif, index) => (
                     <ListItem>
                         <Card style={{ minWidth: '100%', backgroundColor: '#e7e7e7' }}>
