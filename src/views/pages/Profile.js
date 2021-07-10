@@ -775,7 +775,7 @@ export default function Profile() {
     }
     let history = useHistory();
     return (
-        <div style={{ backgroundColor: '#8ab6d6', padding: '0rem' }}>
+        <div style={{minWidth: window.innerWidth<500 && calendarMode ? '50rem' : "", backgroundColor: '#8ab6d6', padding: '0rem' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Button onClick={() => history.goBack()} style={{ color: 'white' }}><ArrowBackIcon /></Button>
@@ -812,7 +812,7 @@ export default function Profile() {
             </div>
             </Container>
             :
-            <Container maxWidth="lg" className={classes.container}>
+            <Container className={classes.container}>
                 <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', minHeight: 'inherit' }}>
                     <Grid container className={classes.grid} direction="row" spacing={0} alignItems="flex-start" justify="space-around" margin="1rem">
                         <Grid item md={4} xs style={{/*maxWidth: "40vmax"*/ }} >
@@ -908,7 +908,7 @@ export default function Profile() {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs container direction="column" style={{ marginTop: '2em', marginRight: '2em' }}>
+                        <Grid item xs container direction="column" style={{ marginTop: '2em', marginRight: window.innerWidth<500 ? '0em' : '2em' }}>
                             <Grid item style={{ width: "inherit" }}>
                                 {isDoctor ?
                                     <Tabs

@@ -35,7 +35,7 @@ const CommentFragment = ({ comments, reload, show, page, pageCount, count, setMe
                     <Box key={"Box-comment-" + comment.id}>
                     <Card 
                         key={"card-" + comment.id} 
-                        style={{wordBreak: "break-word", minWidth: "95%", maxWidth: "95%" , marginRight: "1em", marginLeft: "1em", borderRadius: (index === 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
+                        style={{wordBreak: "break-word", minWidth: window.innerWidth<500 ? "100%" : "95%", maxWidth: window.innerWidth<500 ? "100%" : "95%" , marginRight: window.innerWidth<500 ? "0em" : "1em", marginLeft: window.innerWidth<500 ? "0em" : "1em", borderRadius: (index === 0 ? (comments.length === 1 ? "7px" : "7px 7px 0 0") :
                         (index === comments.length - 1 ? "0 0 7px 7px" : "0")) }}
                         >
                         <>

@@ -427,7 +427,7 @@ function DoctorCalendarPage({ isRemembered }) {
     }, [a]);
 
     return (
-        <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
+        <div style={{ minWidth:'50rem', backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -471,7 +471,7 @@ function DoctorCalendarPage({ isRemembered }) {
                                         ))}
                                     </Select>
                                 </FormControl>
-                                <Calendar style={{ minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`, }}
+                                <Calendar style={{ minHeight: '79.5vh', fontFamily: `'Josefin Sans', sans-serif`, }}
                                     localizer={localizer}
                                     titleAccessor={handleTitleAccessor}
                                     view={view}

@@ -70,8 +70,8 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(1),
     },
     cardMedia: {
-        height: '15vh',
-        width: '15vh',
+        height: window.innerWidth < 500 ? '10vh' : '15vh',
+        width: window.innerWidth < 500 ? '10vh' : '15vh',
         marginLeft: '0.5em',
         justifyContent: 'center',
         alignItems: 'center',
@@ -88,6 +88,12 @@ const useStyles = makeStyles((theme) => ({
     gridList: {
         flexWrap: 'nowrap',
         transform: 'translateZ(0)',
+    },
+    paper: {
+        padding: window.innerWidth < 500 ? theme.spacing(1) : theme.spacing(2),
+        display: 'flex',
+        overflow: 'auto',
+        flexDirection: 'column',
     },
 }));
 export default function SavedAccounts() {
@@ -187,16 +193,18 @@ export default function SavedAccounts() {
             <Container maxWidth="lg" className={classes.container}>
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
-                        <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em' }}>
+                        <div className={classes.paper} style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px' }}>
                             <React.Fragment>
-                                <Container style={{ backgroundColor: '#E0E0E0', minHeight: '43em' }} className={classes.cardGrid}>
-                                    <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
+                                <Container style={{ backgroundColor: '#E0E0E0', minHeight: '50em' }} className={classes.cardGrid}>
+                                    <Grid container style={{ background: '#E0E0E0', marginTop:'1em' }} spacing={4}>
                                         {SavedAccounts.map((card, index) => (
                                             <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
                                                 <Button style={{ textTransform: 'none' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.doctor.user.username)} size="small" color="primary">
-                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', width: '320px' }}>
+                                                    <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', height: '100%', maxWidth: '75vw' }}>
                                                         <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                            <Avatar className={classes.cardMedia} src={proPictures[index]} />
+                                                            <Grid container alignItems="center">
+                                                                <Avatar className={classes.cardMedia} src={proPictures[index]} />
+                                                            </Grid>
                                                             <CardContent className={classes.cardContent}>
                                                                 <Typography gutterBottom variant="h5" component="h2">
                                                                     {card.doctor.user.username}

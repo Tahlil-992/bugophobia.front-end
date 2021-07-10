@@ -223,7 +223,7 @@ const useStyles = makeStyles((theme) => ({
     },
     button: {
         backgroundColor: '#40bad5',
-        padding: '1em 6.3em 1em 6.3em',
+        padding: window.innerWidth ? '1em 3.39em 1em 3.39em' : '1em 6.3em 1em 6.3em',
         margin: '1em 0em 0em 0em',
         textAlign: 'center',
         borderRadius: '5px',
@@ -851,7 +851,7 @@ export default function Profile() {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs container direction="column" style={{ marginTop: '2em', marginRight: '2em' }} >
+                        <Grid item xs container direction="column" style={{ marginTop: '2em', marginRight: window.innerWidth<500 ? '0em' : '2em' }} >
                             <Grid item style={{ width: "inherit" }}>
                                 {isViewedDoctor ?
                                     <Tabs
@@ -927,7 +927,7 @@ export default function Profile() {
                                         re={re}                                     setRe={setRe}
                                         />
                                 </TabPanel>
-                                <TabPanel value={tabValue} index={2}>
+                                <TabPanel style={{padding: window.innerWidth<500 ? "0em" : ""}} value={tabValue} index={2}>
                                     <Box display="flex" flex={1} position="relative">
                                         <CommentSection username={viewedUsername} />
                                     </Box>

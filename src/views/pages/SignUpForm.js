@@ -185,36 +185,30 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
   }
 
   const handleSubmit = () => {
-    if (!isdoctor)
-    {
-      if (email === "" || username === "" || password === "" || configPass === "")
-      {
+    if (!isdoctor) {
+      if (email === "" || username === "" || password === "" || configPass === "") {
         setOpenSnackBar(true);
         setMessage("Please fill all the fields!");
-        setIsLoading(false);        
+        setIsLoading(false);
       }
-      else
-      {
+      else {
         setOpenSnackBar(false);
         setIsLoading(true);
-        setOnSubmit(true);        
+        setOnSubmit(true);
       }
     }
-    else
-    {
+    else {
       if (email === "" || username === "" || password === "" || configPass === "" || FirstName === "" || LastName === ""
-        || gmcNum === "" || Specialization === "")
-      {
+        || gmcNum === "" || Specialization === "") {
         setOpenSnackBar(true);
         setMessage("Please fill all the fields!");
-        setIsLoading(false);        
+        setIsLoading(false);
       }
-      else
-      {
+      else {
         setOpenSnackBar(false);
         setIsLoading(true);
-        setOnSubmit(true);        
-      }      
+        setOnSubmit(true);
+      }
     }
   }
 
@@ -345,9 +339,9 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
           {!isdoctor && <Typography variant="h6" color="inherit" noWrap>Patient SignUp Page</Typography>}
         </Toolbar>
       </AppBar>
-      <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
-        <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
-        <Grid item style={{ position:'relative', width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
+      <Grid container component="main" className={classes.root} style={{ paddingTop: window.innerWidth<500 ? "15%" : '2.6%', paddingBottom: window.innerWidth<500 ? "0%" : "2.6%", paddingRight: window.innerWidth<500 ? '5%' : '22.5%', paddingLeft: window.innerWidth<500 ? '5%' : '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
+        {window.innerWidth >= 500 && <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />}
+        <Grid item style={{ position:'relative', width: window.innerWidth<500 ? "100%" : "50%" , borderTopRightRadius: '20px', borderBottomRightRadius: '20px', borderTopLeftRadius: window.innerWidth<500 ? '20px' : '0px', borderBottomLeftRadius: window.innerWidth<500 ? '20px' : '0px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
           <div className={classes.paper} class="vertical_center_element">
             <Grid container spacing={2} >
               {isdoctor &&
@@ -508,13 +502,13 @@ const SignUp = ({ isdoctor, setIsDoctor }) => {
               {isLoading && <LoadingSpinner />}
             </Grid>
             <Grid>
-              {!isdoctor && <Link class="link" onClick={changeToDoctor} style={{fontFamily: `'Josefin Sans', sans-serif`}}>Are you a doctor? Sign up as a doctor</Link>}
+              {!isdoctor && <Link class="link" onClick={changeToDoctor} style={{ fontFamily: `'Josefin Sans', sans-serif` }}>Are you a doctor? Sign up as a doctor</Link>}
             </Grid>
             <Grid>
-              {isdoctor && <Link class="link" onClick={changeToPatient} style={{fontFamily: `'Josefin Sans', sans-serif`}}>Are you a patient? Sign up as a patient</Link>}
+              {isdoctor && <Link class="link" onClick={changeToPatient} style={{ fontFamily: `'Josefin Sans', sans-serif` }}>Are you a patient? Sign up as a patient</Link>}
             </Grid>
             <Grid>
-              <Link class="link" to="/login" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Already have an account? Log in</Link>
+              <Link class="link" to="/login" style={{ fontFamily: `'Josefin Sans', sans-serif` }}>Already have an account? Log in</Link>
             </Grid>
           </div>
         </Grid>

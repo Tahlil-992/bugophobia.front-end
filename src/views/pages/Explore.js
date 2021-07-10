@@ -229,7 +229,7 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('sm')]: {
             width: collapsedSearchWidth,
             '&:focus': {
-                width: expandedSearchWidth,
+                width: window.innerWidth<500 ? "" : expandedSearchWidth,
             },
         },
     },
@@ -266,7 +266,7 @@ const useStyles = makeStyles((theme) => ({
         paddingTop: theme.spacing(4),
     },
     paper: {
-        padding: theme.spacing(2),
+        padding: window.innerWidth < 500 ? theme.spacing(1) : theme.spacing(2),
         display: 'flex',
         overflow: 'auto',
         flexDirection: 'column',
@@ -320,8 +320,8 @@ const useStyles = makeStyles((theme) => ({
 
     },
     cardMedia: {
-        height: '15vh',
-        width: '15vh',
+        height: window.innerWidth < 500 ? '10vh' : '15vh',
+        width: window.innerWidth < 500 ? '10vh' : '15vh',
         marginLeft: '0.5em',
         justifyContent: 'center',
         alignItems: 'center',
@@ -361,7 +361,7 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateZ(0)',
     },
     list: {
-        width: 350,
+        width: window.innerWidth<500 ? 250 : 350,
     },
     fullList: {
         width: 'auto',
@@ -376,7 +376,7 @@ const useStyles = makeStyles((theme) => ({
     bottomPushOpen: {
         position: "fixed",
         width: drawerWidth,
-        bottom: 0,
+        bottom: window.innerWidth<500 ? '5em' : 0,
         textAlign: "center",
         paddingBottom: 10,
     },
@@ -616,13 +616,13 @@ function Explore({ signOut }) {
 
     const callDeleteNotificationAPI = async (id, index) => {
         try {
-            const response = await deleteNotificationAPI({id: id}, isRemembered);
+            const response = await deleteNotificationAPI({ id: id }, isRemembered);
             if (response.status === 204) {
                 notifications.splice(index, 1);
-                seta(a+1);
+                seta(a + 1);
             }
         }
-        catch(error) {
+        catch (error) {
             console.error("notification couldn't be deleted!");
         }
     }
@@ -724,7 +724,7 @@ function Explore({ signOut }) {
                             <Box display="flex" flexDirection="row-reverse">
                                 <CardActions>
                                     <Button size="small" onClick={() => ViewProfile2(notif)} style={{ textTransform: 'none', backgroundColor: 'rgba(61,132,184,0.8)', color: 'white' }}>View</Button>
-                                    <Button size="small" onClick={() => {callDeleteNotificationAPI(notif.id, index); }} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
+                                    <Button size="small" onClick={() => { callDeleteNotificationAPI(notif.id, index); }} style={{ textTransform: 'none', backgroundColor: 'rgba(255,0,0,0.5)', color: 'white' }}>Delete</Button>
                                 </CardActions>
                             </Box>
                         </Card>
@@ -788,7 +788,7 @@ function Explore({ signOut }) {
             <CssBaseline />
             <AppBar ref={filterAnchorRef} position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
                 <Toolbar className={classes.toolbar}>
-                    <IconButton
+                    <IconButton style={{display: showLimitedMenu ? "none" : ""}}
                         edge="start"
                         color="inherit"
                         aria-label="open drawer"
@@ -896,9 +896,9 @@ function Explore({ signOut }) {
                     </div>
                     <div>
                         <React.Fragment key={'right'}>
-                            <IconButton color="inherit" onClick={toggleDrawer('right', true)}>
+                            <IconButton color="inherit" onClick={toggleDrawer('right', true)} style={{display: showLimitedMenu ? "none" : ""}}>
                                 <Badge badgeContent={notifications.length} color="secondary">
-                                    <NotificationsIcon />
+                                    <NotificationsIcon/>
                                 </Badge>
                             </IconButton>
                             <SwipeableDrawer
@@ -912,7 +912,7 @@ function Explore({ signOut }) {
                     </div>
                 </Toolbar>
             </AppBar>
-            <Drawer variant="permanent"
+            <Drawer variant="permanent" style={{ display: !open && window.innerWidth < 500 ? "none" : "" }}
                 classes={{ paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose), }} open={open}>
                 <div className={classes.toolbarIcon}>
                     <Typography component="h2" variant="h6" gutterBottom style={{ width: '80%', marginLeft: '10px' }}>
@@ -1007,7 +1007,7 @@ function Explore({ signOut }) {
                                 <React.Fragment>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
                                         <Box flex={1}>
-                                            <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' }} gutterBottom>
+                                            <Typography component="h2" variant="h6" color="primary" style={{ marginLeft: '1.5em' , width: '10em'}}>
                                                 {title}
                                             </Typography>
                                         </Box>
@@ -1022,13 +1022,15 @@ function Explore({ signOut }) {
                                         </Box>
                                     </Box>
                                     <Container style={{ backgroundColor: '#E0E0E0', minHeight: '41.9em' }} className={classes.cardGrid}>
-                                        <Grid container style={{ background: '#E0E0E0' }} spacing={4}>
+                                        <Grid container alignItems="center" style={{ background: '#E0E0E0' }} spacing={4}>
                                             {cards.map((card, index) => (
                                                 <Grid item key={`card-${index}`} xs={12} sm={6} md={4} style={{ backgroundColor: '#E0E0E0', }}>
-                                                    <Button style={{ textTransform: 'none', padding:'0px', borderRadius: '10px', color:'rgba(0,0,0,0)' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
-                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px' }}>
+                                                    <Button style={{ textTransform: 'none', padding: '0px', borderRadius: '10px', color: 'rgba(0,0,0,0)' }} component={Link} to="/view-profile" onClick={() => ViewProfile(card.user.username)} size="small" color="primary">
+                                                        <Card className={classes.card} style={{ justifyContent: 'center', alignItems: 'center', borderRadius: '10px', maxWidth: '75vw' }}>
                                                             <Grid style={{ display: 'flex', flexDirection: 'row', color: 'inherit' }}>
-                                                                <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
+                                                                <Grid container justify="center" alignItems="center">
+                                                                    <Avatar className={classes.cardMedia} src={proPictures[card.user.id]} alt={DoctorImage} />
+                                                                </Grid>
                                                                 <CardContent className={classes.cardContent}>
                                                                     <Typography gutterBottom variant="h5" component="h2">
                                                                         {card.user.username}

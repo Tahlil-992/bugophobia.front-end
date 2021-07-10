@@ -28,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
     button: {
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
-        padding: '1em 4em 1em 4em',
+        padding: window.innerWidth<500 ? '1em 3em 1em 3em' : '1em 4em 1em 4em',
+        width:'100%',
         margin: '1em 0em 0em 0em',
         textAlign: 'center',
         fontSize: '0.9em',
@@ -50,9 +51,10 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     textfieldleft: {
-        width: '45%',
+        width: window.innerWidth<500 ? '94%' : '45%',
         marginLeft: "3%",
-        marginRight: '2%',
+        marginRight: window.innerWidth<500 ? '3%' : '2%',
+        marginBottom: window.innerWidth<500 ? '1.7em' : "",
         transition: 'all 0.15s linear',
         '&:hover': {
             backgroundColor: "#f9f9f9",
@@ -60,8 +62,8 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     textfieldright: {
-        width: '45%',
-        marginLeft: "2%",
+        width: window.innerWidth<500 ? '94%' : '45%',
+        marginLeft: window.innerWidth<500 ? "3%" : "2%",
         marginRight: '3%',
         transition: 'all 0.15s linear',
         '&:hover': {

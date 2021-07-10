@@ -37,8 +37,25 @@ const callGetOfficeAPI = async (doctorid, isRemembered) => {
     catch (e) {
         throw e;
     }
-} 
-
+}
+const getNotificationAPI = ({ patient }, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "GET", url: `/schedule/get-notification/${patient}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+const deleteNotificationAPI = ({ id }, isRemembered) => {
+    try {
+        const response = callAPIHandler({ method: "DELETE", url: `/schedule/delete-notification/${id}/` }, true, isRemembered);
+        return response;
+    }
+    catch (e) {
+        throw e;
+    }
+}
 const locales = {
     'en-US': require('date-fns/locale/en-US'),
 }
@@ -130,7 +147,7 @@ const useStyles = makeStyles((theme) => ({
     },
     button2: {
         backgroundColor: '#40bad5',
-        padding: '2em 4em 2em 4em',
+        padding: window.innerWidth < 500 ? '2em 2.8em 2em 2.8em' : '2em 4em 2em 4em',
         margin: '1em 0em 1em 0em',
         textAlign: 'center',
         borderRadius: '5px',
@@ -173,7 +190,7 @@ export default function OfficesView(props) {
     const [re, setRe] = [props.re, props.setRe];
 
     const classes = useStyles();
-    
+
     const [a, seta] = useState(0);
     const [redirected, setRedirected] = useState(0);
     const bottomRef = useRef();
@@ -211,7 +228,7 @@ export default function OfficesView(props) {
 
     const callUnreserve = async (event) => {
         try {
-            const response = await callUnreserveAPI({id: event.id}, isRemembered);
+            const response = await callUnreserveAPI({ id: event.id }, isRemembered);
             if (response.status === 200) {
                 const payload = response.payload;
                 event.id = payload.id;
@@ -393,10 +410,20 @@ export default function OfficesView(props) {
     }
     const callRemoveReserve = (id) => {
         try {
-            
+
         }
         catch (error) {
 
+        }
+    }
+
+    const callProfileAPI = async (isRemembered) => {
+        try {
+            const response = callAPIHandler({ method: "GET", url: `/profile/patient/` }, true, isRemembered);
+            return response;
+        }
+        catch (e) {
+            throw e;
         }
     }
 
@@ -575,7 +602,7 @@ export default function OfficesView(props) {
         if (redirected === 1 && sessionStorage.getItem("viewedOffice") && officeIndex >= 0) {
             setRedirected(2);
             const md = getDateElements(sessionStorage.getItem("viewedEventDate"));
-            const myDate = new Date(md.year, md.month-1, md.day, md.hour, md.minute);
+            const myDate = new Date(md.year, md.month - 1, md.day, md.hour, md.minute);
             handleOnRangeChange([myDate]);
             handleOnView('day');
             handleOnNavigate(myDate);
@@ -585,7 +612,7 @@ export default function OfficesView(props) {
             setRedirected(3);
             setRe(false);
             const md = getDateElements(sessionStorage.getItem("viewedEventDate"));
-            const myDate = new Date(md.year, md.month-1, md.day, md.hour, md.minute);
+            const myDate = new Date(md.year, md.month - 1, md.day, md.hour, md.minute);
             bottomRef.current.scrollIntoView({
                 behavior: "smooth",
                 block: blockMaker(myDate),
@@ -642,6 +669,48 @@ export default function OfficesView(props) {
     const Transition = React.forwardRef(function Transition(props, ref) {
         return <Slide direction="up" ref={ref} {...props} />;
     });
+    const [notifications, setnotifications] = useState([]);
+    const callgetNotificationAPI = async (patient) => {
+        try {
+            const response = await getNotificationAPI({ patient }, isRemembered);
+            if (response.status === 200) {
+                setnotifications(response.payload);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+        seta(a + 1);
+    }
+    const callDeleteNotificationAPI = async (id, index) => {
+        try {
+            const response = await deleteNotificationAPI({ id: id }, isRemembered);
+            if (response.status === 204) {
+                notifications.splice(index, 1);
+                seta(a + 1);
+            }
+        }
+        catch (error) {
+            console.error("notification couldn't be deleted!");
+        }
+    }
+    const callGetAPI = async () => {
+        try {
+            const response = await callProfileAPI(isRemembered);
+            if (response.status === 200) {
+                let payload = response.payload;
+                callgetNotificationAPI(payload.user.id);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    useEffect(() => {
+        callGetAPI();
+    }, [])
+
+    const [smallscreen, setsmallscreen] = useState(window.innerWidth < 500);
 
     return (officeIndex === -1 ?
         <>
@@ -681,12 +750,14 @@ export default function OfficesView(props) {
                 </Grid>
                 {calendarMode ?
                     <Grid item>
-                        <IconButton
-                            onClick={() => setFullscreenMode(!fullscreenMode)}
-                            className={classes.backicon}
-                        >
-                            {fullscreenMode ? <FullscreenExitIcon /> : <FullscreenIcon />}
-                        </IconButton>
+                        {window.innerWidth >= 500 &&
+                            <IconButton
+                                onClick={() => setFullscreenMode(!fullscreenMode)}
+                                className={classes.backicon}
+                            >
+                                {fullscreenMode ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                            </IconButton>
+                        }
                     </Grid>
                     :
                     <></>
@@ -751,16 +822,21 @@ export default function OfficesView(props) {
                     <Grid item xs={12} container justify='center'>
                         <Button
                             className={classes.button2}
-                            onClick={() => setCalendarMode(true)}
+                            onClick={() => {
+                                setCalendarMode(true)
+                                if (window.innerWidth < 500)
+                                    setFullscreenMode(true);
+                            }
+                            }
                         >
-                            Take a visit time from this office
+                            {window.innerWidth < 500 ? "Take a visit time" : "Take a visit time from this office"}
                         </Button>
                     </Grid>
                 </Grid>
                 :
                 <>
                     <Grid item xs container justify='center'>
-                        <TextField style={{ width: '100%', marginBottom: '1em', maxWidth: '20em' }}
+                        <TextField style={{ width: '100%', marginBottom: '1em', maxWidth: '20em', minWidth: window.innerWidth<500 ? '18em' : "", marginLeft: window.innerWidth<500 ?'2.8em' : "" }}
                             className={classes.margin}
                             id="input-with-icon-textfield"
                             value={"  " + VisitTimeDuration}
@@ -785,8 +861,8 @@ export default function OfficesView(props) {
                         />
                     </Grid>
                     <Grid item xs={12} className={classes.container} ref={bottomRef}>
-                        <Calendar style={{ minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`, }} 
-                            formats={viewCalendar === 'week' ? formats : {}} 
+                        <Calendar style={{ minWidth: smallscreen && calendarMode ? '50rem' : "", minHeight: '37rem', fontFamily: `'Josefin Sans', sans-serif`}}
+                            formats={viewCalendar === 'week' ? formats : {}}
                             titleAccessor={handleTitleAccessor}
                             localizer={localizer}
                             views={['month', 'week', 'day']}
@@ -855,6 +931,10 @@ export default function OfficesView(props) {
                                         callRemoveReserve(UnreserveConfirmOpen);
                                         handleUnreserveConfirmClose();
                                         callUnreserve(UnreserveEvent);
+                                        notifications.map((notif, index) => {
+                                            if (notif.reservation === UnreserveEvent.id)
+                                                callDeleteNotificationAPI(notif.id, index);
+                                        })
                                     }}
                                         style={{ textTransform: 'none', backgroundColor: 'rgba(42,172,61,0.7)', color: 'white', paddingLeft: '2em', paddingRight: '2em', marginRight: '1em', marginBottom: '0.5em' }}>
                                         Confirm

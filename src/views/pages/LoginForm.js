@@ -134,23 +134,28 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
             const response = await callLoginAPI({ email, password }, checked);
             setIsLoading(false);
             if (response.status === 200) {
-                setOpenSnackBar(false);
-                const payload = response.payload;
-                login({ accessToken: payload.access, refreshToken: payload.refresh, email: email });
-                setIsDoctor(payload.is_doctor);
-                if (checked) {
-                    rememberMe();
-                    await setLocalStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
-                    await resetSessionStorage();
+                if (response.payload.access) {
+                    setOpenSnackBar(false);
+                    const payload = response.payload;
+                    login({ accessToken: payload.access, refreshToken: payload.refresh, email: email });
+                    setIsDoctor(payload.is_doctor);
+                    if (checked) {
+                        rememberMe();
+                        await setLocalStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
+                        await resetSessionStorage();
+                    }
+                    else {
+                        await setSessionStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
+                        await resetLocalStorage();
+                    }
+                    await localStorage.setItem("in", "true");
+                    history.replace("/")
                 }
                 else {
-                    await setSessionStorage({ accessToken: payload.access, refreshToken: payload.refresh, email: email, isdoctor: payload.is_doctor ? "true" : "false" });
-                    await resetLocalStorage();
+                    setOpenSnackBar(true);
+                    setMessage("Sorry! We haven't accept your sign up request yet.");
                 }
-                await localStorage.setItem("in", "true");
-                history.replace("/")
             }
-
         }
         catch (error) {
             setIsLoading(false);
@@ -187,9 +192,9 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                     <Typography variant="h6" color="inherit" noWrap>Login Page</Typography>
                 </Toolbar>
             </AppBar>
-            <Grid container component="main" className={classes.root} style={{ paddingTop: '2.6%', paddingBottom: '2.6%', paddingRight: '22.5%', paddingLeft: '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
-                <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />
-                <Grid item style={{ position:'relative', width: '50%', borderTopRightRadius: '20px', borderBottomRightRadius: '20px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
+            <Grid container component="main" className={classes.root} style={{ paddingTop: window.innerWidth < 500 ? "15%" : '2.6%', paddingBottom: window.innerWidth < 500 ? "0%" : "2.6%", paddingRight: window.innerWidth < 500 ? '5%' : '22.5%', paddingLeft: window.innerWidth < 500 ? '5%' : '22.5%', height: '43.125em', backgroundColor: '#8ab6d6' }}>
+                {window.innerWidth >= 500 && <Grid item style={{ width: '50%', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px', backgroundImage: `url(${images[index]})` }} className={classes.image} />}
+                <Grid item style={{ position: 'relative', width: window.innerWidth < 500 ? "100%" : "50%", borderTopRightRadius: '20px', borderBottomRightRadius: '20px', borderTopLeftRadius: window.innerWidth < 500 ? '20px' : '0px', borderBottomLeftRadius: window.innerWidth < 500 ? '20px' : '0px', backgroundColor: '#E0E0E0' }} component={Paper} elevation={6} square>
                     <div className={classes.paper} class="vertical_center_element">
                         <Grid container spacing={2} style={{ padding: '0.7em' }}>
                             <Grid item xs={12}>
@@ -250,10 +255,10 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                             {isLoading && <LoadingSpinner />}
                         </Grid>
                         <Grid>
-                            <Link class="link" to="/forget-password" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Forget password?</Link>
+                            <Link class="link" to="/forget-password" style={{ fontFamily: `'Josefin Sans', sans-serif` }}>Forget password?</Link>
                         </Grid>
                         <Grid>
-                            <Link class="link" to="/sign-up" style={{fontFamily: `'Josefin Sans', sans-serif`}}>Don't have an account? Sign Up</Link>
+                            <Link class="link" to="/sign-up" style={{ fontFamily: `'Josefin Sans', sans-serif` }}>Don't have an account? Sign Up</Link>
                         </Grid>
                         <Snackbar
                             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -271,6 +276,7 @@ function LogIn({ isdoctor, login, rememberMe, setIsDoctor }) {
                             onClose={handleClose}
                             resumeHideDuration={0}>
                         </Snackbar>
+                        {window.innerWidth < 500 && <Grid style={{ borderRadius: '20px', backgroundImage: `url(${images[index]})`, width: '15em', height: '15em', marginTop: "1em" }} className={classes.image} />}
                     </div>
                 </Grid>
             </Grid>

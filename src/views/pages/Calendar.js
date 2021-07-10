@@ -288,7 +288,7 @@ function CalendarPage({ isRemembered }) {
     }, []);
     
     return (
-        <div style={{ backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
+        <div style={{minWidth:'50rem', backgroundColor: '#8ab6d6', minHeight: '100vh' }}>
             <AppBar position="relative">
                 <Toolbar style={{ backgroundColor: '#10217d', height: '5vh' }}>
                     <Link to="/"><Button style={{ color: 'white' }}><ArrowBackIcon /></Button></Link>
@@ -299,7 +299,7 @@ function CalendarPage({ isRemembered }) {
                 <Grid container spacing={0}>
                     <Grid item xs={12}>
                         <div style={{ backgroundColor: '#E0E0E0', borderTopLeftRadius: '50px', borderTopRightRadius: '50px', padding: '2em', minHeight: '37.1em',  }}>
-                            <Calendar style={{ minHeight : '37rem', fontFamily: `'Josefin Sans', sans-serif`, }}
+                            <Calendar style={{ minHeight : '79.5vh', fontFamily: `'Josefin Sans', sans-serif`, }}
                                 localizer={localizer}
                                 view={view}
                                 views={[calendar_views.month, calendar_views.week, calendar_views.day, calendar_views.agenda]}

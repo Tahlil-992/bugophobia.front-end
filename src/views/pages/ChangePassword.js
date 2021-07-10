@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     button: {
         backgroundColor: '#40bad5',
         border: '0px solid #10217d',
-        padding: '1em 4em 1em 4em',
+        padding: window.innerWidth<500 ? '1em 2.3em 1em 2.3em' : '1em 4em 1em 4em',
         margin: '1em 0em 1em 0em',
         textAlign: 'center',
         fontSize: '0.9em',
